@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "#D",
+        " B"
+    ],
+    "key": {
+        "#": {
+            "item": "minecraft:red_mushroom"
+        },
+        "D": {
+            "item": "minecraft:dried_kelp_block"
+        },
+        "B": {
+            "item": "minecraft:bowl"
+        }
+    },
+    "result": {
+        "item": "zomboidhealthsystem:sleeping_pills",
+        "count": 1
+    }
+}

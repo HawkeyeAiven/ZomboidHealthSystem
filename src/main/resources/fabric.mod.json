@@ -1,0 +1,35 @@
+{
+	"schemaVersion": 1,
+	"id": "zomboidhealthsystem",
+	"version": "${version}",
+	"name": "Zomboid Health System",
+	"description": "hardcore bro",
+	"authors": [
+		"Aiven"
+	],
+	"contact": {
+		"homepage": "https://modrinth.com/mod/zomboid-health-system"
+	},
+	"license": "MIT",
+	"icon": "assets/zomboidhealthsystem/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"aiven.zomboidhealthsystem.ZomboidHealthSystem"
+		],
+		"client": [
+			"aiven.zomboidhealthsystem.ZomboidHealthSystemClient"
+		]
+	},
+	"mixins": [
+		"zomboidhealthsystemmixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.10",
+		"minecraft": "~1.20.1",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+	}
+}

@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "#B",
+        "P "
+    ],
+    "key": {
+        "#": {
+            "item": "minecraft:potion"
+        },
+        "B": {
+            "item": "minecraft:blaze_powder"
+        },
+        "P": {
+            "item": "minecraft:paper"
+        }
+    },
+    "result": {
+        "item": "zomboidhealthsystem:alcohol_wipe",
+        "count": 1
+    }
+}

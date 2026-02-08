@@ -1,0 +1,23 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "#",
+        "G",
+        "I"
+    ],
+    "key": {
+        "#": {
+            "item": "minecraft:redstone"
+        },
+        "G": {
+            "item": "minecraft:glass_bottle"
+        },
+        "I": {
+            "item": "minecraft:iron_nugget"
+        }
+    },
+    "result": {
+        "item": "zomboidhealthsystem:thermometer",
+        "count": 1
+    }
+}

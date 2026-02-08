@@ -1,0 +1,9 @@
+{
+    "type": "minecraft:smelting",
+    "ingredient": {
+        "item": "minecraft:potion"
+    },
+    "result": "zomboidhealthsystem:purified_water_bottle",
+    "experience": 0,
+    "cookingtime": 200
+}
