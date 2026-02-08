@@ -9,12 +9,14 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.io.IOException;
@@ -89,17 +91,16 @@ public abstract class LivingEntityMixin extends EntityMixin {
 
     @Shadow public abstract ItemStack getMainHandStack();
 
-//    @Inject(at = @At("HEAD"), method = "sleep")
-//    private void sleep(BlockPos pos, CallbackInfo ci){
-//        if(!this.getWorld().isClient && this.isPlayer()){
-//
-//        }
-//    }
+    @Inject(at = @At("HEAD"), method = "sleep")
+    private void sleep(BlockPos pos, CallbackInfo ci){
+        if(!this.getWorld().isClient && this.isPlayer()){
+            ModServer.WEATHER.setSleep(this.getWorld().getTimeOfDay());
+        }
+    }
 
     @Inject(at = @At("HEAD"), method = "addStatusEffect(Lnet/minecraft/entity/effect/StatusEffectInstance;Lnet/minecraft/entity/Entity;)Z")
     private void addStatusEffect(StatusEffectInstance effect, Entity source, CallbackInfoReturnable<Boolean> cir) {
         if(!this.getWorld().isClient && this.isPlayer() && effect.getEffectType().equals(StatusEffects.ABSORPTION)) {
-
             try {
                 Health health = ModServer.getHealth((PlayerEntity) ((Object) this));
                 for(Health.BodyPart bodyPart : health.getBodyParts()) {

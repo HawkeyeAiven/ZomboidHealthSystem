@@ -12,20 +12,15 @@ import net.minecraft.client.MinecraftClient;
 
 @Environment(EnvType.CLIENT)
 public class ZomboidHealthSystemClient implements ClientModInitializer {
-
     @Override
     public void onInitializeClient() {
-
         ServerPackets.initialize();
         ModKeyBindings.initialize();
         ModClientEventCallbacks.initialize();
         ClientTasks.initialize();
-
     }
 
     public static ClientWorldInfo WORLD_INFO = new ClientWorldInfo();
-
     public static ClientHealth HEALTH = new ClientHealth();
-
     public static Hud HUD = new Hud(MinecraftClient.getInstance());
 }
