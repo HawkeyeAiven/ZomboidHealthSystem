@@ -55,13 +55,7 @@ public class Wet extends Moodle {
 
     @Override
     public void setAmount(float amount) {
-        if(amount > MAX_AMOUNT) {
-            this.amount = MAX_AMOUNT;
-        } else if(amount > 0) {
-            this.amount = amount;
-        } else {
-            this.amount = 0;
-        }
+        this.amount = Math.min(Math.max(amount, 0), MAX_AMOUNT);
     }
 
     @Override

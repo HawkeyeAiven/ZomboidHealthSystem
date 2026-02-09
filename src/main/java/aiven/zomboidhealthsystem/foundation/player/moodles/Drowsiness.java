@@ -97,7 +97,7 @@ public class Drowsiness extends Moodle {
     @Override
     public void update() {
         super.update();
-        addTicks(1 * (this.getHealth().getExhaustion().getAmount() + 1) * 1.85F * Config.DROWSINESS_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
+        addTicks(1.0F * 1.85F * Config.DROWSINESS_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
 
         if(caffeine_effect) {
             if(caffeine < max_caffeine) {
@@ -120,7 +120,7 @@ public class Drowsiness extends Moodle {
             max_sleeping_pills = 0;
         }
 
-        getHealth().getExhaustion().addMultiplier((getAmplifier() / 3) + 1);
+        getHealth().getExhaustion().addMultiplier(this, (getAmplifier() / 3) + 1);
 
         if (this.getAmplifier() >= 1) {
             if (random((int) (5 * 60 * 20 / this.getAmplifier()))) {
@@ -131,8 +131,6 @@ public class Drowsiness extends Moodle {
                 if (random((int) (5 * 60 * 20 / (this.getAmplifier() / 2))) && this.getHealth().getPlayer().getMovementSpeed() > 0.1f) {
                     this.getHealth().stumble();
                 }
-
-                getHealth().getExhaustion().addMultiplier(getAmplifier());
 
                 if (this.getAmplifier() >= 3) {
                     this.getHealth().addStatusEffect(StatusEffects.MINING_FATIGUE, (int) (this.getAmplifier() / 2), 15 * 20);

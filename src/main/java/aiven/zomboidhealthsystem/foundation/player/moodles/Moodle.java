@@ -4,9 +4,12 @@ import aiven.zomboidhealthsystem.foundation.player.Health;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.player.PlayerEntity;
 
+import java.util.HashMap;
+
 public abstract class Moodle {
     final Health health;
     protected float amount;
+    protected HashMap<Moodle, Float> multipliers = new HashMap<>();
 
     public Moodle(Health health){
         this.health = health;
@@ -73,6 +76,18 @@ public abstract class Moodle {
 
     public int getEffectAmplifier() {
         return (int) getAmount();
+    }
+
+    public float getMultiplier() {
+        float multiplier = 1.0F;
+        for(float mul : multipliers.values()) {
+            multiplier *= mul;
+        }
+        return multiplier;
+    }
+
+    public void addMultiplier(Moodle from, float multiplier) {
+        multipliers.put(from, multiplier);
     }
 
     protected final boolean isOverWorld() {

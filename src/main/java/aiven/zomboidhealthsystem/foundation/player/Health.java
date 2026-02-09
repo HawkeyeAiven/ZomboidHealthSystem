@@ -162,8 +162,7 @@ public class Health {
             } else return amount;
         }
 
-        public float damage(float amount, float bleeding_chance) {
-
+        public float damage(float amount, DamageSource source) {
             if(getAdditionalHp() > 0) {
                 float d = amount - additionalHp;
                 setAdditionalHp(Math.max(0, additionalHp - amount));
@@ -174,30 +173,14 @@ public class Health {
                 return 0;
             }
 
-            if (amount > this.getHp()) {
-                float d = amount - this.hp;
-                this.setHp(0);
-                this.setBleeding(2.5f);
-                this.getHealth().damagePlayerHp(
-                        Util.getDamageSource(ModDamageTypes.BLEEDING, getHealth().getPlayer().getWorld()),
-                        amount - d
-                );
-                return d;
-            } else {
-                this.hp -= amount;
-                if (bleeding_chance > 0) {
-                    float g = 13 / ((this.getMaxHp() - this.getHp()) * bleeding_chance);
-                    float random = new Random().nextFloat(0, g);
-                    if (random <= 5) {
-                        this.setBleeding((this.getMaxHp() - this.getHp()) / 2.0f);
-                    }
-                }
-                return 0;
+            float d = amount - this.hp;
+            this.hp = Math.max(this.hp - amount, 0);
+            float random = new Random().nextFloat(0, 1);
+            if (random <= getBleedingChance(amount, source)) {
+                this.setBleeding((this.getMaxHp() - this.getHp()) / 1.85F);
             }
-        }
 
-        public float damage(float amount) {
-            return damage(amount, 1.0F);
+            return Math.max(0, d);
         }
 
         protected void update() {
@@ -287,6 +270,27 @@ public class Health {
                 if(this.getHp() >= this.getMaxHp()) {
                     this.addInfection(-UPDATE_FREQUENCY);
                 }
+            }
+        }
+
+        public float getBleedingChance(float damage, DamageSource source) {
+            if(source == null) {
+                return 0;
+            }
+
+            float chance = Config.AVERAGE_BLEEDING_CHANCE.getValue() * damage;
+            chance *= Math.max(1, (this.getMaxHp() - this.getHp()) * 0.75F);
+
+            if((source.isOf(DamageTypes.FALL) || source.isOf(DamageTypes.HOT_FLOOR)) && !getHealth().getPlayer().isCrawling()) {
+                return chance / 2.25F;
+            } else if (isPointDamage(source)) {
+                return chance;
+            } else if(isDamageAllOverBody(source)) {
+                return chance / 2.0F;
+            } else if(source.isOf(DamageTypes.DROWN)){
+                return 0;
+            } else {
+                return chance;
             }
         }
 
@@ -415,7 +419,7 @@ public class Health {
             }
         }
 
-        protected abstract void addEffectAmplifier(Effects effects);
+        protected abstract void addEffectAmplifier(EffectAmplifiers effectAmplifiers);
 
         public abstract float getMaxHp();
     }
@@ -437,12 +441,12 @@ public class Health {
         }
 
         @Override
-        public float damage(float amount) {
-            wasDamaged(amount);
-            return super.damage(amount);
+        public float damage(float amount, DamageSource source) {
+            onDamage(amount);
+            return super.damage(amount, source);
         }
 
-        protected abstract void wasDamaged(float amount);
+        protected abstract void onDamage(float amount);
     }
 
 
@@ -452,7 +456,7 @@ public class Health {
         }
 
         @Override
-        protected void wasDamaged(float amount) {
+        protected void onDamage(float amount) {
             if (amount >= 1) {
                 Util.addStatusEffect(this.getPlayer(), StatusEffects.BLINDNESS, 10 * 20, 1);
                 this.getHealth().damagePlayerHp(new DamageSource(this.getPlayer().getWorld().getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(ModDamageTypes.BLEEDING)),amount * 5f);
@@ -460,7 +464,7 @@ public class Health {
         }
 
         @Override
-        protected void addEffectAmplifier(Effects effects) {
+        protected void addEffectAmplifier(EffectAmplifiers effectAmplifiers) {
 
         }
 
@@ -487,15 +491,15 @@ public class Health {
         }
 
         @Override
-        protected void wasDamaged(float amount) {
+        protected void onDamage(float amount) {
             if (amount >= 1) {
                 this.getHealth().damagePlayerHp(new DamageSource(this.getPlayer().getWorld().getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(ModDamageTypes.BLEEDING)),amount * 5f);
             }
         }
 
         @Override
-        protected void addEffectAmplifier(Effects effects) {
-            effects.slownessAmplifier += (getMaxHp() - getHp()) / 2;
+        protected void addEffectAmplifier(EffectAmplifiers effectAmplifiers) {
+            effectAmplifiers.slownessAmplifier += (getMaxHp() - getHp()) / 2;
         }
 
         @Override
@@ -521,8 +525,8 @@ public class Health {
         }
 
         @Override
-        protected void addEffectAmplifier(Effects effects) {
-            effects.fatigueAmplifier += (getMaxHp() - getHp()) / 3.0F;
+        protected void addEffectAmplifier(EffectAmplifiers effectAmplifiers) {
+            effectAmplifiers.fatigueAmplifier += (getMaxHp() - getHp()) / 3.0F;
         }
 
         @Override
@@ -538,8 +542,8 @@ public class Health {
         }
 
         @Override
-        protected void addEffectAmplifier(Effects effects) {
-            effects.slownessAmplifier += (getMaxHp() - getHp()) / 2.0F;
+        protected void addEffectAmplifier(EffectAmplifiers effectAmplifiers) {
+            effectAmplifiers.slownessAmplifier += (getMaxHp() - getHp()) / 2.0F;
         }
 
         @Override
@@ -556,8 +560,8 @@ public class Health {
         }
 
         @Override
-        protected void addEffectAmplifier(Effects effects) {
-            effects.slownessAmplifier += (getMaxHp() - getHp()) / 2.0F;
+        protected void addEffectAmplifier(EffectAmplifiers effectAmplifiers) {
+            effectAmplifiers.slownessAmplifier += (getMaxHp() - getHp()) / 2.0F;
         }
 
         @Override
@@ -567,7 +571,7 @@ public class Health {
     }
 
 
-    private static class Effects {
+    private static class EffectAmplifiers {
         public float slownessAmplifier = 0;
         public float fatigueAmplifier = 0;
     }
@@ -583,25 +587,25 @@ public class Health {
     public void applyEffects() {
         if (this.getPlayer().isAlive() && !this.getPlayer().isCreative()) {
 
-            Effects effects = new Effects();
+            EffectAmplifiers effectAmplifiers = new EffectAmplifiers();
 
             for (BodyPart part : bodyParts) {
-                part.addEffectAmplifier(effects);
+                part.addEffectAmplifier(effectAmplifiers);
             }
 
-            if (effects.slownessAmplifier >= PLAYER_FALLING_IF_AMPLIFIER) {
+            if (effectAmplifiers.slownessAmplifier >= PLAYER_FALLING_IF_AMPLIFIER) {
                 this.getPlayer().setPose(EntityPose.SWIMMING);
                 isCanWalk = false;
             } else {
                 isCanWalk = true;
             }
-            if (effects.slownessAmplifier > MAX_SLOWNESS_AMPLIFIER) {
-                effects.slownessAmplifier = MAX_SLOWNESS_AMPLIFIER;
+            if (effectAmplifiers.slownessAmplifier > MAX_SLOWNESS_AMPLIFIER) {
+                effectAmplifiers.slownessAmplifier = MAX_SLOWNESS_AMPLIFIER;
             }
 
-            addStatusEffect(StatusEffects.SLOWNESS, (int) effects.slownessAmplifier, 15 * 20);
-            addStatusEffect(StatusEffects.MINING_FATIGUE, (int) effects.fatigueAmplifier, 15 * 20);
-            addStatusEffect(StatusEffects.WEAKNESS, (int) effects.fatigueAmplifier, 15 * 20);
+            addStatusEffect(StatusEffects.SLOWNESS, (int) effectAmplifiers.slownessAmplifier, 15 * 20);
+            addStatusEffect(StatusEffects.MINING_FATIGUE, (int) effectAmplifiers.fatigueAmplifier, 15 * 20);
+            addStatusEffect(StatusEffects.WEAKNESS, (int) effectAmplifiers.fatigueAmplifier, 15 * 20);
 
             if (this.getPlayerHp() <= 0) {
                 this.onDeath(Util.getDamageSource(ModDamageTypes.BLEEDING,  this.getPlayer().getWorld()));
@@ -662,8 +666,8 @@ public class Health {
                 }
             } else if (isPointDamage(source)) {
 
-                float d = randomHit().damage(damageAmount);
-                if (d > 0.1f && this.importantBodyPartsAlive(source)) {
+                float d = randomHit().damage(damageAmount, source);
+                if (d > 0.1f && this.IsImportantBodyPartsAlive(source)) {
                     damage(source, d);
                 }
 
@@ -683,22 +687,22 @@ public class Health {
                     if (d < 0.2f) break;
                     int random = new Random().nextInt(0, 2);
                     BodyPart part = orderDamageBodyParts[i - random];
-                    d = part.damage(d, 0.75f);
+                    d = part.damage(d, source);
                 }
 
-            } else if (isAllBodyDamage(source)) {
+            } else if (isDamageAllOverBody(source)) {
 
                 for (BodyPart part : bodyParts) {
-                    part.damage(damageAmount / alivePartCount(), 0.75f);
+                    part.damage(damageAmount / alivePartCount(), source);
                 }
 
-                importantBodyPartsAlive(source);
+                IsImportantBodyPartsAlive(source);
 
             } else {
 
                 int random = new Random().nextInt(0, 8);
-                float d = bodyParts[random].damage(amount);
-                if (d > 0.2f && this.importantBodyPartsAlive(source)) {
+                float d = bodyParts[random].damage(amount, source);
+                if (d > 0.2f && this.IsImportantBodyPartsAlive(source)) {
                     damage(source, d);
                 }
 
@@ -774,7 +778,7 @@ public class Health {
         if (!this.getPlayer().isCrawling()) {
             int random = new Random().nextInt(6, 8);
             if (damage != 0) {
-                bodyParts[random].damage(damage, 0f);
+                bodyParts[random].damage(damage, null);
             }
             this.getPlayer().setPose(EntityPose.SWIMMING);
             ModServer.sendPacketDamage((ServerPlayerEntity) this.getPlayer());
@@ -800,7 +804,7 @@ public class Health {
         }
     }
 
-    public boolean importantBodyPartsAlive(DamageSource source) {
+    public boolean IsImportantBodyPartsAlive(DamageSource source) {
         boolean bl = head.getHp() <= 0 || body.getHp() <= 0;
         if (bl && this.isAlive()) {
             onDeath(source);
@@ -1046,7 +1050,7 @@ public class Health {
         }
     }
 
-    private static boolean isAllBodyDamage(DamageSource source) {
+    private static boolean isDamageAllOverBody(DamageSource source) {
         for (TagKey<DamageType> t : new TagKey[]{
                 DamageTypeTags.IS_EXPLOSION,
                 DamageTypeTags.BYPASSES_EFFECTS,

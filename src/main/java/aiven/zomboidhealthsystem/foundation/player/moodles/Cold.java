@@ -48,12 +48,13 @@ public class Cold extends Moodle {
             this.addAmount(1.0F / (5 * 60 * 20) * d * wet * Config.COLD_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
         }
 
+        this.getHealth().getExhaustion().addMultiplier(this, Math.max(getAmount(), 1));
+
         if(getAmount() >= 1.0F){
             if(bodyTemperature < 35.0F) {
                 this.addAmount(1.0F / (25 * 60 * 20) * d * wet * Config.COLD_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
             }
 
-            this.getHealth().getExhaustion().addMultiplier(getAmount());
             this.getHealth().getDrowsiness().addTicks(getAmount() / 2 * Health.UPDATE_FREQUENCY);
             this.getHealth().getThirst().addAmount(getAmount() / (20 * 60 * 20));
 

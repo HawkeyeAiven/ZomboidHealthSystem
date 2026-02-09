@@ -35,11 +35,12 @@ public class Thirst extends Moodle {
     @Override
     public void update() {
         super.update();
-        this.addAmount(speed * ((this.getHealth().getExhaustion().getAmount() / 1.5F) + 1) * Config.THIRST_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
+        this.addAmount(speed * Config.THIRST_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
+
+        this.getHealth().getExhaustion().addMultiplier(this, 1.0F);
 
         if (amount >= 1) {
-            this.getHealth().getExhaustion().addMultiplier(amount);
-
+            this.getHealth().getExhaustion().addMultiplier(this, getAmount());
             if (amount >= 2) {
 
                 if (random(4 * 60 * 20)) {
@@ -71,7 +72,7 @@ public class Thirst extends Moodle {
         if (clean) {
             this.addAmount(-amount);
         }
-        this.getHealth().getTemperature().cool(0.5f);
+        this.getHealth().getTemperature().cool(0.5F);
     }
 
     @Override

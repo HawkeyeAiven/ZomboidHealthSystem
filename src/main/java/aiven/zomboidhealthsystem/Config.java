@@ -51,6 +51,8 @@ public class Config {
 
     public static final FloatCodec HEAT_FROM_OTHER_ARMOR = (FloatCodec) CONFIG.add(new FloatCodec("heat_from_other_armor", 1.0F));
 
+    public static final FloatCodec AVERAGE_BLEEDING_CHANCE = (FloatCodec) CONFIG.add(new FloatCodec("average_bleeding_chance", 0.25F));
+
     public static final IntegerCodec MIN_HUNGER_FOR_SLEEP = (IntegerCodec) CONFIG.add(new IntegerCodec("min_hunger_for_sleep", 11));
     public static final IntegerCodec HEAL_TIME = (IntegerCodec) CONFIG.add(new IntegerCodec("heal_time", 40 * 60 * 20));
     public static final IntegerCodec FOOD_HEAL_AMOUNT = (IntegerCodec) CONFIG.add(new IntegerCodec("food_heal_amount",2));
