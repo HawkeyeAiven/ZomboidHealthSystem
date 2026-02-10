@@ -56,9 +56,8 @@ public class Health {
             MAX_FOOT_HP = 4;
 
     public static final int BANDAGE_HEAL_TIME = Config.HEAL_TIME.getValue();
-    public static final int BANDAGE_BECOME_DIRTY_AFTER = 2 * 60 * 20;
+    public static final int BANDAGE_BECOMES_DIRTY_AFTER = 2 * 60 * 20;
     public static final int UPDATE_FREQUENCY = ZomboidHealthSystem.UPDATE_FREQUENCY;
-    public static final int INFECTION_TIME = Config.INFECTION_TIME.getValue();
     public static final int MAX_SLOWNESS_AMPLIFIER = 4 - 1;
     public static final int PLAYER_FALLING_IF_AMPLIFIER = MAX_SLOWNESS_AMPLIFIER;
 
@@ -141,7 +140,7 @@ public class Health {
         private BandageItem bandageItem;
         private BandageItem lastBandageItem;
         private float bleeding = 0;
-        private int infection = 0;
+        private boolean infection = false;
 
         private BodyPart(Health health, float hp, PlayerEntity player, String id) {
             this.health = health;
@@ -160,7 +159,9 @@ public class Health {
                     this.setHp(this.getHp() + amount);
                     return 0;
                 }
-            } else return amount;
+            } else {
+                return amount;
+            }
         }
 
         public float damage(float amount, DamageSource source) {
@@ -185,92 +186,40 @@ public class Health {
         }
 
         protected void update() {
-            checkInfect();
-
             if(getHp() >= getMaxHp()) {
                 setBleeding(0);
             }
 
             if (this.isBandaged()) {
-                if (!this.isInfection()) {
-                    this.heal(bandageItem.getHealAmount() / BANDAGE_HEAL_TIME * (this.getPlayer().getHungerManager().getFoodLevel() / 20.0F) * UPDATE_FREQUENCY);
+                float m = 1;
+                if(this.hasInfection()) {
+                    m = 3;
                 }
+                this.heal(bandageItem.getHealAmount() / m / BANDAGE_HEAL_TIME * (this.getPlayer().getHungerManager().getFoodLevel() / 20.0F) * UPDATE_FREQUENCY);
 
                 this.setBandageTime(this.getBandageTime() + UPDATE_FREQUENCY);
 
                 if (bandageItem.isDirty()) {
-                    this.addInfection(UPDATE_FREQUENCY);
+                    if(random(Config.INFECTION_TIME.getValue())) {
+                        this.infection = true;
+                    }
                 }
 
                 if (bandageItem.isStopBleeding()) {
                     if (this.isBleeding()) {
-                        this.setBleeding(this.getBleeding() - (0.00015f * UPDATE_FREQUENCY));
+                        this.setBleeding(this.getBleeding() - (0.00015F * UPDATE_FREQUENCY));
 
-                        if (this.getBandageTime() > BANDAGE_BECOME_DIRTY_AFTER / (this.getBleeding() + 0.5) / bandageItem.dirtyDivisor()) {
+                        if (this.getBandageTime() > BANDAGE_BECOMES_DIRTY_AFTER / (this.getBleeding() + 0.5) / bandageItem.dirtyDivisor()) {
 
                             this.setBandageItem(this.bandageItem.getDirtyBandageItem());
                         }
                     }
-                } else {
-                    this.getHealth().damagePlayerHp(
-                            Util.getDamageSource(ModDamageTypes.BLEEDING, getPlayer().getWorld()),
-                            (this.getBleeding() / 30) * UPDATE_FREQUENCY);
                 }
-            } else {
+            }
+            if(!this.isBandaged() || !this.bandageItem.isStopBleeding()) {
                 this.getHealth().damagePlayerHp(
                         Util.getDamageSource(ModDamageTypes.BLEEDING, getPlayer().getWorld()),
                         (this.getBleeding() / 30) * UPDATE_FREQUENCY);
-            }
-        }
-
-        private void checkInfect(){
-            if (this.isInfection()) {
-
-                this.setInfection(this.getInfection() + UPDATE_FREQUENCY);
-
-                if (this.getInfection() > INFECTION_TIME * 2) {
-
-                    this.getHealth().addStatusEffect(StatusEffects.SLOWNESS, 1 - 1, 15 * 20);
-
-                    if (this.getInfection() > INFECTION_TIME * 3) {
-
-                        this.getHealth().addStatusEffect(StatusEffects.MINING_FATIGUE, 1 - 1, 15 * 20);
-
-                        if (this.getInfection() > INFECTION_TIME * 4) {
-
-                            this.getHealth().addStatusEffect(StatusEffects.SLOWNESS, 2 - 1, 15 * 20);
-                            this.getHealth().addStatusEffect(StatusEffects.WEAKNESS, 1 - 1, 15 * 20);
-
-                            if (this.getInfection() > INFECTION_TIME * 5) {
-
-                                if (random(2 * 60 * 20)) {
-                                    this.getHealth().stumble(0);
-                                }
-                                if (random(20 * 20)) {
-                                    this.getHealth().addStatusEffect(StatusEffects.NAUSEA, 0, 7 * 20);
-                                }
-
-                                if (this.getInfection() > INFECTION_TIME * 6) {
-
-                                    if (random(2 * 60 * 20)) {
-                                        this.getHealth().stumble(0);
-                                    }
-                                    if (random(20 * 20)) {
-                                        this.getHealth().addStatusEffect(StatusEffects.BLINDNESS, 0, 7 * 20);
-                                    }
-
-                                    if (this.getInfection() > INFECTION_TIME * 7) {
-                                        this.getHealth().addStatusEffect(StatusEffects.POISON, 0, 15 * 20);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
-                if(this.getHp() >= this.getMaxHp()) {
-                    this.addInfection(-UPDATE_FREQUENCY);
-                }
             }
         }
 
@@ -344,26 +293,17 @@ public class Health {
             return this.getBleeding() != 0;
         }
 
-        public boolean isInfection() {
-            return this.getInfection() > INFECTION_TIME;
+        public void setInfection(boolean infection) {
+            this.infection = infection;
         }
 
-        public void setInfection(int infection) {
-            this.infection = Math.max(infection, 0);
-        }
-
-        public void addInfection(int infection) {
-            this.setInfection(this.getInfection() + infection);
-        }
-
-        public int getInfection() {
+        public boolean hasInfection() {
             return infection;
         }
 
         public void disInfect() {
-            this.setInfection(this.getInfection() - (INFECTION_TIME / 5));
-            if(!isInfection()){
-                this.setInfection(0);
+            if(new Random().nextInt(0, 3) == 0) {
+                setInfection(false);
             }
         }
 
@@ -923,7 +863,7 @@ public class Health {
 
     public boolean haveInfection() {
         for (BodyPart part : bodyParts) {
-            if (part.isInfection()) return true;
+            if (part.hasInfection()) return true;
         }
         return false;
     }
@@ -998,8 +938,8 @@ public class Health {
             if (part.isBleeding()) {
                 bodyPartBuilder.append("bleeding",  String.valueOf(part.getBleeding()));
             }
-            if (part.getInfection() > 0) {
-                bodyPartBuilder.append("infection",  String.valueOf(part.getInfection()));
+            if (part.hasInfection()) {
+                bodyPartBuilder.append("infection",  String.valueOf(true));
             }
             if(!bodyPartBuilder.isEmpty()) {
                 healthBuilder.append(part.getId(), bodyPartBuilder.toString());
@@ -1076,7 +1016,7 @@ public class Health {
         {
             String infection = Json.getValue(value, "infection");
             if(infection != null) {
-                bodyPart.setInfection(Integer.parseInt(infection));
+                bodyPart.setInfection(Boolean.parseBoolean(infection));
             }
         }
     }

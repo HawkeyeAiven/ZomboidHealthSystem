@@ -51,10 +51,6 @@ public class Util {
         return distance;
     }
 
-    public static void setCooldownAllBandageItems(ItemCooldownManager manager, int dur){
-        Util.setCooldownItems(manager,dur, BandageItem.bandageItems.toArray(new Item[BandageItem.bandageItems.size()]));
-    }
-
     public static void setCooldownItems(ItemCooldownManager manager, int duration, Item...items){
         for(Item item : items){
             manager.set(item,duration);
@@ -134,29 +130,6 @@ public class Util {
             }
         }
         return null;
-    }
-
-    public static Item getCooldowningBandageItem(PlayerEntity player){
-        PlayerInventory inv = player.getInventory();
-        for(int i = 0; i < inv.size(); i++){
-            Item item = inv.getStack(i).getItem();
-            if(item instanceof BandageItem && player.getItemCooldownManager().isCoolingDown(item)){
-                return item;
-            }
-        }
-        return null;
-    }
-
-    public static int getCooldownTime(Item item, int maxTime, int tickDelta){
-        ItemCooldownManager manager = MinecraftClient.getInstance().player.getItemCooldownManager();
-
-        for(int i = maxTime; i > 0; i -= tickDelta) {
-            float d = manager.getCooldownProgress(item, i);
-            if(d != 0){
-                return i;
-            }
-        }
-        return 0;
     }
 
     public static void addStatusEffect(PlayerEntity user, StatusEffect effect, int duration, int amplifier){

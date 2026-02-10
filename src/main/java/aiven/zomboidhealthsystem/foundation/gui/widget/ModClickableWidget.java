@@ -73,9 +73,9 @@ public class ModClickableWidget extends ClickableWidget {
     public void destroy(){
         if(MinecraftClient.getInstance().currentScreen instanceof AbstractModScreen screen){
             screen.destroy(this);
-            this.visible = false;
-            this.active = false;
         }
+        this.visible = false;
+        this.active = false;
     }
 
     public int getLowestPoint() {

@@ -10,8 +10,8 @@ import net.minecraft.text.Text;
 import java.util.ArrayList;
 
 public class BandageContainer extends ButtonsContainer {
-    public BandageContainer(int x, int y, ClientHealth.BodyPart bodyPart) {
-        super(x, y, 60, 20, Text.of("Bandage"), false);
+    public BandageContainer(int x, int y, ClientHealth.BodyPart bodyPart, ActionsButton actionsButton) {
+        super(x, y, 60, 20, Text.of("Bandage"));
         PlayerInventory inventory = MinecraftClient.getInstance().player.getInventory();
         ArrayList<Integer> ids = new ArrayList<>();
         ArrayList<BandageItem> bandageItems = new ArrayList<>();
@@ -31,7 +31,7 @@ public class BandageContainer extends ButtonsContainer {
         }
 
         for(BandageItem bandageItem : bandageItems){
-            addButton(new BandageButton(0,0, minWidth, bodyPart, bandageItem));
+            addButton(new BandageButton(0,0, minWidth, bodyPart, bandageItem, actionsButton));
         }
     }
 }

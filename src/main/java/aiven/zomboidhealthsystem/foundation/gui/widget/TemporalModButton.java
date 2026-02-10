@@ -12,11 +12,11 @@ public class TemporalModButton extends ModClickableWidget {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if(!super.mouseClicked(mouseX, mouseY, button) && this.active && this.visible){
+        if(!super.mouseClicked(mouseX, mouseY, button)){
             this.destroy();
             return false;
         } else {
-            return this.visible && this.active;
+            return true;
         }
     }
 }

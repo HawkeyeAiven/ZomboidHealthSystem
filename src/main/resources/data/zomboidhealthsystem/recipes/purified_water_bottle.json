@@ -1,7 +1,8 @@
 {
     "type": "minecraft:smelting",
     "ingredient": {
-        "item": "minecraft:potion"
+        "item": "minecraft:potion",
+        "nbt": "{Potion:\"minecraft:water\"}"
     },
     "result": "zomboidhealthsystem:purified_water_bottle",
     "experience": 0,

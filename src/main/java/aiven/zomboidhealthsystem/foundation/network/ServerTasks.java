@@ -25,8 +25,6 @@ public enum ServerTasks {
 
             inventory.getStack(inventory.getSlotWithStack(bandageItem.getDefaultStack())).decrement(1);
 
-            Util.setCooldownAllBandageItems(serverPlayerEntity.getItemCooldownManager(),BandageItem.BANDAGE_COOLDOWN_TIME);
-
             ModServer.getHealth(serverPlayerEntity).getBodyPart(bodyPart).bandage(bandageItem);
 
             ModServer.sendPacketHealth(serverPlayerEntity);
@@ -54,8 +52,6 @@ public enum ServerTasks {
                 if(!serverPlayerEntity.giveItemStack(bandageItem.getDefaultStack())) {
                     serverPlayerEntity.dropStack(bandageItem.getDefaultStack());
                 }
-
-                Util.setCooldownAllBandageItems(serverPlayerEntity.getItemCooldownManager(), BandageItem.UNBANDAGE_COOLDOWN_TIME);
 
                 ModServer.sendPacketHealth(serverPlayerEntity);
             }
@@ -128,7 +124,6 @@ public enum ServerTasks {
                     break;
                 }
             }
-            serverPlayerEntity.getItemCooldownManager().set(ModItems.ALCOHOL_WIPE, AlcoholWipe.DISINFECT_COOLDOWN_TIME);
 
             ModServer.sendPacketHealth(serverPlayerEntity);
         } catch (Exception e){

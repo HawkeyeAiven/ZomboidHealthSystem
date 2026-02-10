@@ -27,4 +27,13 @@ public class InGameHudMixin {
 
     }
 
+//    /**
+//     * @author Aiven
+//     * @reason Yes.
+//     */
+//    @Overwrite
+//    private void renderStatusBars(DrawContext context) {
+//
+//    }
+
 }

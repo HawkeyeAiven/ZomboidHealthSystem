@@ -29,8 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class BandageItem extends Item {
-    public static final int BANDAGE_COOLDOWN_TIME = 6 * 20;
-    public static final int UNBANDAGE_COOLDOWN_TIME = 3 * 20;
+    public static final int BANDAGE_COOLDOWN_TIME = 4 * 20;
+    public static final int UNBANDAGE_COOLDOWN_TIME = 2 * 20;
     public static final ArrayList<BandageItem> bandageItems = new ArrayList<>();
 
     public BandageItem() {

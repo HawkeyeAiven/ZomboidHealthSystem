@@ -7,14 +7,16 @@ import aiven.zomboidhealthsystem.foundation.network.PacketIdentifiers;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.text.Text;
 
-public class BandageButton extends ModClickableWidget {
+public class BandageButton extends ModButtonWithDelay {
     private final ClientHealth.BodyPart bodyPart;
     private final BandageItem bandageItem;
+    private final ActionsButton actionsButton;
 
-    public BandageButton(int x, int y, int width, ClientHealth.BodyPart bodyPart, BandageItem bandageItem) {
-        super(x, y, width, 20, Text.translatable("item.zomboidhealthsystem." + bandageItem));
+    public BandageButton(int x, int y, int width, ClientHealth.BodyPart bodyPart, BandageItem bandageItem, ActionsButton actionsButton) {
+        super(x, y, width, 20, BandageItem.BANDAGE_COOLDOWN_TIME, Text.translatable("item.zomboidhealthsystem." + bandageItem));
         this.bodyPart = bodyPart;
         this.bandageItem = bandageItem;
+        this.actionsButton = actionsButton;
     }
 
     @Override
@@ -25,5 +27,7 @@ public class BandageButton extends ModClickableWidget {
                         .writeString(bodyPart.getId())
                         .writeVarInt(BandageItem.getRawId(bandageItem))
         );
+        this.actionsButton.destroy();
+        super.onClick(mouseX, mouseY);
     }
 }

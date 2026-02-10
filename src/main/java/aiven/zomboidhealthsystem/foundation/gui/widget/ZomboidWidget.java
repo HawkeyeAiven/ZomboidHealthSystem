@@ -18,14 +18,14 @@ public class ZomboidWidget extends ScrollableWidget {
     public ZomboidWidget(int x, int y) {
         super(x, y, 149, 135, null);
         ClientHealth health = ZomboidHealthSystemClient.HEALTH;
-        bodyPartButtons.add(new BodyPartButton(0, 0, health.head));
-        bodyPartButtons.add(new BodyPartButton(0, 0, health.body));
-        bodyPartButtons.add(new BodyPartButton(0, 0, health.leftArm));
-        bodyPartButtons.add(new BodyPartButton(0, 0, health.rightArm));
-        bodyPartButtons.add(new BodyPartButton(0, 0, health.leftLeg));
-        bodyPartButtons.add(new BodyPartButton(0, 0, health.rightLeg));
-        bodyPartButtons.add(new BodyPartButton(0, 0, health.leftFoot));
-        bodyPartButtons.add(new BodyPartButton(0, 0, health.rightFoot));
+        bodyPartButtons.add(new BodyPartButton(0, 0, health.getHead()));
+        bodyPartButtons.add(new BodyPartButton(0, 0, health.getBody()));
+        bodyPartButtons.add(new BodyPartButton(0, 0, health.getLeftArm()));
+        bodyPartButtons.add(new BodyPartButton(0, 0, health.getRightArm()));
+        bodyPartButtons.add(new BodyPartButton(0, 0, health.getLeftLeg()));
+        bodyPartButtons.add(new BodyPartButton(0, 0, health.getRightLeg()));
+        bodyPartButtons.add(new BodyPartButton(0, 0, health.getLeftFoot()));
+        bodyPartButtons.add(new BodyPartButton(0, 0, health.getRightFoot()));
     }
 
     @Override

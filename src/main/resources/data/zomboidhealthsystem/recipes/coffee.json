@@ -10,7 +10,8 @@
             "item": "minecraft:cocoa_beans"
         },
         "P": {
-            "item": "minecraft:potion"
+            "item": "minecraft:potion",
+            "nbt": "{Potion:\"minecraft:water\"}"
         },
         "H": {
             "item": "zomboidhealthsystem:empty_cup"

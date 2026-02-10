@@ -60,7 +60,7 @@ public class Config {
     public static final IntegerCodec FOOD_HEAL_AMOUNT = (IntegerCodec) CONFIG.add(new IntegerCodec("food_heal_amount",2));
     public static final IntegerCodec UPDATE_FREQUENCY = (IntegerCodec) CONFIG.add(new IntegerCodec("update_frequency", 5));
     public static final IntegerCodec MIN_DROWSINESS_FOR_SLEEP = (IntegerCodec) CONFIG.add(new IntegerCodec("min_drowsiness_for_sleep",1));
-    public static final IntegerCodec INFECTION_TIME = (IntegerCodec) CONFIG.add(new IntegerCodec("infection_time", 5 * 60 * 20));
+    public static final IntegerCodec INFECTION_TIME = (IntegerCodec) CONFIG.add(new IntegerCodec("infection_time", 3 * 60 * 20));
     public static final IntegerCodec AUTOSAVE_FREQUENCY = (IntegerCodec) CONFIG.add(new IntegerCodec("autosave_frequency", 60 * 20));
 
     public static final Vector2fCodec HEALTH_HUD_POS = (Vector2fCodec) CONFIG.add(new Vector2fCodec("health_hud_pos", new Vector2f(10, 30)));

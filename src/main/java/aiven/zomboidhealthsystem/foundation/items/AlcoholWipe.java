@@ -13,7 +13,7 @@ import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 
 public class AlcoholWipe extends ToolItem {
-    public static final int DISINFECT_COOLDOWN_TIME = 5 * 20;
+    public static final int DISINFECT_COOLDOWN_TIME = 2 * 20;
 
     public AlcoholWipe() {
         super(new ToolMaterial() {

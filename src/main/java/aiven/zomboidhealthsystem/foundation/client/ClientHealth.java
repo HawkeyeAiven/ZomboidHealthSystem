@@ -7,7 +7,7 @@ import net.minecraft.item.Item;
 import net.minecraft.network.PacketByteBuf;
 
 public class ClientHealth {
-    public final BodyPart head, body, leftArm, rightArm, leftLeg, rightLeg, leftFoot, rightFoot;
+    private final BodyPart head, body, leftArm, rightArm, leftLeg, rightLeg, leftFoot, rightFoot;
     private final BodyPart[] bodyParts;
     private float hp = 100;
 
@@ -90,10 +90,7 @@ public class ClientHealth {
                 {
                     String infection = Json.getValue(value, "infection");
                     if(infection != null) {
-                        int ticks = Integer.parseInt(infection);
-                        bodyPart.setInfection(ticks > Health.INFECTION_TIME);
-                    } else {
-                        bodyPart.setInfection(false);
+                        bodyPart.setInfection(Boolean.parseBoolean(infection));
                     }
                 }
 

@@ -6,13 +6,14 @@
     ],
     "key": {
         "#": {
-            "item": "minecraft:potion"
+            "item": "minecraft:potion",
+            "nbt": "{Potion:\"minecraft:water\"}"
         },
         "B": {
-            "item": "minecraft:blaze_powder"
+            "item": "minecraft:sugar"
         },
         "P": {
-            "item": "minecraft:paper"
+            "item": "zomboidhealthsystem:rag"
         }
     },
     "result": {
