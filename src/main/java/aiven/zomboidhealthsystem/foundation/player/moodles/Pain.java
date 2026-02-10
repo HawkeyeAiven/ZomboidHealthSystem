@@ -106,7 +106,7 @@ public class Pain extends Moodle {
 
     public void applyEffects() {
         if (this.getPain() >= 8) {
-            health.addStatusEffect(StatusEffects.BLINDNESS, 1, 5 * 20);
+            health.addStatusEffect(StatusEffects.BLINDNESS, 0, 5 * 20);
         }
     }
 

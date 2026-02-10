@@ -1,18 +1,14 @@
 package aiven.zomboidhealthsystem.foundation.gui.widget;
 
-
 import aiven.zomboidhealthsystem.ZomboidHealthSystem;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Identifier;
 
-public class CheckMark extends ModButton {
+public class CheckMark extends ModClickableWidget {
     private boolean enabled = false;
 
     public CheckMark(int x, int y, int size) {
-        super(x, y, size, size, null, null);
-        this.task = (x1,y1,button) -> {
-            this.enabled = !enabled;
-        };
+        super(x, y, size, size, null);
     }
 
     @Override
@@ -42,5 +38,10 @@ public class CheckMark extends ModButton {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    @Override
+    public void onClick(double mouseX, double mouseY) {
+        this.enabled = !enabled;
     }
 }

@@ -1,7 +1,6 @@
 package aiven.zomboidhealthsystem.foundation.gui.widget;
 
 import aiven.zomboidhealthsystem.ZomboidHealthSystem;
-import aiven.zomboidhealthsystem.foundation.gui.OnClick;
 import aiven.zomboidhealthsystem.foundation.gui.screen.AbstractModScreen;
 import aiven.zomboidhealthsystem.foundation.utility.Util;
 import net.fabricmc.api.EnvType;
@@ -14,21 +13,20 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 @Environment(EnvType.CLIENT)
-public class ModButton extends ClickableWidget {
-    OnClick task;
+public class ModClickableWidget extends ClickableWidget {
     protected Identifier currentTexture = getTextureOff();
+    protected int contentX, contentY, contentWidth, contentHeight;
 
-    public ModButton(int x, int y, int width, int height, Text message, OnClick task) {
+    public ModClickableWidget(int x, int y, int width, int height, Text message) {
         super(x, y, width, height, message);
-        this.task = task;
+        this.contentX = x;
+        this.contentY = y;
+        this.contentWidth = width;
+        this.contentHeight = height;
     }
 
     @Override
     protected void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
-        renderButton(context, mouseX, mouseY, delta, this.getX(), this.getY(),this.getWidth(), this.getHeight());
-    }
-
-    protected void renderButton(DrawContext context, int mouseX, int mouseY, float delta, int x, int y, int width, int height) {
         if(isMouseOver(mouseX, mouseY)) {
             currentTexture = getTextureOn();
         } else {
@@ -36,13 +34,13 @@ public class ModButton extends ClickableWidget {
         }
         context.drawTexture(
                 currentTexture,
-                x, y,0,0, width, height, width, height
+                this.getX(), this.getY(),0,0, this.getWidth(), this.getHeight(), this.getWidth(), this.getHeight()
         );
         if(this.getMessage() != null) {
             context.drawCenteredTextWithShadow(
                     MinecraftClient.getInstance().textRenderer,
                     Util.reduce(this.getMessage().getString(), width - 6),
-                    x + (width / 2), y + 6, 0xFFffffff
+                    this.getX() + (width / 2), this.getY() + 6, 0xFFffffff
             );
         }
     }
@@ -62,10 +60,10 @@ public class ModButton extends ClickableWidget {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if(this.active && this.visible && this.task != null){
+        if(this.active && this.visible){
             if(this.clicked(mouseX,mouseY) && this.isValidClickButton(button)){
                 this.playDownSound(MinecraftClient.getInstance().getSoundManager());
-                this.task.onClick((int) mouseX,(int) mouseY, button);
+                this.onClick(mouseX, mouseY);
                 return true;
             }
         }
@@ -80,8 +78,40 @@ public class ModButton extends ClickableWidget {
         }
     }
 
-    public void setTask(OnClick task) {
-        this.task = task;
+    public int getLowestPoint() {
+        return Math.max(getY() + getHeight(), getContentY() + getContentHeight());
+    }
+
+    public int getHighestPoint() {
+        return Math.min(getY(), getContentY());
+    }
+
+    public int getContentX() {
+        return contentX;
+    }
+
+    public int getContentY() {
+        return contentY;
+    }
+
+    public int getContentWidth() {
+        return contentWidth;
+    }
+
+    public int getContentHeight() {
+        return contentHeight;
+    }
+
+    @Override
+    public void setX(int x) {
+        this.contentX = x;
+        super.setX(x);
+    }
+
+    @Override
+    public void setY(int y) {
+        this.contentY = y;
+        super.setY(y);
     }
 
     @Override

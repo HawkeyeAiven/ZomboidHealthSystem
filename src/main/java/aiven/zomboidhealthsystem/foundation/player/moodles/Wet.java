@@ -26,19 +26,17 @@ public class Wet extends Moodle {
         World world = player.getWorld();
 
         if(world.getBlockState(player.getBlockPos()).getBlock().equals(Blocks.WATER) && player.getControllingVehicle() == null){
-
             this.setAmount(MAX_AMOUNT);
-
         } else if(world.hasRain(player.getBlockPos())){
-
             if(Util.getArmorCount(getPlayer()) < 3) {
                 this.addAmount(SPEED);
             }
-
         } else {
-
             this.addAmount(-SPEED);
+        }
 
+        if(getHealth().getTemperature().getAmount() > Temperature.AVERAGE_TEMPERATURE_BODY + 1.0F && this.getAmount() < 2.1F) {
+            this.addAmount(0.035F / 20 * Health.UPDATE_FREQUENCY);
         }
     }
 

@@ -43,8 +43,8 @@ public class Exhaustion extends Moodle {
             getHealth().getThirst().addMultiplier(this, getAmount());
             if (amount >= 1.5F) {
                 this.getHealth().getWet().addAmount(1 / 500F * (Util.getArmorCount(getPlayer()) >= 3 ? 2 : 1) * Health.UPDATE_FREQUENCY);
-                this.getHealth().addStatusEffect(StatusEffects.SLOWNESS, (int) amount, 20 * 5);
-                this.getHealth().addStatusEffect(StatusEffects.MINING_FATIGUE, (int) amount, 20 * 5);
+                this.getHealth().addStatusEffect(StatusEffects.SLOWNESS, (int) amount - 1, 20 * 5);
+                this.getHealth().addStatusEffect(StatusEffects.MINING_FATIGUE, (int) amount - 1, 20 * 5);
             }
         }
 

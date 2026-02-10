@@ -20,6 +20,8 @@ public class Config {
     public static final BooleanCodec HEALTH_HUD = (BooleanCodec) CONFIG.add(new BooleanCodec("health_hud", true));
     public static final BooleanCodec TEMPERATURE_DEPENDS_ON_Z_COORDINATE = (BooleanCodec) CONFIG.add(new BooleanCodec("temperature_depends_on_z_coordinate", true));
     public static final BooleanCodec FROZEN_OCEANS_IN_WINTER = (BooleanCodec) CONFIG.add(new BooleanCodec("frozen_ocean_in_winter", true));
+    public static final BooleanCodec SHOW_BLEEDING_ICON = (BooleanCodec) CONFIG.add(new BooleanCodec("show_bleeding_icon", true));
+    public static final BooleanCodec SHOW_INJURED_ICON = (BooleanCodec) CONFIG.add(new BooleanCodec("show_injured_icon", true));
 
     public static final FloatCodec TEMPERATURE_MULTIPLIER = (FloatCodec) CONFIG.add(new FloatCodec("temperature_multiplier", 1.0F));
     public static final FloatCodec COLD_MULTIPLIER = (FloatCodec) CONFIG.add(new FloatCodec("cold_multiplier", 1.0F));
@@ -74,7 +76,6 @@ public class Config {
             configFolder.mkdirs();
             FILE.createNewFile();
         }
-
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
                 CONFIG.save(FILE);

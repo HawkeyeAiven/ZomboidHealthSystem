@@ -5,13 +5,12 @@ import aiven.zomboidhealthsystem.infrastructure.utility.helpers.FileHelper;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 public class Json {
-    private final ConcurrentHashMap<String, String> map = new ConcurrentHashMap<>();
+    private final LinkedHashMap<String, String> map = new LinkedHashMap<>();
 
     public void add(String key, String value) {
         map.put(key, value);
@@ -30,7 +29,7 @@ public class Json {
     }
 
     public String getValueOfString(String key) {
-        StringBuilder builder = new StringBuilder(map.get(key));
+        StringBuilder builder = new StringBuilder(getValue(key));
         if(builder.charAt(0) == '\"') {
             builder.deleteCharAt(0);
         }
@@ -72,7 +71,7 @@ public class Json {
     public String toString() {
         JsonBuilder builder = new JsonBuilder();
 
-        for(String key : getKeys()) {
+        for(String key : map.keySet()) {
             builder.append(key, getValue(key));
         }
 
@@ -105,7 +104,7 @@ public class Json {
             index++;
         }
 
-        return value.toString().trim().replace("\n\t", "\n"); // replace нужен!!
+        return value.toString().trim().replace("\n\t", "\n");
     }
 
     public static String[] getKeys(String config) {

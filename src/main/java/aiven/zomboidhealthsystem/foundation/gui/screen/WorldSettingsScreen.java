@@ -1,7 +1,8 @@
 package aiven.zomboidhealthsystem.foundation.gui.screen;
 
+import aiven.zomboidhealthsystem.foundation.gui.widget.BackButton;
 import aiven.zomboidhealthsystem.foundation.gui.widget.CheckMark;
-import aiven.zomboidhealthsystem.foundation.gui.widget.ModButton;
+import aiven.zomboidhealthsystem.foundation.gui.widget.ModClickableWidget;
 import aiven.zomboidhealthsystem.foundation.world.ModServer;
 import aiven.zomboidhealthsystem.foundation.world.WorldSettings;
 import net.fabricmc.api.EnvType;
@@ -21,7 +22,7 @@ public class WorldSettingsScreen extends AbstractModScreen {
     public TextFieldWidget dayLength = new TextFieldWidget(MinecraftClient.getInstance().textRenderer,  115,110,80,20, null);
     public CheckMark temperature = new CheckMark(115,140,20);
     public CheckMark wind = new CheckMark(115,170,20);
-    public ClickableWidget backButton = new ModButton(20,MinecraftClient.getInstance().getWindow().getScaledHeight() - 75,40,20, Text.of("Back"),(x,y,button) -> this.close());
+    public ClickableWidget backButton = new BackButton(this);
 
 
     public WorldSettingsScreen(Screen createWorldScreen){

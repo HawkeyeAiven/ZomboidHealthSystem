@@ -14,34 +14,30 @@ public class TemporalButtonsContainer extends ButtonsContainer {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if(button != 0){
+        if(!isValidClickButton(button)){
             this.destroy();
             return false;
         } else {
-            boolean bl = false;
-            if (!isButtonsHidden) {
+            if (!areButtonsHidden) {
                 for (ClickableWidget btn : buttons) {
                     if (btn.mouseClicked(mouseX, mouseY, button)) {
-                        if (!(btn instanceof BandageContainer)) {
-                            this.destroy();
-                            return true;
-                        }
-                        bl = true;
+                        this.destroy();
+                        return true;
                     }
                 }
             }
             if (clicked(mouseX, mouseY)) {
-                if (!isButtonsHidden) {
+                if (!areButtonsHidden) {
                     hideButtons();
                 } else {
                     unHideButtons();
                 }
                 this.playDownSound(MinecraftClient.getInstance().getSoundManager());
                 return true;
-            } else if (!bl) {
-                this.destroy();
+            } else {
+                destroy();
+                return false;
             }
-            return bl;
         }
     }
 }

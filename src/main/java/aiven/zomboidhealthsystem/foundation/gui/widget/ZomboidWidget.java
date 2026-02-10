@@ -1,95 +1,129 @@
 package aiven.zomboidhealthsystem.foundation.gui.widget;
 
-import aiven.zomboidhealthsystem.ZomboidHealthSystem;
 import aiven.zomboidhealthsystem.ZomboidHealthSystemClient;
 import aiven.zomboidhealthsystem.foundation.client.ClientHealth;
-import aiven.zomboidhealthsystem.foundation.gui.screen.UIHealth;
-import aiven.zomboidhealthsystem.foundation.player.Health;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
+import net.minecraft.client.gui.widget.ScrollableWidget;
+
+import java.util.ArrayList;
 
 @Environment(EnvType.CLIENT)
-public class ZomboidWidget extends AbstractModScrollableWidget {
-    public ButtonElement buttonElement1 = (mouseX, mouseY, button, element) -> {
-        if(button == 1) {
-            UIHealth screen = (UIHealth) MinecraftClient.getInstance().currentScreen;
-            screen.addClickableWidget(new ActionsButton(mouseX, (int) (mouseY - getScrollY()), element, screen));
-        }
-    };
-
-    private final ColoredText scrape = new ColoredText(0xFFc81414, Text.translatable("zomboidhealthsystem.health.hud.scrape"));
-    private final ColoredText injury = new ColoredText(0xFFc81414, Text.translatable("zomboidhealthsystem.health.hud.injury"));
-    private final ColoredText wound = new ColoredText(0xFFc81414,Text.translatable("zomboidhealthsystem.health.hud.wound"));
-    private final ColoredText crack = new ColoredText(0xFFc81414,Text.translatable("zomboidhealthsystem.health.hud.crack"));
-    private final ColoredText laceration = new ColoredText(0xFFc81414, Text.translatable("zomboidhealthsystem.health.hud.laceration"));
-    private final ColoredText fracture = new ColoredText(0xFFc81414, Text.translatable("zomboidhealthsystem.health.hud.fracture"));
-    private final ColoredText deep_fracture = new ColoredText(0xFFc81414, Text.translatable("zomboidhealthsystem.health.hud.deep_fracture"));
-    private final ColoredText bleeding = new ColoredText(0xFFc81414, Text.translatable("zomboidhealthsystem.health.hud.bleeding"));
-    private final ColoredText infection = new ColoredText(0xFFc81414, Text.translatable("zomboidhealthsystem.health.hud.infection"));
-    private final ColoredText bandaged = new ColoredText(0xFF2cb828, Text.translatable("zomboidhealthsystem.health.hud.bandaged"));
-    private final ColoredText dirty_bandage = new ColoredText(0xFFc81414,Text.translatable("item.zomboidhealthsystem.dirty_bandage"));
+public class ZomboidWidget extends ScrollableWidget {
+    private final ArrayList<BodyPartButton> bodyPartButtons = new ArrayList<>();
+    private final int spaceSize = 8;
 
     public ZomboidWidget(int x, int y) {
-        super(x, y,149,135, Text.of(" "));
-        super.addElement(new Element(Health.HEAD_ID, buttonElement1));
-        super.addElement(new Element(Health.BODY_ID, buttonElement1));
-        super.addElement(new Element(Health.LEFT_ARM_ID, buttonElement1));
-        super.addElement(new Element(Health.RIGHT_ARM_ID, buttonElement1));
-        super.addElement(new Element(Health.LEFT_LEG_ID, buttonElement1));
-        super.addElement(new Element(Health.RIGHT_LEG_ID, buttonElement1));
-        super.addElement(new Element(Health.LEFT_FOOT_ID, buttonElement1));
-        super.addElement(new Element(Health.RIGHT_FOOT_ID, buttonElement1));
+        super(x, y, 149, 135, null);
+        ClientHealth health = ZomboidHealthSystemClient.HEALTH;
+        bodyPartButtons.add(new BodyPartButton(0, 0, health.head));
+        bodyPartButtons.add(new BodyPartButton(0, 0, health.body));
+        bodyPartButtons.add(new BodyPartButton(0, 0, health.leftArm));
+        bodyPartButtons.add(new BodyPartButton(0, 0, health.rightArm));
+        bodyPartButtons.add(new BodyPartButton(0, 0, health.leftLeg));
+        bodyPartButtons.add(new BodyPartButton(0, 0, health.rightLeg));
+        bodyPartButtons.add(new BodyPartButton(0, 0, health.leftFoot));
+        bodyPartButtons.add(new BodyPartButton(0, 0, health.rightFoot));
     }
 
-    private int ticks = ZomboidHealthSystem.UPDATE_FREQUENCY;
+    @Override
+    public void render(DrawContext context, int mouseX, int mouseY, float tickDelta) {
+        renderOverlay(context);
+        renderButton(context, mouseX, mouseY, tickDelta);
+    }
 
-    public void tick(){
-        if(ticks >= Math.min(ZomboidHealthSystem.UPDATE_FREQUENCY -1, 5 -1)) {
-            for (Element element : elements) {
-                int i = elements.indexOf(element);
-                element.clearText();
 
-                ClientHealth health = ZomboidHealthSystemClient.HEALTH;
-                ClientHealth.BodyPart bodyPart = health.indexOf(i);
-
-                if(!bodyPart.isBandaged()) {
-
-                    if (bodyPart.getHpPercent() >= 1.0F)
-                        element.setPos(null);
-                    else if (bodyPart.getHpPercent() >= 0.9F)
-                        element.addText(scrape);
-                    else if (bodyPart.getHpPercent() >= 0.8F)
-                        element.addText(injury);
-                    else if(bodyPart.getHpPercent() >= 0.65F)
-                        element.addText(wound);
-                    else if (bodyPart.getHpPercent() >= 0.5F)
-                        element.addText(crack);
-                    else if (bodyPart.getHpPercent() >= 0.35F)
-                        element.addText(laceration);
-                    else if (bodyPart.getHpPercent() >= 0.2F)
-                        element.addText(fracture);
-                    else
-                        element.addText(deep_fracture);
-
-                } else {
-                    if(!bodyPart.isDirtyBandage()) {
-                        element.addText(bandaged);
-                    } else {
-                        element.addText(dirty_bandage);
-                    }
-                }
-                if (bodyPart.isBleeding()){
-                    element.addText(bleeding);
-                }
-                if(bodyPart.isInfection()){
-                    element.addText(infection);
-                }
-            }
-
-            ticks = 0;
+    public void tick() {
+        for (BodyPartButton bodyPartButton : bodyPartButtons) {
+            bodyPartButton.tick();
         }
-        ticks++;
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        setScrollY(getScrollY() + (amount * -7));
+        return true;
+    }
+
+    @Override
+    protected int getMaxScrollY() {
+        int maxScrollY = 0;
+        for (BodyPartButton button : bodyPartButtons) {
+            if (button.hasText()) {
+                maxScrollY += button.getHeight() + spaceSize;
+            }
+        }
+        return maxScrollY;
+    }
+
+    @Override
+    protected int getContentsHeight() {
+        return 300;
+    }
+
+    @Override
+    protected double getDeltaYPerScroll() {
+        return 0.1;
+    }
+
+    @Override
+    protected void renderContents(DrawContext context, int mouseX, int mouseY, float delta) {
+        int y = 15;
+        for (BodyPartButton button : bodyPartButtons) {
+            if (button.hasText()) {
+                button.setPosition(this.getX() + 10, this.getY() + y);
+                button.renderButton(context, mouseX, mouseY, delta);
+                y += button.getHeight() + 8;
+            }
+        }
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        for(BodyPartButton bodyPartButton : bodyPartButtons) {
+            bodyPartButton.mouseReleased(mouseX, mouseY, button);
+        }
+        return super.mouseReleased(mouseX, mouseY, button);
+    }
+
+    @Override
+    public void mouseMoved(double mouseX, double mouseY) {
+        for(BodyPartButton bodyPartButton : bodyPartButtons) {
+            bodyPartButton.mouseMoved(mouseX, mouseY);
+        }
+        super.mouseMoved(mouseX, mouseY);
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        for(BodyPartButton bodyPartButton : bodyPartButtons) {
+            bodyPartButton.mouseClicked(mouseX, mouseY, button);
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        for(BodyPartButton bodyPartButton : bodyPartButtons) {
+            bodyPartButton.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+        }
+        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+    }
+
+    @Override
+    protected void appendClickableNarrations(NarrationMessageBuilder builder) {
+
+    }
+
+    @Override
+    protected void drawBox(DrawContext context) {
+
+    }
+
+    @Override
+    protected void renderOverlay(DrawContext context) {
+
     }
 }

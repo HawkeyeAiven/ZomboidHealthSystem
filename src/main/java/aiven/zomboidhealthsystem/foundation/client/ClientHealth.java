@@ -7,19 +7,19 @@ import net.minecraft.item.Item;
 import net.minecraft.network.PacketByteBuf;
 
 public class ClientHealth {
-    private final BodyPart head, body, leftArm, rightArm, leftLeg, rightLeg, leftFoot, rightFoot;
+    public final BodyPart head, body, leftArm, rightArm, leftLeg, rightLeg, leftFoot, rightFoot;
     private final BodyPart[] bodyParts;
     private float hp = 100;
 
     public ClientHealth() {
-        this.head = new BodyPart(4);
-        this.body = new BodyPart(6);
-        this.leftArm = new BodyPart(4);
-        this.rightArm = new BodyPart(4);
-        this.leftLeg = new BodyPart(4);
-        this.rightLeg = new BodyPart(4);
-        this.leftFoot = new BodyPart(4);
-        this.rightFoot = new BodyPart(4);
+        this.head = new BodyPart(4, Health.HEAD_ID);
+        this.body = new BodyPart(6, Health.BODY_ID);
+        this.leftArm = new BodyPart(4, Health.LEFT_ARM_ID);
+        this.rightArm = new BodyPart(4, Health.RIGHT_ARM_ID);
+        this.leftLeg = new BodyPart(4, Health.LEFT_LEG_ID);
+        this.rightLeg = new BodyPart(4, Health.RIGHT_LEG_ID);
+        this.leftFoot = new BodyPart(4, Health.LEFT_FOOT_ID);
+        this.rightFoot = new BodyPart(4, Health.RIGHT_FOOT_ID);
 
         this.bodyParts = new BodyPart[]{head,body,leftArm,rightArm,leftLeg,rightLeg,leftFoot,rightFoot};
     }
@@ -30,8 +30,6 @@ public class ClientHealth {
     }
 
     private void set(String health) {
-        String[] ids = new String[]{Health.HEAD_ID,Health.BODY_ID,Health.LEFT_ARM_ID,Health.RIGHT_ARM_ID,Health.LEFT_LEG_ID,Health.RIGHT_LEG_ID,Health.LEFT_FOOT_ID,Health.RIGHT_FOOT_ID};
-
         {
             String playerHp = Json.getValue(health, "player_hp");
             if(playerHp != null) {
@@ -41,8 +39,8 @@ public class ClientHealth {
             }
         }
 
-        for(int index = 0; index < ids.length; index++) {
-            String id = ids[index];
+        for(int index = 0; index < bodyParts.length; index++) {
+            String id = bodyParts[index].getId();
             String value = Json.getValue(health, id);
             BodyPart bodyPart = this.indexOf(index);
 
@@ -68,7 +66,6 @@ public class ClientHealth {
                     }
                 }
 
-                boolean stopBleeding = false;
                 {
                     String bandageItemRawIdString = Json.getValue(value, "bandage_item");
                     if(bandageItemRawIdString != null) {
@@ -76,7 +73,7 @@ public class ClientHealth {
                         Item item = Item.byRawId(rawId);
                         try {
                             BandageItem bandage = (BandageItem) item;
-                            stopBleeding = bandage.isStopBleeding();
+                            bodyPart.setBandageStopBleeding(bandage.isStopBleeding());
                             bodyPart.setBandaged(true);
                             bodyPart.setDirtyBandage(bandage.isDirty());
                         } catch (Exception ignored) {
@@ -87,12 +84,8 @@ public class ClientHealth {
                     }
                 }
 
-                if(!stopBleeding) {
-                    String bleedingString = Json.getValue(value, "bleeding");
-                    bodyPart.setBleeding(bleedingString != null);
-                } else {
-                    bodyPart.setBleeding(false);
-                }
+                String bleedingString = Json.getValue(value, "bleeding");
+                bodyPart.setBleeding(bleedingString != null);
 
                 {
                     String infection = Json.getValue(value, "infection");
@@ -106,6 +99,15 @@ public class ClientHealth {
 
             }
         }
+    }
+
+    public BodyPart get(String id) {
+        for(BodyPart part : bodyParts) {
+            if(part.getId().equals(id)) {
+                return part;
+            }
+        }
+        return null;
     }
 
     public BodyPart indexOf(int index) {
@@ -168,6 +170,10 @@ public class ClientHealth {
         return rightLeg;
     }
 
+    public BodyPart[] getBodyParts() {
+        return bodyParts;
+    }
+
     public static class BodyPart {
         private float hp;
         private float additionalHp = 0;
@@ -176,10 +182,17 @@ public class ClientHealth {
         boolean isInfection = false;
         boolean isBandaged = false;
         boolean isDirtyBandage = false;
+        boolean isBandageStopBleeding = false;
+        private final String id;
 
-        public BodyPart(float maxHp) {
+        public BodyPart(float maxHp, String id) {
             this.maxHp = maxHp;
             this.hp = maxHp;
+            this.id = id;
+        }
+
+        public String getId() {
+            return id;
         }
 
         public void setInfection(boolean infection) {
@@ -198,6 +211,10 @@ public class ClientHealth {
             isDirtyBandage = dirtyBandage;
         }
 
+        public void setBandageStopBleeding(boolean bandageStopBleeding) {
+            isBandageStopBleeding = bandageStopBleeding;
+        }
+
         public boolean isBleeding() {
             return isBleeding;
         }
@@ -212,6 +229,10 @@ public class ClientHealth {
 
         public boolean isDirtyBandage() {
             return isDirtyBandage;
+        }
+
+        public boolean isBandageStopBleeding() {
+            return isBandageStopBleeding;
         }
 
         public float getMaxHp() {
@@ -245,6 +266,7 @@ public class ClientHealth {
             setBandaged(false);
             setDirtyBandage(false);
             setAdditionalHp(0);
+            setBandageStopBleeding(false);
         }
     }
 }

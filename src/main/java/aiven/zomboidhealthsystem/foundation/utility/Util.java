@@ -18,22 +18,8 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeKeys;
-import org.joml.Vector2f;
 
 public class Util {
-    public static Vector2f toVector2f(String string) {
-        StringBuilder stringBuilder = new StringBuilder(string.replace(',', '.').replaceAll(" {2}", " "));
-        stringBuilder.deleteCharAt(0);
-        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-        if(stringBuilder.charAt(0) == ' ') {
-            stringBuilder.deleteCharAt(0);
-        }
-        String[] numbers = stringBuilder.toString().split(" ");
-        return new Vector2f(Float.parseFloat(numbers[0]), Float.parseFloat(numbers[1]));
-    }
-
     public static int getArmorCount(PlayerEntity player) {
         int d = 0;
 
@@ -92,25 +78,6 @@ public class Util {
         return string.toString();
     }
 
-    public static boolean isOcean(RegistryKey<Biome> key){
-        for(RegistryKey<Biome> k : new RegistryKey[]{
-                BiomeKeys.OCEAN,
-                BiomeKeys.DEEP_OCEAN,
-                BiomeKeys.COLD_OCEAN,
-                BiomeKeys.DEEP_OCEAN,
-                BiomeKeys.FROZEN_OCEAN,
-                BiomeKeys.LUKEWARM_OCEAN,
-                BiomeKeys.WARM_OCEAN,
-                BiomeKeys.DEEP_COLD_OCEAN,
-                BiomeKeys.DEEP_FROZEN_OCEAN
-        }){
-            if(key.equals(k)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public static boolean isInOpenSpace(World world, BlockPos pos) {
         if (world.getBlockState(pos).getBlock().equals(Blocks.CAVE_AIR)) {
             return false;
@@ -160,6 +127,15 @@ public class Util {
         return false;
     }
 
+    public static BandageItem getBandageItem(PlayerInventory inventory) {
+        for(int i = 0; i < inventory.size(); i++) {
+            if(inventory.getStack(i).getItem() instanceof BandageItem bandageItem) {
+                return bandageItem;
+            }
+        }
+        return null;
+    }
+
     public static Item getCooldowningBandageItem(PlayerEntity player){
         PlayerInventory inv = player.getInventory();
         for(int i = 0; i < inv.size(); i++){
@@ -184,19 +160,18 @@ public class Util {
     }
 
     public static void addStatusEffect(PlayerEntity user, StatusEffect effect, int duration, int amplifier){
-        int amplifier1 = amplifier - 1;
-
-        if(amplifier1 != -1) {
-            StatusEffectInstance statusEffectInstance =
-                    new StatusEffectInstance(
-                            effect,
-                            duration,
-                            amplifier1,
-                            false,
-                            false,
-                            true);
-            user.addStatusEffect(statusEffectInstance);
+        if(amplifier < 0) {
+            return;
         }
+        StatusEffectInstance statusEffectInstance =
+                new StatusEffectInstance(
+                        effect,
+                        duration,
+                        amplifier,
+                        false,
+                        false,
+                        true);
+        user.addStatusEffect(statusEffectInstance);
     }
 
     public static double toDouble(float number){

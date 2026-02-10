@@ -2,6 +2,7 @@ package aiven.zomboidhealthsystem.foundation.player;
 
 import aiven.zomboidhealthsystem.Config;
 import aiven.zomboidhealthsystem.ModDamageTypes;
+import aiven.zomboidhealthsystem.ModStatusEffects;
 import aiven.zomboidhealthsystem.ZomboidHealthSystem;
 import aiven.zomboidhealthsystem.foundation.player.moodles.*;
 import aiven.zomboidhealthsystem.foundation.items.BandageItem;
@@ -58,7 +59,7 @@ public class Health {
     public static final int BANDAGE_BECOME_DIRTY_AFTER = 2 * 60 * 20;
     public static final int UPDATE_FREQUENCY = ZomboidHealthSystem.UPDATE_FREQUENCY;
     public static final int INFECTION_TIME = Config.INFECTION_TIME.getValue();
-    public static final int MAX_SLOWNESS_AMPLIFIER = 4;
+    public static final int MAX_SLOWNESS_AMPLIFIER = 4 - 1;
     public static final int PLAYER_FALLING_IF_AMPLIFIER = MAX_SLOWNESS_AMPLIFIER;
 
     private final PlayerEntity user;
@@ -229,16 +230,16 @@ public class Health {
 
                 if (this.getInfection() > INFECTION_TIME * 2) {
 
-                    this.getHealth().addStatusEffect(StatusEffects.SLOWNESS, 1, 15 * 20);
+                    this.getHealth().addStatusEffect(StatusEffects.SLOWNESS, 1 - 1, 15 * 20);
 
                     if (this.getInfection() > INFECTION_TIME * 3) {
 
-                        this.getHealth().addStatusEffect(StatusEffects.MINING_FATIGUE, 1, 15 * 20);
+                        this.getHealth().addStatusEffect(StatusEffects.MINING_FATIGUE, 1 - 1, 15 * 20);
 
                         if (this.getInfection() > INFECTION_TIME * 4) {
 
-                            this.getHealth().addStatusEffect(StatusEffects.SLOWNESS, 2, 15 * 20);
-                            this.getHealth().addStatusEffect(StatusEffects.WEAKNESS, 1, 15 * 20);
+                            this.getHealth().addStatusEffect(StatusEffects.SLOWNESS, 2 - 1, 15 * 20);
+                            this.getHealth().addStatusEffect(StatusEffects.WEAKNESS, 1 - 1, 15 * 20);
 
                             if (this.getInfection() > INFECTION_TIME * 5) {
 
@@ -246,7 +247,7 @@ public class Health {
                                     this.getHealth().stumble(0);
                                 }
                                 if (random(20 * 20)) {
-                                    this.getHealth().addStatusEffect(StatusEffects.NAUSEA, 1, 7 * 20);
+                                    this.getHealth().addStatusEffect(StatusEffects.NAUSEA, 0, 7 * 20);
                                 }
 
                                 if (this.getInfection() > INFECTION_TIME * 6) {
@@ -255,11 +256,11 @@ public class Health {
                                         this.getHealth().stumble(0);
                                     }
                                     if (random(20 * 20)) {
-                                        this.getHealth().addStatusEffect(StatusEffects.BLINDNESS, 1, 7 * 20);
+                                        this.getHealth().addStatusEffect(StatusEffects.BLINDNESS, 0, 7 * 20);
                                     }
 
                                     if (this.getInfection() > INFECTION_TIME * 7) {
-                                        this.getHealth().addStatusEffect(StatusEffects.POISON, 1, 15 * 20);
+                                        this.getHealth().addStatusEffect(StatusEffects.POISON, 0, 15 * 20);
                                     }
                                 }
                             }
@@ -458,7 +459,7 @@ public class Health {
         @Override
         protected void onDamage(float amount) {
             if (amount >= 1) {
-                Util.addStatusEffect(this.getPlayer(), StatusEffects.BLINDNESS, 10 * 20, 1);
+                getHealth().addStatusEffect(StatusEffects.BLINDNESS, 10 * 20, 0);
                 this.getHealth().damagePlayerHp(new DamageSource(this.getPlayer().getWorld().getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(ModDamageTypes.BLEEDING)),amount * 5f);
             }
         }
@@ -478,7 +479,7 @@ public class Health {
             super.update();
             if (this.getMaxHp() / 2 >= this.getHp()) {
                 if(random(3 * 60 * 20)){
-                    Util.addStatusEffect(this.getPlayer(), StatusEffects.BLINDNESS, 10 * 20, 1);
+                    getHealth().addStatusEffect(StatusEffects.BLINDNESS, 10 * 20, 0);
                 }
             }
         }
@@ -512,7 +513,7 @@ public class Health {
             super.update();
             if (this.getMaxHp() / 2 >= this.getHp()) {
                 if(random(3 * 60 * 20)){
-                    Util.addStatusEffect(this.getPlayer(), StatusEffects.NAUSEA, 10 * 20, 1);
+                    getHealth().addStatusEffect(StatusEffects.NAUSEA, 10 * 20, 0);
                 }
             }
         }
@@ -602,16 +603,37 @@ public class Health {
             if (effectAmplifiers.slownessAmplifier > MAX_SLOWNESS_AMPLIFIER) {
                 effectAmplifiers.slownessAmplifier = MAX_SLOWNESS_AMPLIFIER;
             }
-
-            addStatusEffect(StatusEffects.SLOWNESS, (int) effectAmplifiers.slownessAmplifier, 15 * 20);
-            addStatusEffect(StatusEffects.MINING_FATIGUE, (int) effectAmplifiers.fatigueAmplifier, 15 * 20);
-            addStatusEffect(StatusEffects.WEAKNESS, (int) effectAmplifiers.fatigueAmplifier, 15 * 20);
+            if(effectAmplifiers.slownessAmplifier >= 1) {
+                addStatusEffect(StatusEffects.SLOWNESS, (int) effectAmplifiers.slownessAmplifier - 1, 15 * 20);
+            }
+            if(effectAmplifiers.fatigueAmplifier >= 1) {
+                addStatusEffect(StatusEffects.MINING_FATIGUE, (int) effectAmplifiers.fatigueAmplifier - 1, 15 * 20);
+                addStatusEffect(StatusEffects.WEAKNESS, (int) effectAmplifiers.fatigueAmplifier - 1, 15 * 20);
+            }
 
             if (this.getPlayerHp() <= 0) {
                 this.onDeath(Util.getDamageSource(ModDamageTypes.BLEEDING,  this.getPlayer().getWorld()));
             }
 
             this.getPain().applyEffects();
+
+            if(Config.SHOW_INJURED_ICON.getValue()) {
+                float sumHp = getSumOfHp();
+                float maxSumHp = getMaxSumOfHp();
+                if (sumHp <= maxSumHp - 2) {
+                    this.addStatusEffect(ModStatusEffects.INJURED, Math.min(9, (int) ((getMaxSumOfHp() - sumHp) / 2) - 1), 15 * 20);
+                } else if (this.getPlayer().hasStatusEffect(ModStatusEffects.INJURED)) {
+                    this.removeStatusEffect(ModStatusEffects.INJURED);
+                }
+            }
+
+            if(Config.SHOW_BLEEDING_ICON.getValue()) {
+                if (isBleeding()) {
+                    this.addStatusEffect(ModStatusEffects.BLEEDING, 0, 15 * 20);
+                } else if (getPlayer().hasStatusEffect(ModStatusEffects.BLEEDING)) {
+                    this.removeStatusEffect(ModStatusEffects.BLEEDING);
+                }
+            }
         }
     }
 
@@ -742,6 +764,15 @@ public class Health {
         }
     }
 
+    public boolean isBleeding() {
+        for(BodyPart part : bodyParts) {
+            if(part.isBleeding() && (!part.isBandaged() || !((BandageItem) part.getBandageItem()).isStopBleeding())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Pain getPain() {
         return this.pain;
     }
@@ -812,7 +843,7 @@ public class Health {
         return bl;
     }
 
-    public float getSumHp() {
+    public float getSumOfHp() {
         float sum = 0;
         for (BodyPart part : bodyParts) {
             sum += part.getHp();
@@ -836,7 +867,7 @@ public class Health {
         return count;
     }
 
-    public float getMaxSumHp() {
+    public float getMaxSumOfHp() {
         float d = 0;
         for (BodyPart part : bodyParts) {
             d += part.getMaxHp();
@@ -845,7 +876,7 @@ public class Health {
     }
 
     public float getBodyHpPercent() {
-        return getSumHp() / getMaxSumHp();
+        return getSumOfHp() / getMaxSumOfHp();
     }
 
     public void onDeath(DamageSource source) {
@@ -918,7 +949,7 @@ public class Health {
             return rightFoot;
     }
 
-    public void clearEffect(StatusEffect effect){
+    public void removeStatusEffect(StatusEffect effect){
         if(this.getPlayer().hasStatusEffect(effect)){
             this.getPlayer().removeStatusEffect(effect);
         }

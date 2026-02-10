@@ -44,22 +44,22 @@ public class Thirst extends Moodle {
             if (amount >= 2) {
 
                 if (random(4 * 60 * 20)) {
-                    this.getHealth().addStatusEffect(StatusEffects.BLINDNESS, 1, 10 * 20);
+                    this.getHealth().addStatusEffect(StatusEffects.BLINDNESS, 0, 10 * 20);
                 }
 
-                if (amount >= 2.4f) {
-
+                if (amount >= 2.4F) {
+                    this.getHealth().addStatusEffect(StatusEffects.SLOWNESS, (int) (amount - 1.6F), 15 * 20);
                     if (random(2 * 60 * 20)) {
                         this.getHealth().stumble(0);
                     }
 
-                    if (amount >= 2.8f) {
-                        this.getHealth().addStatusEffect(StatusEffects.BLINDNESS, 1, 15 * 20);
+                    if (amount >= 2.8F) {
+                        this.getHealth().addStatusEffect(StatusEffects.BLINDNESS, 0, 15 * 20);
                         if (random(60 * 20)) {
                             this.getHealth().stumble(0);
                         }
 
-                        if (amount >= 3.1f) {
+                        if (amount >= 3.1F) {
                             this.getHealth().onDeath(this.source);
                         }
                     }

@@ -1,15 +1,14 @@
 package aiven.zomboidhealthsystem.foundation.gui.widget;
 
 import aiven.zomboidhealthsystem.ZomboidHealthSystem;
-import aiven.zomboidhealthsystem.ZomboidHealthSystemClient;
 import aiven.zomboidhealthsystem.foundation.gui.screen.WorldSettingsScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Identifier;
 
-public class WorldPropertiesButton extends ModButton {
+public class WorldPropertiesButton extends ModClickableWidget {
     public WorldPropertiesButton(int x, int y) {
-        super(x, y, 20,20, null, ((x1, y1, button) -> MinecraftClient.getInstance().setScreen(new WorldSettingsScreen(MinecraftClient.getInstance().currentScreen))));
+        super(x, y, 20,20, null);
     }
 
     @Override
@@ -29,5 +28,10 @@ public class WorldPropertiesButton extends ModButton {
     @Override
     protected Identifier getTextureOff() {
         return new Identifier(ZomboidHealthSystem.ID,"textures/gui/square_button_off.png");
+    }
+
+    @Override
+    public void onClick(double mouseX, double mouseY) {
+        MinecraftClient.getInstance().setScreen(new WorldSettingsScreen(MinecraftClient.getInstance().currentScreen));
     }
 }

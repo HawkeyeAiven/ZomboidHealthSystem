@@ -124,7 +124,7 @@ public class Drowsiness extends Moodle {
 
         if (this.getAmplifier() >= 1) {
             if (random((int) (5 * 60 * 20 / this.getAmplifier()))) {
-                this.getHealth().addStatusEffect(StatusEffects.BLINDNESS, 1, 5 * 20);
+                this.getHealth().addStatusEffect(StatusEffects.BLINDNESS, 0, 5 * 20);
             }
 
             if (this.getAmplifier() >= 2) {
@@ -133,7 +133,7 @@ public class Drowsiness extends Moodle {
                 }
 
                 if (this.getAmplifier() >= 3) {
-                    this.getHealth().addStatusEffect(StatusEffects.MINING_FATIGUE, (int) (this.getAmplifier() / 2), 15 * 20);
+                    this.getHealth().addStatusEffect(StatusEffects.MINING_FATIGUE, (int) (this.getAmplifier() / 2) - 1, 15 * 20);
 
                     if(this.getAmplifier() >= 5){
                         this.getHealth().onDeath(this.source);
@@ -165,7 +165,7 @@ public class Drowsiness extends Moodle {
 
     @Override
     public int getEffectAmplifier() {
-        return (int) getAmplifier();
+        return (int) getAmplifier() - 1;
     }
 
     public float getAmplifier() {

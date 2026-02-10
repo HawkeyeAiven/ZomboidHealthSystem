@@ -23,13 +23,13 @@ public abstract class Moodle {
         if(getEffect() != null) {
             if (!hasIcon()) {
                 if (this.getPlayer().hasStatusEffect(getEffect())) {
-                    this.getHealth().clearEffect(getEffect());
+                    this.getHealth().removeStatusEffect(getEffect());
                 }
             } else {
-                if (this.getPlayer().hasStatusEffect(getEffect()) && this.getPlayer().getStatusEffect(getEffect()).getAmplifier() != getEffectAmplifier() - 1) {
-                    this.getHealth().clearEffect(getEffect());
+                if (this.getPlayer().hasStatusEffect(getEffect()) && this.getPlayer().getStatusEffect(getEffect()).getAmplifier() != getEffectAmplifier()) {
+                    this.getHealth().removeStatusEffect(getEffect());
                 }
-                this.getHealth().addStatusEffect(getEffect(), Math.min((int) getAmount(), 10), 15 * 20);
+                this.getHealth().addStatusEffect(getEffect(), Math.min(getEffectAmplifier(), 10 - 1), 15 * 20);
             }
         }
     }
@@ -75,7 +75,7 @@ public abstract class Moodle {
     }
 
     public int getEffectAmplifier() {
-        return (int) getAmount();
+        return (int) getAmount() - 1;
     }
 
     public float getMultiplier() {

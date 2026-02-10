@@ -10,39 +10,36 @@ import net.minecraft.text.Text;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Environment(EnvType.CLIENT)
-public class ButtonsContainer extends ModButton {
-    public boolean isButtonsHidden;
-    public int buttonWidth, buttonHeight;
+public class ButtonsContainer extends ModClickableWidget {
+    public boolean areButtonsHidden;
 
-    public CopyOnWriteArrayList<ClickableWidget> buttons = new CopyOnWriteArrayList<>();
+    public CopyOnWriteArrayList<ModClickableWidget> buttons = new CopyOnWriteArrayList<>();
 
-    public ButtonsContainer(int x, int y, int width, int height, Text text, boolean isButtonsHidden){
-        super(x, y, width, height, text,null);
-        this.isButtonsHidden = isButtonsHidden;
-        this.buttonWidth = width;
-        this.buttonHeight = height;
+    public ButtonsContainer(int x, int y, int width, int height, Text text, boolean areButtonsHidden){
+        super(x, y, width, height, text);
+        this.areButtonsHidden = areButtonsHidden;
     }
 
     public ButtonsContainer(int x, int y, int width, int height, Text text) {
         this(x, y, width, height, text,true);
     }
 
-    public void addButton(ClickableWidget button) {
+    public void addButton(ModClickableWidget button) {
         this.buttons.add(button);
     }
 
-    public void removeButton(ClickableWidget button){
+    public void removeButton(ModClickableWidget button){
         this.buttons.remove(button);
     }
 
     private void updatePoses(){
-        this.height = 20;
-        if(!isButtonsHidden) {
-            for (ClickableWidget button : this.buttons) {
+        this.contentHeight = 20;
+        if(!areButtonsHidden) {
+            for (ModClickableWidget button : this.buttons) {
                 if (button.visible) {
-                    button.setY(this.getY() + this.height);
+                    button.setY(this.getY() + this.contentHeight);
                     button.setX(this.getX() + 10);
-                    this.height += button.getHeight();
+                    this.contentHeight += button.getLowestPoint() - button.getY();
                 }
             }
         }
@@ -58,7 +55,7 @@ public class ButtonsContainer extends ModButton {
             button.visible = false;
             button.active = false;
         }
-        this.isButtonsHidden = true;
+        this.areButtonsHidden = true;
     }
 
     public void unHideButtons(){
@@ -66,14 +63,14 @@ public class ButtonsContainer extends ModButton {
             button.visible = true;
             button.active = true;
         }
-        this.isButtonsHidden = false;
+        this.areButtonsHidden = false;
     }
 
     @Override
     protected void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
         updatePoses();
-        super.renderButton(context, mouseX, mouseY, delta, this.getX(), this.getY(), this.getButtonWidth(), this.getButtonHeight());
-        if(!isButtonsHidden) {
+        super.renderButton(context, mouseX, mouseY, delta);
+        if(!areButtonsHidden) {
             for (ClickableWidget button : buttons) {
                 if(button.visible) {
                     button.render(context, mouseX, mouseY, delta);
@@ -117,7 +114,7 @@ public class ButtonsContainer extends ModButton {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         boolean bl = false;
-        if(!isButtonsHidden) {
+        if(!areButtonsHidden) {
             for (ClickableWidget widget : buttons) {
                 if (widget.mouseClicked(mouseX, mouseY, button)) {
                     bl = true;
@@ -125,7 +122,7 @@ public class ButtonsContainer extends ModButton {
             }
         }
         if(clicked(mouseX,mouseY)){
-            if(!isButtonsHidden){
+            if(!areButtonsHidden){
                 hideButtons();
             } else {
                 unHideButtons();
@@ -134,31 +131,5 @@ public class ButtonsContainer extends ModButton {
             return true;
         }
         return bl;
-    }
-
-    @Override
-    protected boolean clicked(double mouseX, double mouseY) {
-        return this.active && this.visible && isMouseOver(mouseX, mouseY);
-    }
-
-    @Override
-    public boolean isMouseOver(double mouseX, double mouseY) {
-        return mouseX >= (double)this.getX() && mouseY >= (double)this.getY() && mouseX < (double)(this.getX() + 60) && mouseY < (double)(this.getY() + 20);
-    }
-
-    public int getButtonHeight() {
-        return buttonHeight;
-    }
-
-    public int getButtonWidth() {
-        return buttonWidth;
-    }
-
-    public void setButtonHeight(int buttonHeight) {
-        this.buttonHeight = buttonHeight;
-    }
-
-    public void setButtonWidth(int buttonWidth) {
-        this.buttonWidth = buttonWidth;
     }
 }

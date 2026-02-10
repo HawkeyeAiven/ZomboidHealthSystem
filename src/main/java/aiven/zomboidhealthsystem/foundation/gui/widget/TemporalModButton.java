@@ -1,14 +1,13 @@
 package aiven.zomboidhealthsystem.foundation.gui.widget;
 
-import aiven.zomboidhealthsystem.foundation.gui.OnClick;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.text.Text;
 
 @Environment(EnvType.CLIENT)
-public class TemporalButton extends ModButton {
-    public TemporalButton(int x, int y, int width, int height, Text message, OnClick task) {
-        super(x, y, width, height, message, task);
+public class TemporalModButton extends ModClickableWidget {
+    public TemporalModButton(int x, int y, int width, int height, Text message) {
+        super(x, y, width, height, message);
     }
 
     @Override

@@ -23,8 +23,8 @@ public class Temperature extends Moodle {
     public static final float MIN_COMFORTABLE_TEMPERATURE = Config.MIN_COMFORTABLE_TEMP.getValue();
     public static final float MAX_COMFORTABLE_TEMPERATURE = Config.MAX_COMFORTABLE_TEMP.getValue();
     public static final float AVERAGE_TEMPERATURE_BODY = 37.0F;
-    public static final float MIN_TEMPERATURE_BODY = AVERAGE_TEMPERATURE_BODY - 5;
-    public static final float MAX_TEMPERATURE_BODY = AVERAGE_TEMPERATURE_BODY + 5;
+    public static final float MIN_TEMPERATURE_BODY = AVERAGE_TEMPERATURE_BODY - 6;
+    public static final float MAX_TEMPERATURE_BODY = AVERAGE_TEMPERATURE_BODY + 6;
 
     private final DamageSource hypothermia;
     private final DamageSource hyperthermia;
@@ -45,31 +45,33 @@ public class Temperature extends Moodle {
     public void update() {
         float deltaTemp = Math.abs(this.getAmount() - AVERAGE_TEMPERATURE_BODY);
         boolean isOverWorld = isOverWorld();
+        this.getHealth().getExhaustion().addMultiplier(this, 1.0F);
         if(ModServer.WORLD_SETTINGS.hasTemperature()) {
             if (i++ >= UPDATE_MULTIPLIER - 1) {
-                float d = getHeatFromHeatSources() + getHeatFromArmor();
-                float temperature = getInternalHeat() + getHeatFromWeather() + getHeatFromHeatSources();
                 Thirst thirst = getHealth().getThirst();
+
+                float temperature = getPerceivedTemperature();
                 float minComfortableTemp = getMinComfortableTemperature();
                 float maxComfortableTemp = getMaxComfortableTemperature();
 
-                this.getHealth().getExhaustion().addMultiplier(this, 1.0F);
+                boolean isDecreasing = false, isIncreasing = false;
 
                 if (temperature < minComfortableTemp && isOverWorld) {
                     this.amount -= (((minComfortableTemp - temperature) / 2)
                             / 10000
-                            * Config.TEMPERATURE_MULTIPLIER.getValue()
                             * (20.0F / Math.max(10.0F, getPlayer().getHungerManager().getFoodLevel()))
+                            * Config.TEMPERATURE_MULTIPLIER.getValue()
                             * UPDATE_FREQUENCY
                     );
-                } else if (temperature - (d / 2) > maxComfortableTemp && isOverWorld) {
-                    this.amount += (((temperature - (d / 2) - maxComfortableTemp) / 2)
+                    isDecreasing = true;
+                } else if (temperature > maxComfortableTemp && isOverWorld) {
+                    this.amount += (((temperature - maxComfortableTemp) / 2)
                             / 10000
-                            / 5
                             * Math.max(1, thirst.getAmount())
                             * Config.TEMPERATURE_MULTIPLIER.getValue()
                             * UPDATE_FREQUENCY
                     );
+                    isIncreasing = true;
                 } else {
                     if (this.amount < AVERAGE_TEMPERATURE_BODY - 0.1F) {
                         this.amount += 0.003F
@@ -84,38 +86,62 @@ public class Temperature extends Moodle {
                         thirst.setAmount(thirst.getAmount() + (thirst.getSpeed() / 3.0F));
                     }
                 }
+
+                if(isDecreasing) {
+                    getHealth().addStatusEffect(ModStatusEffects.COLD_WEATHER, 0, 15 * 20);
+                } else if(getPlayer().hasStatusEffect(ModStatusEffects.COLD_WEATHER)){
+                    getHealth().removeStatusEffect(ModStatusEffects.COLD_WEATHER);
+                }
+
+                if(isIncreasing) {
+                    getHealth().addStatusEffect(ModStatusEffects.HOT_WEATHER, 0, 15 * 20);
+                } else if(getPlayer().hasStatusEffect(ModStatusEffects.HOT_WEATHER)){
+                    getHealth().removeStatusEffect(ModStatusEffects.HOT_WEATHER);
+                }
+
+                if(deltaTemp >= 1.5F) {
+                    this.getHealth().getExhaustion().addMultiplier(this, deltaTemp / 1.5F);
+                    if(deltaTemp >= 3.0F) {
+                        this.getHealth().addStatusEffect(StatusEffects.SLOWNESS, (int) deltaTemp / 2 - 1, 15 * 20);
+                        this.getHealth().addStatusEffect(StatusEffects.MINING_FATIGUE, (int) deltaTemp / 2 - 1, 15 * 20);
+                        this.getHealth().addStatusEffect(StatusEffects.WEAKNESS, (int) deltaTemp / 2 - 1, 15 * 20);
+                        if(random(2 * 60 * 20)) {
+                            this.getHealth().addStatusEffect(StatusEffects.NAUSEA, 0, 5);
+                        }
+                        if(random(2 * 60 * 20)) {
+                            this.getHealth().addStatusEffect(StatusEffects.DARKNESS, 0, 5);
+                        }
+                        if(deltaTemp >= 4.5F) {
+                            if(random(2 * 60 * 20)) {
+                                getHealth().stumble(0);
+                            }
+                            if(random(60 * 20)) {
+                                this.getHealth().addStatusEffect(StatusEffects.NAUSEA, 0, 5);
+                            }
+                            if(random(60 * 20)) {
+                                this.getHealth().addStatusEffect(StatusEffects.DARKNESS, 0, 5);
+                            }
+                        }
+                    }
+                }
+
+                if(this.getAmount() < AVERAGE_TEMPERATURE_BODY - 1.5F) {
+                    this.getHealth().addStatusEffect(ModStatusEffects.HYPOTHERMIA, (int) (deltaTemp / 1.5F) - 1, 15 * 20);
+
+                } else if(this.getAmount() > AVERAGE_TEMPERATURE_BODY + 1.5F) {
+                    this.getHealth().addStatusEffect(ModStatusEffects.HYPERTHERMIA, (int) (deltaTemp / 1.5F) - 1, 15 * 20);
+                }
+
+                if (this.amount < MIN_TEMPERATURE_BODY) {
+                    this.getHealth().onDeath(this.hypothermia);
+                }
+                if (this.amount > MAX_TEMPERATURE_BODY) {
+                    this.getHealth().onDeath(this.hyperthermia);
+                }
+
                 i = 0;
             }
 
-        }
-
-        if(deltaTemp >= 1.5F) {
-            this.getHealth().getExhaustion().addMultiplier(this, deltaTemp / 1.5F);
-            if(deltaTemp >= 3.5F) {
-                this.getHealth().addStatusEffect(StatusEffects.SLOWNESS, (int) deltaTemp / 2, 15 * 20);
-                if(random(2 * 60 * 20)) {
-                    this.getHealth().addStatusEffect(StatusEffects.NAUSEA, 1, 5);
-                }
-                if(random(2 * 60 * 20)) {
-                    this.getHealth().addStatusEffect(StatusEffects.DARKNESS, 1, 5);
-                }
-            }
-        }
-
-        if(this.getAmount() < AVERAGE_TEMPERATURE_BODY - 1.5F) {
-            this.getHealth().addStatusEffect(ModStatusEffects.HYPOTHERMIA, (int) (deltaTemp / 1.5F), 15 * 20);
-
-        } else if(this.getAmount() > AVERAGE_TEMPERATURE_BODY + 1.5F) {
-            this.getHealth().addStatusEffect(ModStatusEffects.HYPERTHERMIA, (int) (deltaTemp / 1.5F), 15 * 20);
-            this.getHealth().getWet().addAmount(0.005F / 20 * UPDATE_FREQUENCY);
-        }
-
-
-        if (this.amount < MIN_TEMPERATURE_BODY) {
-            this.getHealth().onDeath(this.hypothermia);
-        }
-        if (this.amount > MAX_TEMPERATURE_BODY) {
-            this.getHealth().onDeath(this.hyperthermia);
         }
 
         heat = 0;
@@ -150,7 +176,7 @@ public class Temperature extends Moodle {
     }
 
     public float getPerceivedTemperature() {
-        return getInternalHeat() + getHeatFromWeather() + getHeatFromHeatSources();
+        return getInternalHeat() + getHeatFromWeather() + getHeatFromHeatSources() + getHeatFromArmor();
     }
 
     public float getInternalHeat() {
@@ -165,8 +191,9 @@ public class Temperature extends Moodle {
 
         if (getPlayer().hasStatusEffect(ModStatusEffects.WIND)) {
             int amplifier = getPlayer().getStatusEffect(ModStatusEffects.WIND).getAmplifier();
-            temperature -= amplifier;
+            temperature -= amplifier * (getHealth().getWet().getAmount() / 2 + 1);
         }
+
         return temperature;
     }
 
