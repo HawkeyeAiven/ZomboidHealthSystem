@@ -29,6 +29,7 @@ public class Config {
     public static final FloatCodec THIRST_MULTIPLIER = (FloatCodec) CONFIG.add(new FloatCodec("thirst_multiplier", 1.0F));
     public static final FloatCodec EXHAUSTION_MULTIPLIER = (FloatCodec) CONFIG.add(new FloatCodec("exhaustion_multiplier", 1.0F));
     public static final FloatCodec WET_MULTIPLIER = (FloatCodec) CONFIG.add(new FloatCodec("wet_multiplier", 1.0F));
+    public static final FloatCodec HUNGER_MULTIPLIER = (FloatCodec) CONFIG.add(new FloatCodec("hunger_multiplier", 1.0F));
     public static final FloatCodec DAMAGE_MULTIPLIER = (FloatCodec) CONFIG.add(new FloatCodec("damage_multiplier", 1.1F));
 
     public static final FloatCodec MAX_SEASON_TEMPERATURE = (FloatCodec) CONFIG.add(new FloatCodec("max_season_temperature", 20.0F));
@@ -55,7 +56,6 @@ public class Config {
 
     public static final FloatCodec AVERAGE_BLEEDING_CHANCE = (FloatCodec) CONFIG.add(new FloatCodec("average_bleeding_chance", 0.25F));
 
-    public static final IntegerCodec MIN_HUNGER_FOR_SLEEP = (IntegerCodec) CONFIG.add(new IntegerCodec("min_hunger_for_sleep", 11));
     public static final IntegerCodec HEAL_TIME = (IntegerCodec) CONFIG.add(new IntegerCodec("heal_time", 40 * 60 * 20));
     public static final IntegerCodec FOOD_HEAL_AMOUNT = (IntegerCodec) CONFIG.add(new IntegerCodec("food_heal_amount",2));
     public static final IntegerCodec UPDATE_FREQUENCY = (IntegerCodec) CONFIG.add(new IntegerCodec("update_frequency", 5));

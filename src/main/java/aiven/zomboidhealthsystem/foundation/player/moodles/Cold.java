@@ -5,17 +5,13 @@ import aiven.zomboidhealthsystem.ModDamageTypes;
 import aiven.zomboidhealthsystem.ModStatusEffects;
 import aiven.zomboidhealthsystem.foundation.player.Health;
 import aiven.zomboidhealthsystem.foundation.utility.Util;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
 
 
 public class Cold extends Moodle {
-    private final DamageSource source;
-
     public Cold(Health health){
         super(health);
-        source = Util.getDamageSource(ModDamageTypes.COLD, getPlayer().getWorld());
     }
 
     @Override
@@ -45,7 +41,7 @@ public class Cold extends Moodle {
         float d = Math.max((float) Math.sqrt(35.0F - bodyTemperature),1);
 
         if (bodyTemperature < 35.0F && getAmount() < 1.0F) {
-            this.addAmount(1.0F / (5 * 60 * 20) * d * wet * Config.COLD_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
+            this.addAmount(1.0F / (5 * 60 * 20) * getMultiplier() * d * wet * Config.COLD_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
         }
 
         this.getHealth().getExhaustion().addMultiplier(this, Math.max(getAmount(), 1));
@@ -64,7 +60,7 @@ public class Cold extends Moodle {
                 }
 
                 if(getAmount() >= 3.1F) {
-                    this.getHealth().onDeath(source);
+                    this.getHealth().onDeath(Util.getDamageSource(ModDamageTypes.COLD, getPlayer().getWorld()));
                 }
             }
         }

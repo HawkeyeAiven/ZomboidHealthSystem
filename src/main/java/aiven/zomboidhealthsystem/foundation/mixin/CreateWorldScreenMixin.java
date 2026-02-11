@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Environment(EnvType.CLIENT)
-@Mixin(CreateWorldScreen.class)
+@Mixin(value = CreateWorldScreen.class, priority = 2000)
 public abstract class CreateWorldScreenMixin extends ScreenMixin {
     @Shadow protected abstract <T extends Element & Selectable> T addSelectableChild(T child);
 

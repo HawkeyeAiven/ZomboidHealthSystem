@@ -13,6 +13,7 @@ public class ModDamageTypes {
     public static final RegistryKey<DamageType> HYPOTHERMIA = register("hypothermia");
     public static final RegistryKey<DamageType> HYPERTHERMIA = register("hyperthermia");
     public static final RegistryKey<DamageType> SEVERE_DAMAGE = register("severe_damage");
+    public static final RegistryKey<DamageType> HUNGER = register("hunger");
 
     private static RegistryKey<DamageType> register(String name){
         return RegistryKey.of(RegistryKeys.DAMAGE_TYPE, new Identifier(ZomboidHealthSystem.ID, name));

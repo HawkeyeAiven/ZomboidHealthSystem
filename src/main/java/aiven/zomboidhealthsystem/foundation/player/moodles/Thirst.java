@@ -11,9 +11,6 @@ import net.minecraft.entity.effect.StatusEffects;
 
 public class Thirst extends Moodle {
 
-    private final DamageSource source = Util.getDamageSource(ModDamageTypes.THIRST, getPlayer().getWorld());
-    private final float speed = 1.0F / 30000.0F;
-
     public Thirst(Health health) {
         super(health);
     }
@@ -35,7 +32,7 @@ public class Thirst extends Moodle {
     @Override
     public void update() {
         super.update();
-        this.addAmount(speed * Config.THIRST_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
+        this.addAmount(1.0F / 15000.0F * getMultiplier() * Config.THIRST_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
 
         this.getHealth().getExhaustion().addMultiplier(this, 1.0F);
 
@@ -60,7 +57,7 @@ public class Thirst extends Moodle {
                         }
 
                         if (amount >= 3.1F) {
-                            this.getHealth().onDeath(this.source);
+                            this.getHealth().onDeath(Util.getDamageSource(ModDamageTypes.THIRST, getPlayer().getWorld()));
                         }
                     }
                 }
@@ -78,9 +75,5 @@ public class Thirst extends Moodle {
     @Override
     public void onSleep(){
         this.setAmount(this.getAmount() + 0.35f);
-    }
-
-    public float getSpeed() {
-        return speed;
     }
 }

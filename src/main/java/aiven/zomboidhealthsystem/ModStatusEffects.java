@@ -20,6 +20,8 @@ public class ModStatusEffects {
     public static final StatusEffect HOT_WEATHER = register(new HotWeather(), "moodle_icon_hot_weather");
     public static final StatusEffect INJURED = register(new Injured(), "moodle_icon_injured");
     public static final StatusEffect BLEEDING = register(new Bleeding(), "moodle_icon_bleeding");
+    public static final StatusEffect HUNGER = register(new Hunger(), "moodle_icon_hunger");
+    public static final StatusEffect SATURATION = register(new Saturation(), "moodle_icon_saturation");
 
     public static void initialize(){}
 

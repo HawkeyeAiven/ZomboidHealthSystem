@@ -100,8 +100,4 @@ public abstract class BandageItem extends Item {
     public boolean isDirty(){
         return this.getDirtyBandageItem() == this;
     }
-
-    public float dirtyDivisor(){
-        return 1f;
-    }
 }

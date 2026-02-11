@@ -12,7 +12,8 @@
     "PotionItemMixin",
     "ServerPlayerEntityMixin",
     "ServerWorldMixin",
-    "MinecraftServerMixin"
+    "MinecraftServerMixin",
+    "HungerManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

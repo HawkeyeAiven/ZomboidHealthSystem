@@ -77,10 +77,9 @@ public class Health {
     private final Exhaustion exhaustion;
     private final Cold cold;
     private final Wet wet;
+    private final Hunger hunger;
 
     private final Moodle[] moodles;
-
-    private final HungerHelper hunger;
     private final Temperature temperature;
 
     private boolean isDead = false;
@@ -123,10 +122,9 @@ public class Health {
         this.temperature = new Temperature(this);
         this.cold = new Cold(this);
         this.wet = new Wet(this);
+        this.hunger = new Hunger(this);
 
-        this.hunger = new HungerHelper(this);
-
-        this.moodles = new Moodle[]{pain,drowsiness,thirst,exhaustion,temperature,cold,wet};
+        this.moodles = new Moodle[]{pain,drowsiness,thirst,exhaustion,temperature,cold,wet,hunger};
     }
 
 
@@ -191,15 +189,18 @@ public class Health {
             }
 
             if (this.isBandaged()) {
-                float m = 1;
-                if(this.hasInfection()) {
-                    m = 3;
-                }
-                this.heal(bandageItem.getHealAmount() / m / BANDAGE_HEAL_TIME * (this.getPlayer().getHungerManager().getFoodLevel() / 20.0F) * UPDATE_FREQUENCY);
+                this.heal(
+                        bandageItem.getHealAmount()
+                                / BANDAGE_HEAL_TIME
+                                / (this.hasInfection() ? 3 : 1)
+                                * (this.getHealth().getHunger().getAmount() < 0 ? 1.25F : 1.0F)
+                                / (float) Math.sqrt(Math.max(getHealth().getHunger().getAmount(), 1))
+                                * UPDATE_FREQUENCY)
+                ;
 
                 this.setBandageTime(this.getBandageTime() + UPDATE_FREQUENCY);
 
-                if (bandageItem.isDirty()) {
+                if (bandageItem.isDirty() && isBleeding()) {
                     if(random(Config.INFECTION_TIME.getValue())) {
                         this.infection = true;
                     }
@@ -209,7 +210,7 @@ public class Health {
                     if (this.isBleeding()) {
                         this.setBleeding(this.getBleeding() - (0.00015F * UPDATE_FREQUENCY));
 
-                        if (this.getBandageTime() > BANDAGE_BECOMES_DIRTY_AFTER / (this.getBleeding() + 0.5) / bandageItem.dirtyDivisor()) {
+                        if (this.getBandageTime() > BANDAGE_BECOMES_DIRTY_AFTER / (this.getBleeding() + 0.5F)) {
 
                             this.setBandageItem(this.bandageItem.getDirtyBandageItem());
                         }
@@ -597,15 +598,17 @@ public class Health {
                 }
             }
 
-            if (this.getPlayer().getHungerManager().getFoodLevel() >= 19 && !this.haveInfection()) {
-                this.healPlayerHp(0.003f * UPDATE_FREQUENCY);
+            if(getHunger().getAmount() < 2) {
+                if(getHunger().getAmount() < 0) {
+                    this.healPlayerHp(0.003F * 1.5F * UPDATE_FREQUENCY);
+                } else {
+                    this.healPlayerHp(0.003F * UPDATE_FREQUENCY);
+                }
             }
 
             for(Moodle moodle : this.moodles){
                 moodle.update();
             }
-
-            this.getHunger().update();
         }
     }
 
@@ -621,7 +624,7 @@ public class Health {
         if (this.getPlayer().isAlive() && this.isAlive()) {
             if (source.isOf(DamageTypes.GENERIC_KILL)) {
                 onDeath(source);
-            } else if (source.isOf(DamageTypes.DROWN)) {
+            } else if (source.isOf(DamageTypes.DROWN) || source.isIn(DamageTypeTags.BYPASSES_EFFECTS)) {
                 damagePlayerHp(source, amount * 5);
                 if(getPlayerHp() <= 0) {
                     onDeath(source);
@@ -737,7 +740,7 @@ public class Health {
         return cold;
     }
 
-    public HungerHelper getHunger() {
+    public Hunger getHunger() {
         return hunger;
     }
 
@@ -1024,7 +1027,6 @@ public class Health {
     private static boolean isDamageAllOverBody(DamageSource source) {
         for (TagKey<DamageType> t : new TagKey[]{
                 DamageTypeTags.IS_EXPLOSION,
-                DamageTypeTags.BYPASSES_EFFECTS,
                 DamageTypeTags.IS_FIRE,
                 DamageTypeTags.IS_FREEZING,
                 DamageTypeTags.IS_LIGHTNING

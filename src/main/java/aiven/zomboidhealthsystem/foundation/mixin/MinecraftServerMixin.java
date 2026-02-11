@@ -30,7 +30,7 @@ import java.net.Proxy;
 import java.nio.file.Path;
 import java.util.function.BooleanSupplier;
 
-@Mixin(value = MinecraftServer.class, priority = 2000)
+@Mixin(value = MinecraftServer.class, priority = 10000)
 public abstract class MinecraftServerMixin {
     @Shadow public abstract Path getSavePath(WorldSavePath worldSavePath);
 

@@ -31,6 +31,8 @@
   "effect.zomboidhealthsystem.moodle_icon_hot_weather" : "Hot",
   "effect.zomboidhealthsystem.moodle_icon_injured" : "Injured",
   "effect.zomboidhealthsystem.moodle_icon_bleeding" : "Bleeding",
+  "effect.zomboidhealthsystem.moodle_icon_hunger" : "Hunger",
+  "effect.zomboidhealthsystem.moodle_icon_saturation" : "Saturation",
 
   "zomboidhealthsystem.health.head": "Head",
   "zomboidhealthsystem.health.body": "Body",
@@ -77,15 +79,17 @@
   "death.attack.bleeding" : "%s died of bleeding",
   "death.attack.bleeding.player" : "%s died of bleeding",
   "death.attack.cold" : "%s died of a cold",
-  "death.attack.cold.player" : "%s died of a cold, while fighting %s",
+  "death.attack.cold.player" : "%s died of a cold while fighting %s",
   "death.attack.drowsiness" : "%s slept forever",
-  "death.attack.drowsiness.player" : "%s slept forever, while fighting %s",
+  "death.attack.drowsiness.player" : "%s slept forever while fighting %s",
   "death.attack.thirst" : "%s died of thirst",
-  "death.attack.thirst.player" : "%s died of thirst, while fighting %s",
+  "death.attack.thirst.player" : "%s died of thirst while fighting %s",
   "death.attack.hypothermia" : "%s died of hypothermia",
-  "death.attack.hypothermia.player" : "%s died of hypothermia, while fighting %s",
+  "death.attack.hypothermia.player" : "%s died of hypothermia while fighting %s",
   "death.attack.hyperthermia" : "%s died of hyperthermia",
-  "death.attack.hyperthermia.player" : "%s died of hyperthermia, while fighting %s",
+  "death.attack.hyperthermia.player" : "%s died of hyperthermia while fighting %s",
   "death.attack.severe_damage": "%s died from fatal damage",
-  "death.attack.severe_damage.player": "%s died from fatal damage, while fighting %s"
+  "death.attack.severe_damage.player": "%s died from fatal damage while fighting %s",
+  "death.attack.hunger" : "%s died of hunger",
+  "death.attack.hunger.player" : "%s died of hunger while fighting %s"
 }

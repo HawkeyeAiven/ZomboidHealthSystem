@@ -30,19 +30,19 @@ public class Exhaustion extends Moodle {
     @Override
     public void update() {
         super.update();
-        getHealth().getThirst().addMultiplier(this, 1.0F);
+        getHealth().getThirst().addMultiplier(this, getAmount() / 2.0F + 1.0F);
+        getHealth().getHunger().addMultiplier(this, getAmount() / 1.75F + 1.0F);
         getHealth().getDrowsiness().addMultiplier(this, getAmount() + 1.0F);
 
         if (this.getPlayer().isSprinting()) {
-            this.addAmount(1.0F / 1000 * Config.EXHAUSTION_MULTIPLIER.getValue() * this.getMultiplier() * Health.UPDATE_FREQUENCY);
+            this.addAmount(1.0F / 1000 * getMultiplier() * Config.EXHAUSTION_MULTIPLIER.getValue()  * Health.UPDATE_FREQUENCY);
         } else {
             this.addAmount(-1.0F / 1000 * Config.EXHAUSTION_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
         }
 
         if(amount >= 1.0F) {
-            getHealth().getThirst().addMultiplier(this, getAmount());
+            this.getHealth().getWet().addAmount(1 / 500F * (Util.getArmorCount(getPlayer()) >= 3 ? 2 : 1) * Health.UPDATE_FREQUENCY);
             if (amount >= 1.5F) {
-                this.getHealth().getWet().addAmount(1 / 500F * (Util.getArmorCount(getPlayer()) >= 3 ? 2 : 1) * Health.UPDATE_FREQUENCY);
                 this.getHealth().addStatusEffect(StatusEffects.SLOWNESS, (int) amount - 1, 20 * 5);
                 this.getHealth().addStatusEffect(StatusEffects.MINING_FATIGUE, (int) amount - 1, 20 * 5);
             }

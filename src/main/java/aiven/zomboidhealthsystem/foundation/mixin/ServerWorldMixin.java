@@ -9,7 +9,7 @@ import net.minecraft.world.level.ServerWorldProperties;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.*;
 
-@Mixin(value = ServerWorld.class, priority = 2000)
+@Mixin(value = ServerWorld.class)
 public abstract class ServerWorldMixin {
 
     @Shadow @Final private boolean shouldTickTime;

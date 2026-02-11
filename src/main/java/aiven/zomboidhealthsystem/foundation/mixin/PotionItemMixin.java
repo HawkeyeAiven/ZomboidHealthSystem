@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(PotionItem.class)
+@Mixin(value = PotionItem.class, priority = 10000)
 public class PotionItemMixin {
     @Inject(at = @At("HEAD"), method = "finishUsing")
     private void init(ItemStack stack, World world, LivingEntity user, CallbackInfoReturnable<ItemStack> cir){

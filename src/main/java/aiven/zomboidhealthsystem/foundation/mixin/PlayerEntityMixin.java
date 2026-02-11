@@ -90,6 +90,7 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
 
     @Shadow public abstract Either<PlayerEntity.SleepFailureReason, Unit> trySleep(BlockPos pos);
 
+    @Shadow protected HungerManager hungerManager;
     @Unique
     private float lastSpeed = 0;
 
@@ -305,17 +306,9 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
         }
     }
 
-    @Inject(at = @At("HEAD"), method = "eatFood")
-    private void eatFood(World world, ItemStack stack, CallbackInfoReturnable<ItemStack> cir) {
-        if(!world.isClient()) {
-            int d = stack.getItem().getFoodComponent().getHunger();
-            getModHealth().healPlayerHp(Config.FOOD_HEAL_AMOUNT.getValue() * d);
-        }
-    }
-
     /**
-     * @author
-     * @reason
+     * @author Aiven
+     * @reason No
      */
     @Overwrite
     public boolean canFoodHeal(){
@@ -323,8 +316,8 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
     }
 
     /**
-     * @author
-     * @reason
+     * @author Aiven
+     * @reason No
      */
     @Overwrite
     public void jump() {
@@ -349,8 +342,8 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
     @Unique
     boolean isSwimming = false;
     /**
-     * @author
-     * @reason
+     * @author Aiven
+     * @reason No
      */
     @Overwrite
     public void updatePose(){
@@ -390,6 +383,19 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
             }
 
             this.setPose(entityPose2);
+        }
+    }
+
+    /**
+     * @author Aiven
+     * @reason No
+     */
+    @Overwrite
+    public boolean canConsume(boolean ignoreHunger) {
+        if(!this.getWorld().isClient()) {
+            return this.abilities.invulnerable || ignoreHunger || this.getModHealth().getHunger().canEat();
+        } else {
+            return false;
         }
     }
 

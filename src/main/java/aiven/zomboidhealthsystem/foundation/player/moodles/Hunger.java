@@ -1,0 +1,108 @@
+package aiven.zomboidhealthsystem.foundation.player.moodles;
+
+import aiven.zomboidhealthsystem.Config;
+import aiven.zomboidhealthsystem.ModDamageTypes;
+import aiven.zomboidhealthsystem.ModStatusEffects;
+import aiven.zomboidhealthsystem.foundation.player.Health;
+import aiven.zomboidhealthsystem.foundation.utility.Util;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffects;
+
+public class Hunger extends Moodle {
+    private final float min_amount = -1.0F;
+
+    public Hunger(Health health) {
+        super(health);
+    }
+
+    @Override
+    public void update() {
+        super.update();
+
+        this.addAmount(1.0F / 15000 * getMultiplier() * Config.HUNGER_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
+
+        if(amount < 0) {
+            this.getHealth().addStatusEffect(ModStatusEffects.SATURATION, (int) (amount * -2.5F) - 1, 15 * 20);
+        } else if(this.getPlayer().hasStatusEffect(ModStatusEffects.SATURATION)) {
+            this.getHealth().removeStatusEffect(ModStatusEffects.SATURATION);
+        }
+
+        if(amount >= 1.0F) {
+            this.getHealth().getExhaustion().addMultiplier(this, (getAmount() / 3) + 1);
+            if(amount >= 2.5F) {
+                if(random(5 * 60 * 20)) {
+                    getHealth().addStatusEffect(StatusEffects.NAUSEA, 0, 3 * 20);
+                }
+                if(amount >= 4.0F) {
+                    getHealth().addStatusEffect(StatusEffects.SLOWNESS, (int)(amount / 3) - 1, 15 * 20);
+                    if(amount >= 6.0F) {
+                        getHealth().addStatusEffect(StatusEffects.MINING_FATIGUE,(int) (amount / 4) - 1, 15 * 20);
+                        if(random(5 * 60 * 20)) {
+                            getHealth().addStatusEffect(StatusEffects.NAUSEA, 0, 3 * 20);
+                        }
+                        if(random(5 * 60 * 20)) {
+                            getHealth().addStatusEffect(StatusEffects.DARKNESS, 0, 3 * 20);
+                        }
+                        if (random(5 * 60 * 20)) {
+                            getHealth().stumble(0);
+                        }
+                        if(amount >= 8.4F) {
+                            if(random(3 * 60 * 20)) {
+                                getHealth().addStatusEffect(StatusEffects.NAUSEA, 0, 3 * 20);
+                            }
+                            if(random(3 * 60 * 20)) {
+                                getHealth().addStatusEffect(StatusEffects.DARKNESS, 0, 3 * 20);
+                            }
+                            if (random(3 * 60 * 20)) {
+                                getHealth().stumble(0);
+                            }
+                            if (amount >= 10.5F) {
+                                this.getHealth().onDeath(Util.getDamageSource(ModDamageTypes.HUNGER, getPlayer().getWorld()));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onSleep() {
+        super.onSleep();
+        this.addAmount(0.4F);
+    }
+
+    public void eatFood(int hunger, float saturationModifier) {
+        this.addAmount((float)-hunger / 7.0F);
+        this.getHealth().healPlayerHp(Config.FOOD_HEAL_AMOUNT.getValue() * hunger);
+    }
+
+    public boolean canEat() {
+        return getAmount() >= min_amount - 0.35F;
+    }
+
+    @Override
+    public void setAmount(float amount) {
+        this.amount = Math.max(amount, min_amount);
+    }
+
+    @Override
+    StatusEffect getEffect() {
+        return ModStatusEffects.HUNGER;
+    }
+
+    @Override
+    public String getId() {
+        return "hunger";
+    }
+
+    @Override
+    public void readNbt(String value) {
+        super.readNbt(value);
+    }
+
+    @Override
+    public String getNbt() {
+        return super.getNbt();
+    }
+}

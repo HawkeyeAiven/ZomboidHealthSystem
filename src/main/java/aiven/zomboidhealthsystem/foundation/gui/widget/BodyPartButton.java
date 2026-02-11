@@ -26,7 +26,7 @@ public class BodyPartButton extends ModClickableWidget {
     private final ArrayList<ColoredText> texts = new ArrayList<>();
 
     public BodyPartButton(int x, int y, ClientHealth.BodyPart bodyPart) {
-        super(x, y, 80, 5, Text.translatable("zomboidhealthsystem.health." + bodyPart.getId()));
+        super(x, y, 90, 5, Text.translatable("zomboidhealthsystem.health." + bodyPart.getId()));
         this.bodyPart = bodyPart;
     }
 

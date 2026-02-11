@@ -8,15 +8,13 @@ import aiven.zomboidhealthsystem.foundation.utility.Util;
 import aiven.zomboidhealthsystem.foundation.world.ModServer;
 import aiven.zomboidhealthsystem.infrastructure.config.Json;
 import aiven.zomboidhealthsystem.infrastructure.config.JsonBuilder;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.text.Text;
 
 public class Drowsiness extends Moodle {
-    private final int DROWSINESS_TIME;
+    private final int drowsinessTime;
 
-    public DamageSource source = Util.getDamageSource(ModDamageTypes.DROWSINESS, getPlayer().getWorld());
     private float caffeine = 0;
     private float max_caffeine = 0;
     private boolean caffeine_effect = true;
@@ -26,7 +24,7 @@ public class Drowsiness extends Moodle {
 
     public Drowsiness(Health health) {
         super(health);
-        DROWSINESS_TIME = 24000 * ModServer.WORLD_SETTINGS.getDayLengthMultiplier();
+        drowsinessTime = 24000 * ModServer.WORLD_SETTINGS.getDayLengthMultiplier();
     }
 
     @Override
@@ -37,6 +35,80 @@ public class Drowsiness extends Moodle {
     @Override
     public String getId() {
         return "drowsiness";
+    }
+
+    @Override
+    public void update() {
+        super.update();
+        addTicks(1.0F * 1.85F * getMultiplier() * Config.DROWSINESS_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
+
+        if(caffeine_effect) {
+            if(caffeine < max_caffeine) {
+                caffeine += 1.0F / (60 * 20) * Health.UPDATE_FREQUENCY;
+            } else if(max_caffeine != 0){
+                caffeine_effect = false;
+            }
+        } else {
+            if(caffeine > max_caffeine * -0.75F) {
+                caffeine -= 1.0F / (drowsinessTime / 4.0F) * Health.UPDATE_FREQUENCY;
+            }
+        }
+
+        if(sleeping_pills < max_sleeping_pills) {
+            final float speed = Config.SLEEPING_PILLS_SPEED.getValue() * Health.UPDATE_FREQUENCY;
+            sleeping_pills = Math.min(sleeping_pills + speed, max_sleeping_pills);
+            addAmount(speed);
+        } else {
+            sleeping_pills = 0;
+            max_sleeping_pills = 0;
+        }
+
+        getHealth().getExhaustion().addMultiplier(this, (getAmplifier() / 3) + 1);
+
+        if (this.getAmplifier() >= 1) {
+            if (random((int) (5 * 60 * 20 / this.getAmplifier()))) {
+                this.getHealth().addStatusEffect(StatusEffects.BLINDNESS, 0, 5 * 20);
+            }
+
+            if (this.getAmplifier() >= 2) {
+                if (random((int) (5 * 60 * 20 / (this.getAmplifier() / 2))) && this.getHealth().getPlayer().getMovementSpeed() > 0.1f) {
+                    this.getHealth().stumble();
+                }
+
+                if (this.getAmplifier() >= 3) {
+                    this.getHealth().addStatusEffect(StatusEffects.MINING_FATIGUE, (int) (this.getAmplifier() / 2) - 1, 15 * 20);
+
+                    if(this.getAmplifier() >= 5){
+                        this.getHealth().onDeath(Util.getDamageSource(ModDamageTypes.DROWSINESS, getPlayer().getWorld()));
+                    }
+                }
+            }
+        }
+
+        if(getPlayer().isSleeping() && getAmplifier() < Config.MIN_DROWSINESS_FOR_SLEEP.getValue()) {
+            getPlayer().wakeUp();
+            getPlayer().sendMessage(Text.translatable("zomboidhealthsystem.message.dont_want_sleep"), true);
+        }
+    }
+
+    @Override
+    public void onSleep() {
+        this.max_caffeine = 0;
+        this.caffeine = 0;
+        this.caffeine_effect = true;
+        this.sleeping_pills = 0;
+        this.max_sleeping_pills = 0;
+        this.amount = 0;
+    }
+
+    @Override
+    public boolean hasIcon() {
+        return this.getAmplifier() >= 1;
+    }
+
+    @Override
+    public int getEffectAmplifier() {
+        return (int) getAmplifier() - 1;
     }
 
     @Override
@@ -94,80 +166,6 @@ public class Drowsiness extends Moodle {
         }
     }
 
-    @Override
-    public void update() {
-        super.update();
-        addTicks(1.0F * 1.85F * Config.DROWSINESS_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
-
-        if(caffeine_effect) {
-            if(caffeine < max_caffeine) {
-                caffeine += 1.0F / (60 * 20) * Health.UPDATE_FREQUENCY;
-            } else if(max_caffeine != 0){
-                caffeine_effect = false;
-            }
-        } else {
-            if(caffeine > max_caffeine * -0.75F) {
-                caffeine -= 1.0F / (DROWSINESS_TIME / 4.0F) * Health.UPDATE_FREQUENCY;
-            }
-        }
-
-        if(sleeping_pills < max_sleeping_pills) {
-            final float speed = Config.SLEEPING_PILLS_SPEED.getValue() * Health.UPDATE_FREQUENCY;
-            sleeping_pills = Math.min(sleeping_pills + speed, max_sleeping_pills);
-            addAmount(speed);
-        } else {
-            sleeping_pills = 0;
-            max_sleeping_pills = 0;
-        }
-
-        getHealth().getExhaustion().addMultiplier(this, (getAmplifier() / 3) + 1);
-
-        if (this.getAmplifier() >= 1) {
-            if (random((int) (5 * 60 * 20 / this.getAmplifier()))) {
-                this.getHealth().addStatusEffect(StatusEffects.BLINDNESS, 0, 5 * 20);
-            }
-
-            if (this.getAmplifier() >= 2) {
-                if (random((int) (5 * 60 * 20 / (this.getAmplifier() / 2))) && this.getHealth().getPlayer().getMovementSpeed() > 0.1f) {
-                    this.getHealth().stumble();
-                }
-
-                if (this.getAmplifier() >= 3) {
-                    this.getHealth().addStatusEffect(StatusEffects.MINING_FATIGUE, (int) (this.getAmplifier() / 2) - 1, 15 * 20);
-
-                    if(this.getAmplifier() >= 5){
-                        this.getHealth().onDeath(this.source);
-                    }
-                }
-            }
-        }
-
-        if(getPlayer().isSleeping() && getAmplifier() < Config.MIN_DROWSINESS_FOR_SLEEP.getValue()) {
-            getPlayer().wakeUp();
-            getPlayer().sendMessage(Text.translatable("zomboidhealthsystem.message.dont_want_sleep"), true);
-        }
-    }
-
-    @Override
-    public void onSleep() {
-        this.max_caffeine = 0;
-        this.caffeine = 0;
-        this.caffeine_effect = true;
-        this.sleeping_pills = 0;
-        this.max_sleeping_pills = 0;
-        this.amount = 0;
-    }
-
-    @Override
-    public boolean hasIcon() {
-        return this.getAmplifier() >= 1;
-    }
-
-    @Override
-    public int getEffectAmplifier() {
-        return (int) getAmplifier() - 1;
-    }
-
     public float getAmplifier() {
         return amount - caffeine;
     }
@@ -186,6 +184,6 @@ public class Drowsiness extends Moodle {
     }
 
     public void addTicks(float amount) {
-        addAmount(amount / DROWSINESS_TIME);
+        addAmount(amount / drowsinessTime);
     }
 }

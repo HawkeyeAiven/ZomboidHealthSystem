@@ -121,7 +121,7 @@ public class ButtonsContainer extends ModClickableWidget {
                 }
             }
         }
-        if(clicked(mouseX,mouseY)){
+        if(clicked(mouseX,mouseY) && isValidClickButton(button)){
             if(!areButtonsHidden){
                 hideButtons();
             } else {

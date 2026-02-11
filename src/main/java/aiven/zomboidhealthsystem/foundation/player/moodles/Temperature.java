@@ -26,8 +26,6 @@ public class Temperature extends Moodle {
     public static final float MIN_TEMPERATURE_BODY = AVERAGE_TEMPERATURE_BODY - 6;
     public static final float MAX_TEMPERATURE_BODY = AVERAGE_TEMPERATURE_BODY + 6;
 
-    private final DamageSource hypothermia;
-    private final DamageSource hyperthermia;
     private float heat = 0;
     private float heatFromCampfire = 0;
     private float heatFromFurnace = 0;
@@ -37,8 +35,6 @@ public class Temperature extends Moodle {
     public Temperature(Health health) {
         super(health);
         setAmount(AVERAGE_TEMPERATURE_BODY);
-        this.hypothermia = Util.getDamageSource(ModDamageTypes.HYPOTHERMIA,getPlayer().getWorld());
-        this.hyperthermia = Util.getDamageSource(ModDamageTypes.HYPERTHERMIA,getPlayer().getWorld());
     }
 
     @Override
@@ -49,6 +45,10 @@ public class Temperature extends Moodle {
         if(ModServer.WORLD_SETTINGS.hasTemperature()) {
             if (i++ >= UPDATE_MULTIPLIER - 1) {
                 Thirst thirst = getHealth().getThirst();
+                Hunger hunger = getHealth().getHunger();
+
+                thirst.addMultiplier(this, 1.0F);
+                hunger.addMultiplier(this, 1.0F);
 
                 float temperature = getPerceivedTemperature();
                 float minComfortableTemp = getMinComfortableTemperature();
@@ -59,7 +59,7 @@ public class Temperature extends Moodle {
                 if (temperature < minComfortableTemp && isOverWorld) {
                     this.amount -= (((minComfortableTemp - temperature) / 2)
                             / 10000
-                            * (20.0F / Math.max(10.0F, getPlayer().getHungerManager().getFoodLevel()))
+                            * Math.max(1, (hunger.getAmount() / 2.5F) + 1)
                             * Config.TEMPERATURE_MULTIPLIER.getValue()
                             * UPDATE_FREQUENCY
                     );
@@ -77,13 +77,13 @@ public class Temperature extends Moodle {
                         this.amount += 0.003F
                                 * Config.TEMPERATURE_MULTIPLIER.getValue()
                                 * UPDATE_FREQUENCY;
-                        getHealth().getHunger().reduceHunger(1.0F / 10000F * UPDATE_FREQUENCY);
+                        hunger.addMultiplier(this, 1.33F);
                     } else if (this.amount > AVERAGE_TEMPERATURE_BODY + 0.1F) {
-                        this.amount -= 0.003f
+                        this.amount -= 0.003F
                                 / ((thirst.getAmount() + 1.0F) * 1.5F)
                                 * Config.TEMPERATURE_MULTIPLIER.getValue()
                                 * UPDATE_FREQUENCY;
-                        thirst.setAmount(thirst.getAmount() + (thirst.getSpeed() / 3.0F));
+                        thirst.addMultiplier(this, 1.33F);
                     }
                 }
 
@@ -133,10 +133,10 @@ public class Temperature extends Moodle {
                 }
 
                 if (this.amount < MIN_TEMPERATURE_BODY) {
-                    this.getHealth().onDeath(this.hypothermia);
+                    this.getHealth().onDeath(Util.getDamageSource(ModDamageTypes.HYPOTHERMIA,getPlayer().getWorld()));
                 }
                 if (this.amount > MAX_TEMPERATURE_BODY) {
-                    this.getHealth().onDeath(this.hyperthermia);
+                    this.getHealth().onDeath(Util.getDamageSource(ModDamageTypes.HYPERTHERMIA,getPlayer().getWorld()));
                 }
 
                 i = 0;
@@ -205,9 +205,9 @@ public class Temperature extends Moodle {
         Health health = getHealth();
         Thirst thirst = health.getThirst();
         float hpPercent = (float) Math.sqrt(health.getBodyHpPercent());
-        float foodLvlPercent = (float) getPlayer().getHungerManager().getFoodLevel() / 20;
-        foodLvlPercent = (float) (Math.cbrt(Math.cbrt(foodLvlPercent)));
-        return MIN_COMFORTABLE_TEMPERATURE / hpPercent / foodLvlPercent + ((Math.max(thirst.getAmount() - 1,0)) * 2);
+        float foodLvl = Math.max(getHealth().getHunger().getAmount(), 1);
+        foodLvl = (float) (Math.cbrt(Math.cbrt(foodLvl)));
+        return MIN_COMFORTABLE_TEMPERATURE / hpPercent * foodLvl + ((Math.max(thirst.getAmount() - 1,0)) * 2);
     }
 
     private float getMaxComfortableTemperature() {
@@ -253,7 +253,7 @@ public class Temperature extends Moodle {
     }
 
     public void addHeat(float heat) {
-        this.heat += heat;
+        this.setHeat(getHeat() + heat);
     }
 
     public float getHeat() {

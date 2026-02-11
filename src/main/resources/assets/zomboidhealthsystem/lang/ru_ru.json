@@ -24,13 +24,15 @@
   "effect.zomboidhealthsystem.moodle_icon_hyperthermia": "Гипертермия",
   "effect.zomboidhealthsystem.moodle_icon_hypothermia": "Гипотермия",
   "effect.zomboidhealthsystem.moodle_icon_wind": "Ветер",
-  "effect.zomboidhealthsystem.moodle_icon_wet": "Промок",
+  "effect.zomboidhealthsystem.moodle_icon_wet": "Влажность",
   "effect.zomboidhealthsystem.moodle_icon_cold": "Простуда",
   "effect.zomboidhealthsystem.moodle_icon_exhaustion": "Усталость",
   "effect.zomboidhealthsystem.moodle_icon_cold_weather" : "Холодно",
   "effect.zomboidhealthsystem.moodle_icon_hot_weather" : "Жарко",
   "effect.zomboidhealthsystem.moodle_icon_injured" : "Ранения",
   "effect.zomboidhealthsystem.moodle_icon_bleeding" : "Кровотечение",
+  "effect.zomboidhealthsystem.moodle_icon_hunger" : "Голод",
+  "effect.zomboidhealthsystem.moodle_icon_saturation" : "Насыщение",
 
   "zomboidhealthsystem.health.head": "Голова",
   "zomboidhealthsystem.health.body": "Корпус",
@@ -87,5 +89,7 @@
   "death.attack.hyperthermia" : "%s умер от перегрева",
   "death.attack.hyperthermia.player" : "%s умер от перегрева, сражаясь с %s",
   "death.attack.severe_damage": "%s умер от смертельного урона",
-  "death.attack.severe_damage.player": "%s умер от смертельного урона, сражаясь с %s"
+  "death.attack.severe_damage.player": "%s умер от смертельного урона, сражаясь с %s",
+  "death.attack.hunger" : "%s умер от голода",
+  "death.attack.hunger.player" : "%s умер от голода, сражаясь с %s"
 }

@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
 @Environment(EnvType.CLIENT)
-@Mixin(value = InGameHud.class, priority = 10000)
+@Mixin(value = InGameHud.class, priority = 500)
 public class InGameHudMixin {
     /**
      * @author Aiven
@@ -27,13 +27,13 @@ public class InGameHudMixin {
 
     }
 
-//    /**
-//     * @author Aiven
-//     * @reason Yes.
-//     */
-//    @Overwrite
-//    private void renderStatusBars(DrawContext context) {
-//
-//    }
+    /**
+     * @author Aiven
+     * @reason Yes.
+     */
+    @Overwrite
+    private void renderStatusBars(DrawContext context) {
+
+    }
 
 }
