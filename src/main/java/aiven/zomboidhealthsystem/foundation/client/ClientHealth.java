@@ -91,6 +91,8 @@ public class ClientHealth {
                     String infection = Json.getValue(value, "infection");
                     if(infection != null) {
                         bodyPart.setInfection(Boolean.parseBoolean(infection));
+                    } else {
+                        bodyPart.setInfection(false);
                     }
                 }
 

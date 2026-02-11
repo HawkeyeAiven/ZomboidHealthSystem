@@ -74,6 +74,6 @@ public class Thirst extends Moodle {
 
     @Override
     public void onSleep(){
-        this.setAmount(this.getAmount() + 0.35f);
+        this.setAmount(this.getAmount() + 0.35F);
     }
 }

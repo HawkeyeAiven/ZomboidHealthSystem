@@ -78,7 +78,7 @@ public class Hunger extends Moodle {
     }
 
     public boolean canEat() {
-        return getAmount() >= min_amount - 0.35F;
+        return getAmount() >= min_amount + 0.35F;
     }
 
     @Override

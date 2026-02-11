@@ -10,8 +10,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 
 public class Wet extends Moodle {
-    private static final float MULTIPLIER = Config.WET_MULTIPLIER.getValue();
-    private static final float SPEED = 1.0F / (45 * 20) * MULTIPLIER * Health.UPDATE_FREQUENCY;
+    private static final float SPEED = 1.0F / (45 * 20) * Config.WET_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY;
     private static final float MAX_AMOUNT = 3.5F;
 
     public Wet(Health health) {

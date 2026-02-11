@@ -45,19 +45,21 @@ public class BodyPartButton extends ModClickableWidget {
         texts.clear();
         if(!bodyPart.isBandaged()) {
             if(bodyPart.getHpPercent() < 1.0F) {
-                texts.add(scrape);
-            } else if (bodyPart.getHpPercent() <= 0.9F)
-                texts.add(injury);
-            else if (bodyPart.getHpPercent() <= 0.8F) {
-                texts.add(wound);
-            } else if(bodyPart.getHpPercent() <= 0.65F) {
-                texts.add(crack);
-            } else if (bodyPart.getHpPercent() <= 0.5F) {
-                texts.add(laceration);
-            } else if (bodyPart.getHpPercent() <= 0.35F) {
-                texts.add(fracture);
-            } else if (bodyPart.getHpPercent() <= 0.2F) {
-                texts.add(deep_fracture);
+                if (bodyPart.getHpPercent() >= 0.9F) {
+                    texts.add(scrape);
+                } else if (bodyPart.getHpPercent() >= 0.8F) {
+                    texts.add(injury);
+                } else if (bodyPart.getHpPercent() >= 0.65F) {
+                    texts.add(wound);
+                } else if (bodyPart.getHpPercent() >= 0.5F) {
+                    texts.add(crack);
+                } else if (bodyPart.getHpPercent() >= 0.35F) {
+                    texts.add(laceration);
+                } else if (bodyPart.getHpPercent() >= 0.2F) {
+                    texts.add(fracture);
+                } else {
+                    texts.add(deep_fracture);
+                }
             }
         } else if(!bodyPart.isDirtyBandage()) {
             texts.add(bandaged);

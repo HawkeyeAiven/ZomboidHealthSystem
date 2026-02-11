@@ -63,7 +63,7 @@ public class Drowsiness extends Moodle {
             max_sleeping_pills = 0;
         }
 
-        getHealth().getExhaustion().addMultiplier(this, (getAmplifier() / 3) + 1);
+        getHealth().getExhaustion().addMultiplier(this, (getAmplifier() / 2) + 1);
 
         if (this.getAmplifier() >= 1) {
             if (random((int) (5 * 60 * 20 / this.getAmplifier()))) {

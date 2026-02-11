@@ -48,7 +48,7 @@ public class Cold extends Moodle {
 
         if(getAmount() >= 1.0F){
             if(bodyTemperature < 35.0F) {
-                this.addAmount(1.0F / (25 * 60 * 20) * d * wet * Config.COLD_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
+                this.addAmount(1.0F / (25 * 60 * 20) * getMultiplier() * d * wet * Config.COLD_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
             }
 
             this.getHealth().getDrowsiness().addTicks(getAmount() / 2 * Health.UPDATE_FREQUENCY);

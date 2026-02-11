@@ -18,12 +18,11 @@ public class ActionsButton extends TemporalButtonsContainer {
             if(Util.getBandageItem(inventory) != null) {
                 addButton(new BandageContainer(0, 0, bodyPart, this));
             }
+            if(bodyPart.isInfection() && Util.inventoryContains(inventory, ModItems.ALCOHOL_WIPE)) {
+                addButton(new DisinfectButton(0,0, bodyPart, this));
+            }
         } else {
             addButton(new UnbandageButton(0,0,bodyPart, this));
-        }
-
-        if(bodyPart.isInfection() && Util.inventoryContains(inventory, ModItems.ALCOHOL_WIPE)) {
-            addButton(new DisinfectButton(0,0, bodyPart, this));
         }
     }
 }

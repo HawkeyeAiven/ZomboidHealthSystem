@@ -624,7 +624,7 @@ public class Health {
         if (this.getPlayer().isAlive() && this.isAlive()) {
             if (source.isOf(DamageTypes.GENERIC_KILL)) {
                 onDeath(source);
-            } else if (source.isOf(DamageTypes.DROWN) || source.isIn(DamageTypeTags.BYPASSES_EFFECTS)) {
+            } else if (source.isOf(DamageTypes.DROWN) || source.isOf(DamageTypes.MAGIC)) {
                 damagePlayerHp(source, amount * 5);
                 if(getPlayerHp() <= 0) {
                     onDeath(source);
