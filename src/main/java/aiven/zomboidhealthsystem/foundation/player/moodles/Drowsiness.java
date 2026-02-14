@@ -40,7 +40,7 @@ public class Drowsiness extends Moodle {
     @Override
     public void update() {
         super.update();
-        addTicks(1.0F * 1.85F * getMultiplier() * Config.DROWSINESS_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
+        addTicks(1.0F * 2.0F * getMultiplier() * Config.DROWSINESS_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
 
         if(caffeine_effect) {
             if(caffeine < max_caffeine) {
@@ -66,12 +66,12 @@ public class Drowsiness extends Moodle {
         getHealth().getExhaustion().addMultiplier(this, (getAmplifier() / 2) + 1);
 
         if (this.getAmplifier() >= 1) {
-            if (random((int) (5 * 60 * 20 / this.getAmplifier()))) {
+            if (once((int) (5 * 60 * 20 / this.getAmplifier()))) {
                 this.getHealth().addStatusEffect(StatusEffects.BLINDNESS, 0, 5 * 20);
             }
 
             if (this.getAmplifier() >= 2) {
-                if (random((int) (5 * 60 * 20 / (this.getAmplifier() / 2))) && this.getHealth().getPlayer().getMovementSpeed() > 0.1f) {
+                if (once((int) (5 * 60 * 20 / (this.getAmplifier() / 2))) && this.getHealth().getPlayer().getMovementSpeed() > 0.1f) {
                     this.getHealth().stumble();
                 }
 

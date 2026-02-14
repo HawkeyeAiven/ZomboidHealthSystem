@@ -1,5 +1,6 @@
 package aiven.zomboidhealthsystem.foundation.utility;
 
+import aiven.zomboidhealthsystem.foundation.effects.ModStatusEffect;
 import aiven.zomboidhealthsystem.foundation.items.BandageItem;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -8,7 +9,6 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageType;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.player.ItemCooldownManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
@@ -19,7 +19,33 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Random;
+
 public class Util {
+    public static ArrayList<StatusEffectInstance> sortEffects(Collection<StatusEffectInstance> list) {
+        ArrayList<StatusEffectInstance> result = new ArrayList<>();
+
+        for(StatusEffectInstance effect : list) {
+            if(!(effect.getEffectType() instanceof ModStatusEffect)) {
+                result.add(effect);
+            }
+        }
+
+        for(StatusEffectInstance effect : list) {
+            if(effect.getEffectType() instanceof ModStatusEffect) {
+                result.add(effect);
+            }
+        }
+
+        return result;
+    }
+
+    public static boolean random(float chance) {
+        return chance > new Random().nextFloat(0, 1.0F);
+    }
+
     public static int getArmorCount(PlayerEntity player) {
         int d = 0;
 
@@ -49,12 +75,6 @@ public class Util {
             }
         }
         return distance;
-    }
-
-    public static void setCooldownItems(ItemCooldownManager manager, int duration, Item...items){
-        for(Item item : items){
-            manager.set(item,duration);
-        }
     }
 
     public static DamageSource getDamageSource(RegistryKey<DamageType> type, World world){

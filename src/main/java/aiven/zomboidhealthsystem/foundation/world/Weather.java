@@ -1,12 +1,8 @@
 package aiven.zomboidhealthsystem.foundation.world;
 
 import aiven.zomboidhealthsystem.Config;
-import aiven.zomboidhealthsystem.ModStatusEffects;
 import aiven.zomboidhealthsystem.foundation.utility.Util;
 import aiven.zomboidhealthsystem.infrastructure.config.JsonBuilder;
-import net.minecraft.entity.EntityPose;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameRules;
@@ -49,18 +45,6 @@ public final class Weather {
             newDay = false;
         }
 
-        if(worldSettings.hasWind()) {
-            for (PlayerEntity player : getWorld().getPlayers()) {
-                float wind = getWind(player);
-
-                if (wind >= 1) {
-                    player.addStatusEffect(new StatusEffectInstance(ModStatusEffects.WIND, 3 * 20, (int) wind, false, false, true));
-                } else if(player.hasStatusEffect(ModStatusEffects.WIND)) {
-                    player.removeStatusEffect(ModStatusEffects.WIND);
-                }
-            }
-        }
-
         if(!getWorld().getGameRules().get(GameRules.DO_DAYLIGHT_CYCLE).get()){
             return;
         }
@@ -68,24 +52,6 @@ public final class Weather {
         if(worldSettings.hasTemperature()) {
             worldTemperature = getTemperatureOnTimeOfDay(20, (int) timeOfDay);
         }
-    }
-
-    private float getWind(BlockPos pos) {
-        if(wind >= 1 && Util.isInOpenSpace(getWorld(), pos)) {
-            return wind;
-        } else {
-            return 0;
-        }
-    }
-
-    private float getWind(PlayerEntity player) {
-        float wind;
-        if(player.getPose() != EntityPose.SWIMMING) {
-            wind = getWind(player.getBlockPos().up(1));
-        } else {
-            wind = getWind(player.getBlockPos());
-        }
-        return wind;
     }
 
     public float getTemperatureAtPos(BlockPos pos) {
@@ -140,8 +106,8 @@ public final class Weather {
 
     private void onNewDay() {
         if(worldSettings.hasWind()) {
-            if (new Random().nextFloat(0.0F, 1.0F) < Config.WIND_CHANCE.getValue()) {
-                wind = new Random().nextFloat(0.0F, 10.0F);
+            if (Util.random(Config.WIND_CHANCE.getValue())) {
+                wind = new Random().nextFloat(3.0F, 10.0F);
             } else {
                 wind = 0;
             }

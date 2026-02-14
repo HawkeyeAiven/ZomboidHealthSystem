@@ -78,6 +78,7 @@ public class Health {
     private final Cold cold;
     private final Wet wet;
     private final Hunger hunger;
+    private final Wind wind;
 
     private final Moodle[] moodles;
     private final Temperature temperature;
@@ -123,8 +124,9 @@ public class Health {
         this.cold = new Cold(this);
         this.wet = new Wet(this);
         this.hunger = new Hunger(this);
+        this.wind = new Wind(this);
 
-        this.moodles = new Moodle[]{pain,drowsiness,thirst,exhaustion,temperature,cold,wet,hunger};
+        this.moodles = new Moodle[]{pain,drowsiness,thirst,exhaustion,temperature,cold,wet,hunger,wind};
     }
 
 
@@ -175,8 +177,7 @@ public class Health {
 
             float d = amount - this.hp;
             this.hp = Math.max(this.hp - amount, 0);
-            float random = new Random().nextFloat(0, 1);
-            if (random <= getBleedingChance(amount, source)) {
+            if (Util.random(getBleedingChance(amount, source))) {
                 this.setBleeding((this.getMaxHp() - this.getHp()) / 1.85F);
             }
 
@@ -201,7 +202,7 @@ public class Health {
                 this.setBandageTime(this.getBandageTime() + UPDATE_FREQUENCY);
 
                 if (bandageItem.isDirty() && isBleeding()) {
-                    if(random(Config.INFECTION_TIME.getValue())) {
+                    if(Util.random(Config.INFECTION_CHANCE.getValue() * UPDATE_FREQUENCY)) {
                         this.infection = true;
                     }
                 }
@@ -235,7 +236,7 @@ public class Health {
             if((source.isOf(DamageTypes.FALL) || source.isOf(DamageTypes.HOT_FLOOR)) && !getHealth().getPlayer().isCrawling()) {
                 return chance / 2.25F;
             } else if (isPointDamage(source)) {
-                return chance;
+                return chance * 1.05F;
             } else if(isDamageAllOverBody(source)) {
                 return chance / 2.0F;
             } else if(source.isOf(DamageTypes.DROWN)){
@@ -419,7 +420,7 @@ public class Health {
         public void update() {
             super.update();
             if (this.getMaxHp() / 2 >= this.getHp()) {
-                if(random(3 * 60 * 20)){
+                if(once(3 * 60 * 20)){
                     getHealth().addStatusEffect(StatusEffects.BLINDNESS, 10 * 20, 0);
                 }
             }
@@ -453,7 +454,7 @@ public class Health {
         public void update() {
             super.update();
             if (this.getMaxHp() / 2 >= this.getHp()) {
-                if(random(3 * 60 * 20)){
+                if(once(3 * 60 * 20)){
                     getHealth().addStatusEffect(StatusEffects.NAUSEA, 10 * 20, 0);
                 }
             }
@@ -588,8 +589,8 @@ public class Health {
 
             if (this.getPlayer().hasStatusEffect(StatusEffects.REGENERATION)) {
                 int amplifier = this.getPlayer().getStatusEffect(StatusEffects.REGENERATION).getAmplifier();
-                this.healAllParts(((float) amplifier + 1) / 100f * UPDATE_FREQUENCY);
-                this.healPlayerHp(((float) amplifier + 1) / 100f * UPDATE_FREQUENCY);
+                this.healAllParts(((float) amplifier + 1) / 100.0F * UPDATE_FREQUENCY);
+                this.healPlayerHp(((float) amplifier + 1) / 100.0F * UPDATE_FREQUENCY);
             }
 
             if(!this.getPlayer().hasStatusEffect(StatusEffects.ABSORPTION)) {
@@ -624,7 +625,7 @@ public class Health {
         if (this.getPlayer().isAlive() && this.isAlive()) {
             if (source.isOf(DamageTypes.GENERIC_KILL)) {
                 onDeath(source);
-            } else if (source.isOf(DamageTypes.DROWN) || source.isOf(DamageTypes.MAGIC)) {
+            } else if (source.isOf(DamageTypes.DROWN) || source.isOf(DamageTypes.INDIRECT_MAGIC) || source.isOf(DamageTypes.MAGIC)) {
                 damagePlayerHp(source, amount * 5);
                 if(getPlayerHp() <= 0) {
                     onDeath(source);
@@ -632,7 +633,7 @@ public class Health {
             } else if (isPointDamage(source)) {
 
                 float d = randomHit().damage(damageAmount, source);
-                if (d > 0.1f && this.IsImportantBodyPartsAlive(source)) {
+                if (d > 0.1F && this.IsImportantBodyPartsAlive(source)) {
                     damage(source, d);
                 }
 
@@ -646,10 +647,10 @@ public class Health {
                         leftFoot,rightFoot
                 };
 
-                float d = damageAmount / 2f;
+                float d = damageAmount / 2.0F;
 
                 for (int i = 7; i != 0; i--) {
-                    if (d < 0.2f) break;
+                    if (d < 0.2F) break;
                     int random = new Random().nextInt(0, 2);
                     BodyPart part = orderDamageBodyParts[i - random];
                     d = part.damage(d, source);
@@ -667,7 +668,7 @@ public class Health {
 
                 int random = new Random().nextInt(0, 8);
                 float d = bodyParts[random].damage(amount, source);
-                if (d > 0.2f && this.IsImportantBodyPartsAlive(source)) {
+                if (d > 0.2F && this.IsImportantBodyPartsAlive(source)) {
                     damage(source, d);
                 }
 
@@ -746,6 +747,10 @@ public class Health {
 
     public Wet getWet() {
         return wet;
+    }
+
+    public Wind getWind() {
+        return wind;
     }
 
     public void stumble(float damage) {
@@ -1056,7 +1061,7 @@ public class Health {
         return false;
     }
 
-    public static boolean random(int time) {
+    public static boolean once(int time) {
         return new Random().nextInt(0, time / UPDATE_FREQUENCY) == 0;
     }
 }

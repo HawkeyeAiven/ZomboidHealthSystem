@@ -25,42 +25,27 @@ public class Cold extends Moodle {
     }
 
     @Override
-    public void setAmount(float amount) {
-        if(amount > 0) {
-            this.amount = amount;
-        } else {
-            this.amount = 0;
-        }
-    }
-
-    @Override
     public void update() {
         super.update();
-        float bodyTemperature = getHealth().getTemperature().getAmount();
-        float wet = (getHealth().getWet().getAmount() / 2.0F) + 1.0F;
-        float d = Math.max((float) Math.sqrt(35.0F - bodyTemperature),1);
 
-        if (bodyTemperature < 35.0F && getAmount() < 1.0F) {
-            this.addAmount(1.0F / (5 * 60 * 20) * getMultiplier() * d * wet * Config.COLD_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
-        }
+        float amplifier = (Temperature.AVERAGE_TEMPERATURE_BODY - getHealth().getTemperature().getAmount()) / 1.5F;
 
-        this.getHealth().getExhaustion().addMultiplier(this, Math.max(getAmount(), 1));
-
-        if(getAmount() >= 1.0F){
-            if(bodyTemperature < 35.0F) {
-                this.addAmount(1.0F / (25 * 60 * 20) * getMultiplier() * d * wet * Config.COLD_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
+        if (amplifier >= 1.0F) {
+            if(Util.random(Config.COLD_CHANCE.getValue() * Health.UPDATE_FREQUENCY * amplifier * getMultiplier())) {
+                this.addAmount(1.0F);
             }
+        }
+        getHealth().getExhaustion().addMultiplier(this, (getAmount() / 2) + 1);
+        getHealth().getHunger().setAppetite(Hunger.DEFAULT_APPETITE / (getAmount() / 4 + 1));
 
-            this.getHealth().getDrowsiness().addTicks(getAmount() / 2 * Health.UPDATE_FREQUENCY);
-            this.getHealth().getThirst().addAmount(getAmount() / (20 * 60 * 20));
-
-            if(getAmount() >= 2.5F){
-                if(random(60 * 20)){
-                    this.getHealth().addStatusEffect(StatusEffects.NAUSEA,1, 10 * 20);
-                }
-
-                if(getAmount() >= 3.1F) {
-                    this.getHealth().onDeath(Util.getDamageSource(ModDamageTypes.COLD, getPlayer().getWorld()));
+        if(getAmount() > 1.0F) {
+            if(Util.random(1.0F / (4 * 60 * 20) * Health.UPDATE_FREQUENCY * getAmount())) {
+                getHealth().addStatusEffect(StatusEffects.NAUSEA, 0, 5 * 20);
+            }
+            if(getAmount() >= 2.0F) {
+                getHealth().addStatusEffect(StatusEffects.SLOWNESS, (int)(getEffectAmplifier() / 3.0F), 15 * 20);
+                if (getAmount() >= 4.0F) {
+                    getHealth().onDeath(Util.getDamageSource(ModDamageTypes.COLD, getPlayer().getWorld()));
                 }
             }
         }
@@ -68,13 +53,16 @@ public class Cold extends Moodle {
 
     @Override
     public void onSleep(){
-        Temperature temperature = getHealth().getTemperature();
-        Wet wet = getHealth().getWet();
-        float multiplier = (wet.getAmount() / 2) + 1;
-        if (temperature.getAmount() < 35.0F) {
-            this.addAmount(0.75F * multiplier);
-        } else if(temperature.getAmount() > 36.0F){
-            this.addAmount(-0.5F / multiplier);
+        float amplifier = (Temperature.AVERAGE_TEMPERATURE_BODY - getHealth().getTemperature().getAmount()) / 1.5F;
+        if(amplifier < 1) {
+            this.addAmount(-1.0F);
+        } else {
+            this.addAmount(amplifier);
         }
+    }
+
+    @Override
+    public void setAmount(float amount) {
+        this.amount = Math.max(amount, 0);
     }
 }

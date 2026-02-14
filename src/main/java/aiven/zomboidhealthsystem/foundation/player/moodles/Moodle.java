@@ -38,8 +38,8 @@ public abstract class Moodle {
 
     }
 
-    boolean random(int time){
-        return Health.random(time);
+    boolean once(int time){
+        return Health.once(time);
     }
 
     public String getNbt(){

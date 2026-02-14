@@ -37,6 +37,8 @@ public class Wet extends Moodle {
         if(getHealth().getTemperature().getAmount() > Temperature.AVERAGE_TEMPERATURE_BODY + 1.0F && this.getAmount() < 2.1F) {
             this.addAmount(0.035F / 20 * Health.UPDATE_FREQUENCY);
         }
+
+        getHealth().getTemperature().addHeat(getAmount() * -2.5F);
     }
 
     @Override

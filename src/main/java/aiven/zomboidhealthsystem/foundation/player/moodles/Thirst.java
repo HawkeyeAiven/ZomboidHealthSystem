@@ -5,7 +5,6 @@ import aiven.zomboidhealthsystem.ModDamageTypes;
 import aiven.zomboidhealthsystem.ModStatusEffects;
 import aiven.zomboidhealthsystem.foundation.player.Health;
 import aiven.zomboidhealthsystem.foundation.utility.Util;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
 
@@ -40,19 +39,19 @@ public class Thirst extends Moodle {
             this.getHealth().getExhaustion().addMultiplier(this, getAmount());
             if (amount >= 2) {
 
-                if (random(4 * 60 * 20)) {
+                if (once(4 * 60 * 20)) {
                     this.getHealth().addStatusEffect(StatusEffects.BLINDNESS, 0, 10 * 20);
                 }
 
                 if (amount >= 2.4F) {
                     this.getHealth().addStatusEffect(StatusEffects.SLOWNESS, (int) (amount - 1.6F), 15 * 20);
-                    if (random(2 * 60 * 20)) {
+                    if (once(2 * 60 * 20)) {
                         this.getHealth().stumble(0);
                     }
 
                     if (amount >= 2.8F) {
                         this.getHealth().addStatusEffect(StatusEffects.BLINDNESS, 0, 15 * 20);
-                        if (random(60 * 20)) {
+                        if (once(60 * 20)) {
                             this.getHealth().stumble(0);
                         }
 

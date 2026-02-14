@@ -25,6 +25,8 @@
     "ClientWorldMixin",
     "CreateWorldScreenMixin",
     "InGameHudMixin",
-    "ScreenMixin"
+    "ScreenMixin",
+    "AbstractInventoryScreenMixin",
+    "HandledScreenMixin"
   ]
 }

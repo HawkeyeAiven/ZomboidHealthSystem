@@ -91,11 +91,6 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
     @Shadow public abstract Either<PlayerEntity.SleepFailureReason, Unit> trySleep(BlockPos pos);
 
     @Shadow protected HungerManager hungerManager;
-    @Unique
-    private float lastSpeed = 0;
-
-    @Unique
-    public float modSpeed = 0;
 
     @Unique
     public Health modHealth;
@@ -263,11 +258,6 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
         }
     }
 
-    @Inject(at = @At("HEAD"), method = "tick")
-    private void tick(CallbackInfo ci){
-        calculateSpeed(this.speed);
-    }
-
     @Inject(at = @At("HEAD"), method = "readCustomDataFromNbt")
     private void readNbt(NbtCompound nbt, CallbackInfo ci) {
         if(!this.getWorld().isClient) {
@@ -397,12 +387,6 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
         } else {
             return false;
         }
-    }
-
-    @Unique
-    private void calculateSpeed(float speed){
-        this.modSpeed = speed - this.lastSpeed;
-        this.lastSpeed = this.speed;
     }
 
     @Override

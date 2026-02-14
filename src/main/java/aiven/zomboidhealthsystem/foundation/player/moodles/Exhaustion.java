@@ -41,7 +41,7 @@ public class Exhaustion extends Moodle {
         }
 
         if(amount >= 1.0F) {
-            if(this.getHealth().getWet().getAmount() < 1.5F) {
+            if(this.getHealth().getWet().getAmount() < 1.5F && !getHealth().getTemperature().isFeelingCold()) {
                 this.getHealth().getWet().addAmount(1 / 500F * (Util.getArmorCount(getPlayer()) >= 3 ? 2 : 1) * Health.UPDATE_FREQUENCY);
             }
             if (amount >= 1.5F) {

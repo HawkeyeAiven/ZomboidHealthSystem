@@ -1,10 +1,4 @@
 package aiven.zomboidhealthsystem.foundation.effects;
 
-import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.entity.effect.StatusEffectCategory;
-
-public class Hunger extends StatusEffect {
-    public Hunger() {
-        super(StatusEffectCategory.HARMFUL, 0xe9b8b3);
-    }
+public class Hunger extends ModStatusEffect {
 }
