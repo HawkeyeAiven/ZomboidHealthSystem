@@ -8,7 +8,8 @@
 		"Aiven"
 	],
 	"contact": {
-		"homepage": "https://modrinth.com/mod/zomboid-health-system"
+		"homepage": "https://modrinth.com/mod/zomboid-health-system",
+		"sources": "https://github.com/HawkeyeAiven/ZomboidHealthSystem"
 	},
 	"license": "MIT",
 	"icon": "assets/zomboidhealthsystem/icon.png",
@@ -22,7 +23,7 @@
 		]
 	},
 	"mixins": [
-		"zomboidhealthsystemmixins.json"
+		"zomboidhealthsystem.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.16.10",

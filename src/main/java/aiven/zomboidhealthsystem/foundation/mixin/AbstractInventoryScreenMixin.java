@@ -1,7 +1,6 @@
 package aiven.zomboidhealthsystem.foundation.mixin;
 
 import aiven.zomboidhealthsystem.foundation.utility.Util;
-import com.google.common.collect.Ordering;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.DrawContext;
