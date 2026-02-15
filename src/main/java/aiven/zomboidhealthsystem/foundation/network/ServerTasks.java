@@ -3,9 +3,7 @@ package aiven.zomboidhealthsystem.foundation.network;
 import aiven.zomboidhealthsystem.Config;
 import aiven.zomboidhealthsystem.ModItems;
 import aiven.zomboidhealthsystem.ZomboidHealthSystem;
-import aiven.zomboidhealthsystem.foundation.items.AlcoholWipe;
 import aiven.zomboidhealthsystem.foundation.world.ModServer;
-import aiven.zomboidhealthsystem.foundation.utility.Util;
 import aiven.zomboidhealthsystem.foundation.items.BandageItem;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.EntityPose;
@@ -89,11 +87,9 @@ public enum ServerTasks {
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
-                    serverPlayerEntity.setPose(pose);
                 }).start();
-            } else {
-                serverPlayerEntity.setPose(pose);
             }
+            serverPlayerEntity.setPose(pose);
         } catch (Exception e){
 
             print(

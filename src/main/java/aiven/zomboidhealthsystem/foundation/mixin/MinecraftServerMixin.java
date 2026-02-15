@@ -44,7 +44,7 @@ public abstract class MinecraftServerMixin {
 
     @Unique private WeatherCodec weatherCodec;
 
-    @Unique private int ticks = 0;
+    @Unique private int t = 0;
 
     @Unique private int autosaveTicks = 0;
 
@@ -82,11 +82,11 @@ public abstract class MinecraftServerMixin {
     private void tick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) throws IOException {
         weatherCodec.getValue().tick();
 
-        if(ticks++ >= 20 - 1) {
+        if(t++ >= 20 - 1) {
             for(PlayerEntity player : getOverworld().getPlayers()) {
                 ModServer.sendPacketWorld(player);
             }
-            ticks = 0;
+            t = 0;
         }
 
         if(autosaveTicks++ >= Config.AUTOSAVE_FREQUENCY.getValue()) {

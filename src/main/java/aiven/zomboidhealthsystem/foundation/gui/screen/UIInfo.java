@@ -13,6 +13,7 @@ import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
 import org.joml.Vector2f;
 
 @Environment(EnvType.CLIENT)
@@ -51,11 +52,16 @@ public non-sealed class UIInfo extends UI {
         );
 
         ClientWorldInfo worldInfo = ZomboidHealthSystemClient.WORLD_INFO;
+        World world = MinecraftClient.getInstance().world;
+
+        int seconds = (int) (world.getTimeOfDay() * 3.6F);
+        int minutes = seconds / 60 % 60;
+        int hours = (seconds / 3600 + 8) % 24;
 
         if(worldInfo.getDayLengthMultiplier() > 0) {
             context.drawText(
                     MinecraftClient.getInstance().textRenderer,
-                    Text.of("Day: " + ((worldInfo.getTicksFromStart() / 24000 / worldInfo.getDayLengthMultiplier()) + 1)),
+                    Text.of("Day: " + (((world.getTimeOfDay() + 8000) / 24000) + 1)),
                     (int) pos.x + 10, (int) pos.y + 25, 0xFFffffff, true
             );
         } else {
@@ -68,7 +74,7 @@ public non-sealed class UIInfo extends UI {
 
         context.drawText(
                 MinecraftClient.getInstance().textRenderer,
-                Text.of( "Time: " + worldInfo.getHours() + (worldInfo.getMinutes() >= 10 ? ":" : ":0") + worldInfo.getMinutes()),
+                Text.of( "Time: " + hours + (minutes >= 10 ? ":" : ":0") + minutes),
                 (int) pos.x + 10, (int) pos.y + 35, 0xFFffffff, true
         );
 
@@ -97,7 +103,6 @@ public non-sealed class UIInfo extends UI {
         );
 
         BodyPartHud.renderAllParts(context, tickDelta);
-
 
         super.render(context, mouseX, mouseY, tickDelta);
     }

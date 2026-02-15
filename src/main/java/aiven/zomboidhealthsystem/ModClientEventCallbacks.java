@@ -19,12 +19,6 @@ public class ModClientEventCallbacks {
             }
         });
 
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if(client.world != null) {
-                ZomboidHealthSystemClient.WORLD_INFO.tick(client.world);
-            }
-        });
-
         HudRenderCallback.EVENT.register((context,tickDelta) -> {
             MinecraftClient client = MinecraftClient.getInstance();
             if(!client.options.debugEnabled) {

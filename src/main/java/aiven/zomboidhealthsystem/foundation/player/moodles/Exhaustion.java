@@ -40,14 +40,9 @@ public class Exhaustion extends Moodle {
             this.addAmount(-1.0F / 1000 * Config.EXHAUSTION_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
         }
 
-        if(amount >= 1.0F) {
-            if(this.getHealth().getWet().getAmount() < 1.5F && !getHealth().getTemperature().isFeelingCold()) {
-                this.getHealth().getWet().addAmount(1 / 500F * (Util.getArmorCount(getPlayer()) >= 3 ? 2 : 1) * Health.UPDATE_FREQUENCY);
-            }
-            if (amount >= 1.5F) {
-                this.getHealth().addStatusEffect(StatusEffects.SLOWNESS, (int) amount - 1, 20 * 5);
-                this.getHealth().addStatusEffect(StatusEffects.MINING_FATIGUE, (int) amount - 1, 20 * 5);
-            }
+        if (amount >= 1.5F) {
+            this.getHealth().addStatusEffect(StatusEffects.SLOWNESS, (int) amount - 1, 20 * 5);
+            this.getHealth().addStatusEffect(StatusEffects.MINING_FATIGUE, (int) amount - 1, 20 * 5);
         }
 
         Temperature temperature = getHealth().getTemperature();

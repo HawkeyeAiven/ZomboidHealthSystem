@@ -1,6 +1,5 @@
 package aiven.zomboidhealthsystem.foundation.utility;
 
-import aiven.zomboidhealthsystem.foundation.effects.ModStatusEffect;
 import aiven.zomboidhealthsystem.foundation.items.BandageItem;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -19,29 +18,9 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Random;
 
 public class Util {
-    public static ArrayList<StatusEffectInstance> sortEffects(Collection<StatusEffectInstance> list) {
-        ArrayList<StatusEffectInstance> result = new ArrayList<>();
-
-        for(StatusEffectInstance effect : list) {
-            if(!(effect.getEffectType() instanceof ModStatusEffect)) {
-                result.add(effect);
-            }
-        }
-
-        for(StatusEffectInstance effect : list) {
-            if(effect.getEffectType() instanceof ModStatusEffect) {
-                result.add(effect);
-            }
-        }
-
-        return result;
-    }
-
     public static boolean random(float chance) {
         return chance > new Random().nextFloat(0, 1.0F);
     }

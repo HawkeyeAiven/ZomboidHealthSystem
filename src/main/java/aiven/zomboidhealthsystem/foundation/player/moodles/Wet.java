@@ -38,6 +38,10 @@ public class Wet extends Moodle {
             this.addAmount(0.035F / 20 * Health.UPDATE_FREQUENCY);
         }
 
+        if(getHealth().getExhaustion().getAmount() >= 1.5F && getAmount() < 1.5F && !getHealth().getTemperature().isFeelingCold()) {
+            this.getHealth().getWet().addAmount(1 / 500F * (Util.getArmorCount(getPlayer()) >= 3 ? 1.5F : 1.0F) * Health.UPDATE_FREQUENCY);
+        }
+
         getHealth().getTemperature().addHeat(getAmount() * -2.5F);
     }
 

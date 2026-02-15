@@ -400,11 +400,7 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
 
     @Unique
     public PlayerEntity getPlayer() {
-        if(!this.getWorld().isClient) {
-            return (PlayerEntity) (Object) (this);
-        } else {
-            return null;
-        }
+        return (PlayerEntity) (Object) (this);
     }
 
     @Unique

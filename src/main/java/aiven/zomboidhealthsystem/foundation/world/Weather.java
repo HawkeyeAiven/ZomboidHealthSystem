@@ -27,14 +27,14 @@ public final class Weather {
     }
 
     public void tick() {
-        if(i++ > 20 - 1 && this.worldSettings.hasTemperature() && getWorld() != null){
+        if(i++ > 20 - 1 && getWorld() != null){
             this.update();
             i = 0;
         }
     }
 
     private void update() {
-        long timeOfDay = this.getWorld().getTimeOfDay() % 24000;
+        long timeOfDay = this.getWorld().getTimeOfDay();
 
         if(timeOfDay < 20 * 2L){
             if(!newDay){
@@ -84,6 +84,7 @@ public final class Weather {
     }
 
     private float getTemperatureOnTimeOfDay(int tickDelta, int timeOfDay) {
+        timeOfDay = timeOfDay % 24000;
         float temperature = this.worldTemperature;
         float average_temperature = getSeasonTemperature();
         float amount = 1.0F / (60 * 20) * tickDelta / worldSettings.getDayLengthMultiplier();
@@ -123,7 +124,6 @@ public final class Weather {
             worldTemperature = getTemperatureOnTimeOfDay(ticks, timeOfDay);
         }
     }
-
 
     public float getSeasonTemperature(){
         return getSeasonTemperature(this.worldSettings, getWorld());
@@ -178,7 +178,7 @@ public final class Weather {
         int duration = settings.getDaysInSeason() * 24000;
         int time;
         if(world != null) {
-            time = settings.getStartTicks() + (int)(world.getTime() / settings.getDayLengthMultiplier());
+            time = settings.getStartTicks() + (int)(world.getTimeOfDay());
         } else {
             time = settings.getStartTicks();
         }

@@ -7,7 +7,6 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -21,13 +20,7 @@ public abstract class EntityMixin {
 
     @Shadow public abstract Text getName();
 
-    @Shadow public abstract DataTracker getDataTracker();
-
-    @Shadow public abstract boolean isAlive();
-
     @Shadow public abstract boolean isPlayer();
-
-    @Shadow public abstract BlockPos getBlockPos();
 
     @Shadow public abstract boolean isCrawling();
 
@@ -69,8 +62,6 @@ public abstract class EntityMixin {
     @Shadow @Final protected static TrackedData<EntityPose> POSE;
 
     @Shadow public abstract EntityPose getPose();
-
-    @Shadow public float speed;
 
     /**
      * @author

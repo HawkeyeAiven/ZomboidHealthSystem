@@ -15,7 +15,7 @@ public class Hud {
     private final MinecraftClient client;
 
     public Hud(MinecraftClient client) {
-        this.timeHud = new TimeHud(client, ZomboidHealthSystemClient.WORLD_INFO, Config.TIME_HUD_POS.getValue());
+        this.timeHud = new TimeHud(client, Config.TIME_HUD_POS.getValue());
         this.client = client;
     }
 

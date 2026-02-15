@@ -1,21 +1,12 @@
 package aiven.zomboidhealthsystem.foundation.mixin;
 
-import com.google.common.collect.Lists;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.texture.StatusEffectSpriteManager;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.util.Identifier;
@@ -26,9 +17,6 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-
-import java.util.Collection;
-import java.util.List;
 
 @Environment(EnvType.CLIENT)
 @Mixin(value = InGameHud.class, priority = 500)
@@ -140,76 +128,6 @@ public abstract class InGameHudMixin {
             }
 
             this.client.getProfiler().pop();
-        }
-    }
-
-    /**
-     * @author Aiven
-     * @reason Таков путь
-     */
-    @Overwrite
-    public void renderStatusEffectOverlay(DrawContext context) {
-        Collection<StatusEffectInstance> collection = this.client.player.getStatusEffects();
-        if (!collection.isEmpty()) {
-            Screen var4 = this.client.currentScreen;
-            if (var4 instanceof AbstractInventoryScreen) {
-                AbstractInventoryScreen abstractInventoryScreen = (AbstractInventoryScreen)var4;
-                if (abstractInventoryScreen.hideStatusEffectHud()) {
-                    return;
-                }
-            }
-
-            RenderSystem.enableBlend();
-            int i = 0;
-            int j = 0;
-            StatusEffectSpriteManager statusEffectSpriteManager = this.client.getStatusEffectSpriteManager();
-            List<Runnable> list = Lists.newArrayListWithExpectedSize(collection.size());
-
-            for(StatusEffectInstance statusEffectInstance : aiven.zomboidhealthsystem.foundation.utility.Util.sortEffects(collection)) {
-                StatusEffect statusEffect = statusEffectInstance.getEffectType();
-                if (statusEffectInstance.shouldShowIcon()) {
-                    int k = this.scaledWidth;
-                    int l = 1;
-                    if (this.client.isDemo()) {
-                        l += 15;
-                    }
-
-                    if (statusEffect.isBeneficial()) {
-                        ++i;
-                        k -= 25 * i;
-                    } else {
-                        ++j;
-                        k -= 25 * j;
-                        l += 26;
-                    }
-
-                    float f;
-                    if (statusEffectInstance.isAmbient()) {
-                        f = 1.0F;
-                        context.drawTexture(HandledScreen.BACKGROUND_TEXTURE, k, l, 165, 166, 24, 24);
-                    } else {
-                        context.drawTexture(HandledScreen.BACKGROUND_TEXTURE, k, l, 141, 166, 24, 24);
-                        if (statusEffectInstance.isDurationBelow(200)) {
-                            int m = statusEffectInstance.getDuration();
-                            int n = 10 - m / 20;
-                            f = MathHelper.clamp((float)m / 10.0F / 5.0F * 0.5F, 0.0F, 0.5F) + MathHelper.cos((float)m * (float)Math.PI / 5.0F) * MathHelper.clamp((float)n / 10.0F * 0.25F, 0.0F, 0.25F);
-                        } else {
-                            f = 1.0F;
-                        }
-                    }
-
-                    Sprite sprite = statusEffectSpriteManager.getSprite(statusEffect);
-                    int finalK = k;
-                    int finalL = l;
-                    list.add((Runnable)() -> {
-                        context.setShaderColor(1.0F, 1.0F, 1.0F, f);
-                        context.drawSprite(finalK + 3, finalL + 3, 0, 18, 18, sprite);
-                        context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-                    });
-                }
-            }
-
-            list.forEach(Runnable::run);
         }
     }
 }
