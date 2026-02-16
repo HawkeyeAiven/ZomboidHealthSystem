@@ -1,7 +1,6 @@
 package aiven.zomboidhealthsystem.foundation.gui.hud;
 
 import aiven.zomboidhealthsystem.Config;
-import aiven.zomboidhealthsystem.ZomboidHealthSystemClient;
 import aiven.zomboidhealthsystem.foundation.client.ClientWorldInfo;
 import aiven.zomboidhealthsystem.foundation.gui.screen.AbstractModScreen;
 import net.fabricmc.api.EnvType;

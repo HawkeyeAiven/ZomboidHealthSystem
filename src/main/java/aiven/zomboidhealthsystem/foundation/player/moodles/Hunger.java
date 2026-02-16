@@ -22,7 +22,7 @@ public class Hunger extends Moodle {
     public void update() {
         super.update();
 
-        this.addAmount(1.0F / 15000 * getMultiplier() * Config.HUNGER_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
+        this.addAmount(1.0F / 15000 * getMultiplier() * (this.getAmount() < 0 ? 2.25F : 1.0F) * Config.HUNGER_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
 
         if(amount < 0) {
             this.getHealth().addStatusEffect(ModStatusEffects.SATURATION, (int) (amount * -2.5F) - 1, 15 * 20);

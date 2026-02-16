@@ -148,10 +148,6 @@ public class Temperature extends Moodle {
                     this.getHealth().onDeath(Util.getDamageSource(ModDamageTypes.HYPERTHERMIA,getPlayer().getWorld()));
                 }
 
-                System.out.println("heat: " + getHeat());
-                System.out.println("perceived temp: " + getPerceivedTemperature());
-                System.out.println("min: " + getMinComfortableTemperature());
-
                 i = 0;
             }
 
