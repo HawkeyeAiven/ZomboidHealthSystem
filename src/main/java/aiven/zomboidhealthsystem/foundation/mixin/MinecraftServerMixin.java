@@ -58,6 +58,8 @@ public abstract class MinecraftServerMixin {
         jsonConfig = new JsonConfig();
         jsonConfig.add(worldSettingsCodec);
         jsonConfig.add(weatherCodec);
+
+        ModServer.MAP.clear();
     }
 
     @Inject(at = @At("TAIL"), method = "createWorlds")
@@ -71,7 +73,6 @@ public abstract class MinecraftServerMixin {
             worldDateFile.createNewFile();
             worldSettingsCodec.setValue(ModServer.WORLD_SETTINGS_ON_CREATING_WORLD);
             weatherCodec.setValue(new Weather(getOverworld(), worldSettingsCodec.getValue()));
-            weatherCodec.getValue().setWorldTemperature(weatherCodec.getValue().getSeasonTemperature());
         }
 
         ModServer.WEATHER = weatherCodec.getValue();

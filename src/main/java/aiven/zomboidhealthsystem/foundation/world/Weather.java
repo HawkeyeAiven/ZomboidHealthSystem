@@ -5,19 +5,20 @@ import aiven.zomboidhealthsystem.foundation.utility.Util;
 import aiven.zomboidhealthsystem.infrastructure.config.JsonBuilder;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 
 public final class Weather {
+    private static final int UPDATE_FREQUENCY = 20;
+
     private WorldSettings worldSettings;
-    private float worldTemperature;
     private ServerWorld world;
     private float wind;
     private boolean newDay = false;
+    private long lastTimeOfDay = -1;
+    private float temperatureFromRain = 0;
     private int i = 0;
 
     public Weather(ServerWorld world, WorldSettings worldSettings) {
@@ -26,7 +27,7 @@ public final class Weather {
     }
 
     public void tick() {
-        if(i++ > 20 - 1 && getWorld() != null){
+        if(i++ > UPDATE_FREQUENCY - 1 && getWorld() != null){
             this.update();
             i = 0;
         }
@@ -35,7 +36,7 @@ public final class Weather {
     private void update() {
         long timeOfDay = this.getWorld().getTimeOfDay();
 
-        if(timeOfDay % 24000 < 20 * 2L){
+        if(timeOfDay % 24000 < UPDATE_FREQUENCY * 2){
             if(!newDay){
                 this.onNewDay();
                 newDay = true;
@@ -44,13 +45,31 @@ public final class Weather {
             newDay = false;
         }
 
-        if(!getWorld().getGameRules().get(GameRules.DO_DAYLIGHT_CYCLE).get()){
-            return;
+        float d = (float) (lastTimeOfDay == -1 ? 1 : timeOfDay - lastTimeOfDay);
+
+        if(d > 0) {
+            if (world.isRaining()) {
+                temperatureFromRain = Math.max(temperatureFromRain - d / 1000, -5);
+            } else {
+                temperatureFromRain = Math.min(temperatureFromRain + d / 1000, 0);
+            }
         }
 
-        if(worldSettings.hasTemperature()) {
-            worldTemperature = getTemperatureOnTimeOfDay(20, (int) timeOfDay);
+        lastTimeOfDay = timeOfDay;
+    }
+
+    private void onNewDay() {
+        if(worldSettings.hasWind()) {
+            if (Util.random(Config.WIND_CHANCE.getValue())) {
+                wind = new Random().nextFloat(3.0F, 10.0F);
+            } else {
+                wind = 0;
+            }
         }
+    }
+
+    public float getWorldTemperature() {
+        return getSeasonTemperature() + getTemperatureOfTimeOfDay() + getTemperatureFromRain();
     }
 
     public float getTemperatureAtPos(BlockPos pos) {
@@ -82,44 +101,8 @@ public final class Weather {
         return this.getTemperatureAtPos(pos, biome) > 0;
     }
 
-    private float getTemperatureOnTimeOfDay(int tickDelta, int timeOfDay) {
-        timeOfDay = timeOfDay % 24000;
-        float temperature = this.worldTemperature;
-        float average_temperature = getSeasonTemperature();
-        float amount = 1.0F / (60 * 20) * tickDelta / worldSettings.getDayLengthMultiplier();
-        float divisor = (float) (Math.max( Math.pow(Math.abs((average_temperature - worldTemperature) / 2), 2) , 1 ));
-
-        if(timeOfDay > 10000){
-            temperature -= temperature < average_temperature ? amount / divisor * Config.COOLING_WORLD_MULTIPLIER.getValue(): amount * Config.COOLING_WORLD_MULTIPLIER.getValue();
-        } else {
-            temperature += temperature > average_temperature ? amount / divisor * Config.HEATING_WORLD_MULTIPLIER.getValue(): amount * Config.HEATING_WORLD_MULTIPLIER.getValue();
-        }
-
-        if(world.isRaining()) {
-            if(temperature > average_temperature - 5) {
-                temperature -= (temperature < average_temperature ? amount / divisor : amount) * 1.5F;
-            }
-        }
-
-        return temperature;
-    }
-
-    private void onNewDay() {
-        if(worldSettings.hasWind()) {
-            if (Util.random(Config.WIND_CHANCE.getValue())) {
-                wind = new Random().nextFloat(3.0F, 10.0F);
-            } else {
-                wind = 0;
-            }
-        }
-    }
-
-    public float getSeasonTemperature(){
-        return getSeasonTemperature(this.worldSettings, getWorld());
-    }
-
-    public float getWorldTemperature() {
-        return worldTemperature;
+    public float getSeasonTemperature() {
+        return getSeasonTemperature(this.worldSettings.getDaysInSeason(), this.getWorldSettings().getStartTicks() + this.getWorld().getTimeOfDay());
     }
 
     public World getWorld() {
@@ -134,10 +117,6 @@ public final class Weather {
         this.wind = wing;
     }
 
-    public void setWorldTemperature(float worldTemperature) {
-        this.worldTemperature = worldTemperature;
-    }
-
     public void setWorld(ServerWorld world) {
         this.world = world;
     }
@@ -150,42 +129,60 @@ public final class Weather {
         return worldSettings;
     }
 
+    public void setTemperatureFromRain(float temperatureFromRain) {
+        this.temperatureFromRain = temperatureFromRain;
+    }
+
+    public float getTemperatureFromRain() {
+        return temperatureFromRain;
+    }
+
     @Override
     public String toString() {
         JsonBuilder builder = new JsonBuilder();
-        builder.append("world_temperature", String.valueOf(this.getWorldTemperature()));
+        builder.append("temperature_from_rain", String.valueOf(this.temperatureFromRain));
         builder.append("wind", String.valueOf(this.getWind()));
         return builder.toString();
     }
 
-    public static float getSeasonTemperature(WorldSettings settings, @Nullable World world) {
-        int durationYear = settings.getDaysInSeason() * 24000 * 4;
-        int duration = settings.getDaysInSeason() * 24000;
-        int time;
-        if(world != null) {
-            time = settings.getStartTicks() + (int)(world.getTimeOfDay());
-        } else {
-            time = settings.getStartTicks();
-        }
-        float MAX_TEMP = Config.MAX_SEASON_TEMPERATURE.getValue();
+    public float getTemperatureOfTimeOfDay() {
+        return getTemperatureOfTimeOfDay(this.getWorld().getTimeOfDay());
+    }
 
-        time  %= durationYear;
-        if(time >= duration / 2){
-            time -= duration / 2 + 1;
+    public static float getTemperatureOfTimeOfDay(long timeOfDay) {
+        timeOfDay += 1000;
+        timeOfDay = timeOfDay % 24000;
+
+        if(timeOfDay >= 0 && timeOfDay <= 7000) {
+            return (float) timeOfDay / 700 - 5.0F;
         } else {
-            time = (durationYear - (duration / 2)) + (time) + 1;
+            int d = (int) timeOfDay - 7000;
+            return (float) d / -1700 + 5.0F;
+        }
+    }
+
+    public static float getSeasonTemperature(int daysInSeason, long time) {
+        int yearDuration = daysInSeason * 24000 * 4;
+        int seasonDuration = daysInSeason * 24000;
+        float MAX_TEMP = Config.MAX_SEASON_TEMPERATURE.getValue();
+        time  %= yearDuration;
+
+        if(time >= seasonDuration / 2){
+            time -= seasonDuration / 2 + 1;
+        } else {
+            time = (yearDuration - (seasonDuration / 2)) + (time) + 1;
         }
         float temp;
-        int d;
+        long d;
         float divisor = 27 / MAX_TEMP;
-        if(time > durationYear / 2){
-            time %= durationYear / 2;
-            d = time / (duration / 28);
+        if(time > yearDuration / 2){
+            time %= yearDuration / 2;
+            d = time / (seasonDuration / 28);
             temp = MAX_TEMP * -1;
             temp += (float) d / divisor;
         } else {
-            time %= durationYear / 2;
-            d = time / (duration / 28);
+            time %= yearDuration / 2;
+            d = time / (seasonDuration / 28);
             temp = MAX_TEMP;
             temp -= (float) d / divisor;
         }

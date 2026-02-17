@@ -4,8 +4,10 @@ import aiven.zomboidhealthsystem.Config;
 import aiven.zomboidhealthsystem.ModDamageTypes;
 import aiven.zomboidhealthsystem.ModStatusEffects;
 import aiven.zomboidhealthsystem.ZomboidHealthSystem;
+import aiven.zomboidhealthsystem.foundation.player.bodyparts.*;
 import aiven.zomboidhealthsystem.foundation.player.moodles.*;
 import aiven.zomboidhealthsystem.foundation.items.BandageItem;
+import aiven.zomboidhealthsystem.foundation.utility.EffectAmplifiers;
 import aiven.zomboidhealthsystem.foundation.utility.Util;
 import aiven.zomboidhealthsystem.foundation.world.ModServer;
 import aiven.zomboidhealthsystem.infrastructure.config.Json;
@@ -19,13 +21,11 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 
@@ -59,7 +59,6 @@ public class Health {
     public static final int BANDAGE_BECOMES_DIRTY_AFTER = 2 * 60 * 20;
     public static final int UPDATE_FREQUENCY = ZomboidHealthSystem.UPDATE_FREQUENCY;
     public static final int MAX_SLOWNESS_AMPLIFIER = 4 - 1;
-    public static final int PLAYER_FALLING_IF_AMPLIFIER = MAX_SLOWNESS_AMPLIFIER;
 
     private final PlayerEntity user;
 
@@ -85,7 +84,6 @@ public class Health {
 
     private boolean isDead = false;
     private float playerHp = 100;
-    private boolean isCanWalk = true;
 
     private int i = 0;
 
@@ -129,397 +127,6 @@ public class Health {
         this.moodles = new Moodle[]{pain,drowsiness,thirst,exhaustion,temperature,cold,wet,hunger,wind};
     }
 
-
-    public abstract static class BodyPart {
-        private final Health health;
-        private float hp;
-        private float additionalHp;
-        private final PlayerEntity player;
-        private final String id;
-        private int bandageTime = 0;
-        private BandageItem bandageItem;
-        private BandageItem lastBandageItem;
-        private float bleeding = 0;
-        private boolean infection = false;
-
-        private BodyPart(Health health, float hp, PlayerEntity player, String id) {
-            this.health = health;
-            this.hp = hp;
-            this.player = player;
-            this.id = id;
-        }
-
-        public float heal(float amount) {
-            if (!this.isFullHp()) {
-                if (this.getHp() + amount > this.getMaxHp()) {
-                    float d = getHp() + amount - this.getMaxHp();
-                    this.setHp(this.getMaxHp());
-                    return d;
-                } else {
-                    this.setHp(this.getHp() + amount);
-                    return 0;
-                }
-            } else {
-                return amount;
-            }
-        }
-
-        public float damage(float amount, DamageSource source) {
-            if(getAdditionalHp() > 0) {
-                float d = amount - additionalHp;
-                setAdditionalHp(Math.max(0, additionalHp - amount));
-                amount = d;
-            }
-
-            if(amount <= 0) {
-                return 0;
-            }
-
-            float d = amount - this.hp;
-            this.hp = Math.max(this.hp - amount, 0);
-            if (Util.random(getBleedingChance(amount, source))) {
-                this.setBleeding((this.getMaxHp() - this.getHp()) / 1.85F);
-            }
-
-            return Math.max(0, d);
-        }
-
-        protected void update() {
-            if(getHp() >= getMaxHp()) {
-                setBleeding(0);
-            }
-
-            if (this.isBandaged()) {
-                this.heal(
-                        bandageItem.getHealAmount()
-                                / BANDAGE_HEAL_TIME
-                                / (this.hasInfection() ? 3 : 1)
-                                * (this.getHealth().getHunger().getAmount() < 0 ? 1.25F : 1.0F)
-                                / (float) Math.sqrt(Math.max(getHealth().getHunger().getAmount(), 1))
-                                * UPDATE_FREQUENCY
-                );
-
-                this.setBandageTime(this.getBandageTime() + UPDATE_FREQUENCY);
-
-                if (bandageItem.isDirty() && isBleeding()) {
-                    if(Util.random(Config.INFECTION_CHANCE.getValue() * UPDATE_FREQUENCY)) {
-                        this.infection = true;
-                    }
-                }
-
-                if (bandageItem.isStopBleeding()) {
-                    if (this.isBleeding()) {
-                        this.setBleeding(this.getBleeding() - (0.00015F * UPDATE_FREQUENCY));
-
-                        if (this.getBandageTime() > BANDAGE_BECOMES_DIRTY_AFTER / (this.getBleeding() + 0.5F)) {
-
-                            this.setBandageItem(this.bandageItem.getDirtyBandageItem());
-                        }
-                    }
-                }
-            }
-            if(!this.isBandaged() || !this.bandageItem.isStopBleeding()) {
-                this.getHealth().damagePlayerHp(
-                        Util.getDamageSource(ModDamageTypes.BLEEDING, getPlayer().getWorld()),
-                        (this.getBleeding() / 30) * UPDATE_FREQUENCY);
-            }
-        }
-
-        public float getBleedingChance(float damage, DamageSource source) {
-            if(source == null) {
-                return 0;
-            }
-
-            float chance = Config.AVERAGE_BLEEDING_CHANCE.getValue() * damage;
-            chance *= Math.max(1, (this.getMaxHp() - this.getHp()) * 0.75F);
-
-            if((source.isOf(DamageTypes.FALL) || source.isOf(DamageTypes.HOT_FLOOR)) && !getHealth().getPlayer().isCrawling()) {
-                return chance / 2.25F;
-            } else if (isPointDamage(source)) {
-                return chance * 1.05F;
-            } else if(isDamageAllOverBody(source)) {
-                return chance / 2.0F;
-            } else if(source.isOf(DamageTypes.DROWN)){
-                return 0;
-            } else {
-                return chance;
-            }
-        }
-
-        public void bandage(BandageItem item) {
-            this.bandageTime = 0;
-            this.bandageItem = item;
-            this.lastBandageItem = null;
-        }
-
-        public Item unBandage() {
-            this.bandageTime = 0;
-            if (bandageItem != null) {
-                this.lastBandageItem = bandageItem;
-                bandageItem = null;
-                return lastBandageItem;
-            } else {
-                return null;
-            }
-        }
-
-        public Item getBandageItem() {
-            return bandageItem;
-        }
-
-        private void setBandageItem(@Nullable BandageItem item) {
-            this.bandageItem = item;
-        }
-
-        private void setBandageTime(int bandageTime) {
-            this.bandageTime = Math.max(bandageTime, 0);
-        }
-
-        public int getBandageTime() {
-            return bandageTime;
-        }
-
-        public boolean isBandaged() {
-            return this.bandageItem != null;
-        }
-
-        public float getBleeding() {
-            return bleeding;
-        }
-
-        public void setBleeding(float bleeding) {
-            this.bleeding = Math.max(bleeding,0);
-        }
-
-        public boolean isBleeding() {
-            return this.getBleeding() != 0;
-        }
-
-        public void setInfection(boolean infection) {
-            this.infection = infection;
-        }
-
-        public boolean hasInfection() {
-            return infection;
-        }
-
-        public void disInfect() {
-            if(new Random().nextInt(0, 3) == 0) {
-                setInfection(false);
-            }
-        }
-
-        protected void onSleep(){
-            this.heal(0.5f);
-            if(this.isBandaged()) {
-                this.setBleeding(this.getBleeding() - 0.3f);
-            }
-        }
-
-        public Health getHealth() {
-            return health;
-        }
-
-        public float getHp() {
-            return hp;
-        }
-
-        public void setHp(float hp) {
-            this.hp = hp;
-        }
-
-        public void setAdditionalHp(float additionalHp) {
-            this.additionalHp = additionalHp;
-        }
-
-        public float getAdditionalHp() {
-            return additionalHp;
-        }
-
-        public PlayerEntity getPlayer() {
-            return player;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public boolean isFullHp() {
-            return this.getHp() >= this.getMaxHp();
-        }
-
-        public float getPain() {
-            if (this.getHp() <= 0.2f) {
-                return 5f;
-            } else {
-                float d = (this.getMaxHp() - this.getHp());
-
-                if (this.isBandaged())
-                    return d / 1.25f;
-                else {
-                    return d;
-                }
-            }
-        }
-
-        protected abstract void addEffectAmplifier(EffectAmplifiers effectAmplifiers);
-
-        public abstract float getMaxHp();
-    }
-
-
-    private abstract static class ImportartBodyPart extends BodyPart {
-        private ImportartBodyPart(Health health, float hp, PlayerEntity user, String name) {
-            super(health, hp, user, name);
-        }
-
-        protected void nullHp() {
-            this.getHealth().onDeath(new DamageSource(this.getPlayer().getWorld().getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(ModDamageTypes.SEVERE_DAMAGE)));
-        }
-
-        @Override
-        public void update() {
-            super.update();
-            if (getHp() == 0) nullHp();
-        }
-
-        @Override
-        public float damage(float amount, DamageSource source) {
-            onDamage(amount);
-            return super.damage(amount, source);
-        }
-
-        protected abstract void onDamage(float amount);
-    }
-
-
-    private static class Head extends ImportartBodyPart {
-        private Head(Health health, float hp, PlayerEntity user) {
-            super(health, hp, user, HEAD_ID);
-        }
-
-        @Override
-        protected void onDamage(float amount) {
-            if (amount >= 1) {
-                getHealth().addStatusEffect(StatusEffects.BLINDNESS, 10 * 20, 0);
-                this.getHealth().damagePlayerHp(new DamageSource(this.getPlayer().getWorld().getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(ModDamageTypes.BLEEDING)),amount * 5f);
-            }
-        }
-
-        @Override
-        protected void addEffectAmplifier(EffectAmplifiers effectAmplifiers) {
-
-        }
-
-        @Override
-        public float getMaxHp() {
-            return MAX_HEAD_HP;
-        }
-
-        @Override
-        public void update() {
-            super.update();
-            if (this.getMaxHp() / 2 >= this.getHp()) {
-                if(once(3 * 60 * 20)){
-                    getHealth().addStatusEffect(StatusEffects.BLINDNESS, 10 * 20, 0);
-                }
-            }
-        }
-    }
-
-
-    private static class Body extends ImportartBodyPart {
-        private Body(Health health, float hp, PlayerEntity user) {
-            super(health, hp, user, BODY_ID);
-        }
-
-        @Override
-        protected void onDamage(float amount) {
-            if (amount >= 1) {
-                this.getHealth().damagePlayerHp(new DamageSource(this.getPlayer().getWorld().getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(ModDamageTypes.BLEEDING)),amount * 5f);
-            }
-        }
-
-        @Override
-        protected void addEffectAmplifier(EffectAmplifiers effectAmplifiers) {
-            effectAmplifiers.slownessAmplifier += (getMaxHp() - getHp()) / 2;
-        }
-
-        @Override
-        public float getMaxHp() {
-            return MAX_BODY_HP;
-        }
-
-        @Override
-        public void update() {
-            super.update();
-            if (this.getMaxHp() / 2 >= this.getHp()) {
-                if(once(3 * 60 * 20)){
-                    getHealth().addStatusEffect(StatusEffects.NAUSEA, 10 * 20, 0);
-                }
-            }
-        }
-    }
-
-
-    private static class Arm extends BodyPart {
-        private Arm(Health health, float hp, PlayerEntity user, String name) {
-            super(health, hp, user, name);
-        }
-
-        @Override
-        protected void addEffectAmplifier(EffectAmplifiers effectAmplifiers) {
-            effectAmplifiers.fatigueAmplifier += (getMaxHp() - getHp()) / 3.0F;
-        }
-
-        @Override
-        public float getMaxHp() {
-            return MAX_ARM_HP;
-        }
-    }
-
-
-    private static class Leg extends BodyPart {
-        private Leg(Health health, float hp, PlayerEntity user, String name) {
-            super(health, hp, user, name);
-        }
-
-        @Override
-        protected void addEffectAmplifier(EffectAmplifiers effectAmplifiers) {
-            effectAmplifiers.slownessAmplifier += (getMaxHp() - getHp()) / 2.0F;
-        }
-
-        @Override
-        public float getMaxHp() {
-            return MAX_LEG_HP;
-        }
-
-    }
-
-
-    private static class Foot extends BodyPart {
-        private Foot(Health health, float hp, PlayerEntity user, String name) {
-            super(health, hp, user, name);
-        }
-
-        @Override
-        protected void addEffectAmplifier(EffectAmplifiers effectAmplifiers) {
-            effectAmplifiers.slownessAmplifier += (getMaxHp() - getHp()) / 2.0F;
-        }
-
-        @Override
-        public float getMaxHp() {
-            return MAX_FOOT_HP;
-        }
-    }
-
-
-    private static class EffectAmplifiers {
-        public float slownessAmplifier = 0;
-        public float fatigueAmplifier = 0;
-    }
-
-
     public void tick() {
         if (i++ >= UPDATE_FREQUENCY - 1) {
             update();
@@ -536,12 +143,10 @@ public class Health {
                 part.addEffectAmplifier(effectAmplifiers);
             }
 
-            if (effectAmplifiers.slownessAmplifier >= PLAYER_FALLING_IF_AMPLIFIER) {
+            if(!canPlayerWalk()) {
                 this.getPlayer().setPose(EntityPose.SWIMMING);
-                isCanWalk = false;
-            } else {
-                isCanWalk = true;
             }
+
             if (effectAmplifiers.slownessAmplifier > MAX_SLOWNESS_AMPLIFIER) {
                 effectAmplifiers.slownessAmplifier = MAX_SLOWNESS_AMPLIFIER;
             }
@@ -550,7 +155,9 @@ public class Health {
             }
             if(effectAmplifiers.fatigueAmplifier >= 1) {
                 addStatusEffect(StatusEffects.MINING_FATIGUE, (int) effectAmplifiers.fatigueAmplifier - 1, 15 * 20);
-                addStatusEffect(StatusEffects.WEAKNESS, (int) effectAmplifiers.fatigueAmplifier - 1, 15 * 20);
+            }
+            if(effectAmplifiers.weaknessAmplifier >= 1) {
+                addStatusEffect(StatusEffects.WEAKNESS, (int) effectAmplifiers.weaknessAmplifier - 1, 15 * 20);
             }
 
             if (this.getPlayerHp() <= 0) {
@@ -600,11 +207,7 @@ public class Health {
             }
 
             if(getHunger().getAmount() < 2) {
-                if(getHunger().getAmount() < 0) {
-                    this.healPlayerHp(0.003F * 1.5F * UPDATE_FREQUENCY);
-                } else {
-                    this.healPlayerHp(0.003F * UPDATE_FREQUENCY);
-                }
+                this.healPlayerHp(0.003F * (getHunger().getAmount() < 0 ? 1.25F : 1.0F) * UPDATE_FREQUENCY);
             }
 
             for(Moodle moodle : this.moodles){
@@ -677,7 +280,7 @@ public class Health {
         }
     }
 
-    private void damagePlayerHp(DamageSource source, float amount) {
+    public void damagePlayerHp(DamageSource source, float amount) {
         this.getPlayer().getDamageTracker().onDamage(source,amount);
         if (amount > 0) {
             this.setPlayerHp(Math.max(this.getPlayerHp() - amount, 0));
@@ -767,7 +370,7 @@ public class Health {
     }
 
     public void stumble() {
-        stumble(0.05f);
+        stumble(0.05F);
     }
 
     public void onSleep() {
@@ -857,8 +460,11 @@ public class Health {
         return !isDead && this.getPlayer().isAlive();
     }
 
-    public boolean isCanWalk() {
-        return isCanWalk;
+    public boolean canPlayerWalk() {
+        float legsHp = leftLeg.getHp() + rightLeg.getHp() + leftFoot.getHp() + rightFoot.getHp();
+        float legsMaxHp = leftLeg.getMaxHp() + rightLeg.getMaxHp() + leftFoot.getMaxHp() + rightFoot.getMaxHp();
+        float percent = legsHp / legsMaxHp;
+        return percent > 0.60F && getExhaustion().canPlayerWalk();
     }
 
     public void setPlayerHp(float playerHp) {
@@ -931,26 +537,9 @@ public class Health {
         }
 
         for (BodyPart part : bodyParts) {
-            JsonBuilder bodyPartBuilder = new JsonBuilder();
-
-            if (part.getHp() != part.getMaxHp()) {
-                bodyPartBuilder.append("hp", String.valueOf(part.getHp()));
-            }
-            if(part.getAdditionalHp() > 0) {
-                bodyPartBuilder.append("add_hp", String.valueOf(part.getAdditionalHp()));
-            }
-            if (part.isBandaged()) {
-                bodyPartBuilder.append("bandage_time", String.valueOf(part.getBandageTime()));
-                bodyPartBuilder.append("bandage_item",  String.valueOf(Item.getRawId(part.getBandageItem())));
-            }
-            if (part.isBleeding()) {
-                bodyPartBuilder.append("bleeding",  String.valueOf(part.getBleeding()));
-            }
-            if (part.hasInfection()) {
-                bodyPartBuilder.append("infection",  String.valueOf(true));
-            }
-            if(!bodyPartBuilder.isEmpty()) {
-                healthBuilder.append(part.getId(), bodyPartBuilder.toString());
+            String nbt = part.getNbt();
+            if(nbt != null) {
+                healthBuilder.append(part.getId(), nbt);
             }
         }
         return healthBuilder.toString();
@@ -963,7 +552,7 @@ public class Health {
             BodyPart bodyPart = health.getBodyParts()[i];
             String bodyPartValue = Json.getValue(value, bodyPart.getId());
             if(bodyPartValue != null) {
-                parseBodyPart(bodyPartValue, bodyPart);
+                bodyPart.readNbt(bodyPartValue);
             }
         }
 
@@ -990,46 +579,7 @@ public class Health {
         return health;
     }
 
-    private static void parseBodyPart(String value, BodyPart bodyPart){
-        {
-            String hp = Json.getValue(value, "hp");
-            if(hp != null) {
-                bodyPart.setHp(Float.parseFloat(hp));
-            }
-        }
-
-        {
-            String addHp = Json.getValue(value, "add_hp");
-            if(addHp != null) {
-                bodyPart.setAdditionalHp(Float.parseFloat(addHp));
-            }
-        }
-
-        {
-            String bandage_item = Json.getValue(value, "bandage_item");
-            String bandage_time = Json.getValue(value, "bandage_time");
-            if(bandage_item != null && bandage_time != null) {
-                bodyPart.setBandageItem((BandageItem) Item.byRawId(Integer.parseInt(bandage_item)));
-                bodyPart.setBandageTime(Integer.parseInt(bandage_time));
-            }
-        }
-
-        {
-            String bleeding = Json.getValue(value, "bleeding");
-            if(bleeding != null) {
-                bodyPart.setBleeding(Float.parseFloat(bleeding));
-            }
-        }
-
-        {
-            String infection = Json.getValue(value, "infection");
-            if(infection != null) {
-                bodyPart.setInfection(Boolean.parseBoolean(infection));
-            }
-        }
-    }
-
-    private static boolean isDamageAllOverBody(DamageSource source) {
+    public static boolean isDamageAllOverBody(DamageSource source) {
         for (TagKey<DamageType> t : new TagKey[]{
                 DamageTypeTags.IS_EXPLOSION,
                 DamageTypeTags.IS_FIRE,
@@ -1046,7 +596,7 @@ public class Health {
         return false;
     }
 
-    private static boolean isPointDamage(DamageSource source) {
+    public static boolean isPointDamage(DamageSource source) {
         for (RegistryKey<DamageType> t : new RegistryKey[]{
                 DamageTypes.ARROW,
                 DamageTypes.MOB_ATTACK,

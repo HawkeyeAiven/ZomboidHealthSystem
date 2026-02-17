@@ -74,13 +74,13 @@ public enum ServerTasks {
             if (!serverPlayerEntity.isCrawling()) {
                 pose = EntityPose.SWIMMING;
                 time = 200;
-            } else if (ModServer.getHealth(serverPlayerEntity).isCanWalk() && serverPlayerEntity.getWorld().getBlockState(serverPlayerEntity.getBlockPos().up(1)).getBlock().getBlastResistance() == 0) {
+            } else if (ModServer.getHealth(serverPlayerEntity).canPlayerWalk() && serverPlayerEntity.getWorld().getBlockState(serverPlayerEntity.getBlockPos().up(1)).getBlock().getBlastResistance() == 0) {
                 pose = EntityPose.STANDING;
                 time = 700;
             } else {
                 return;
             }
-            if(Config.DELAY_BEFORE_CRAWLING.getValue()) {
+            if(Config.DELAY_BEFORE_CRAWLING.getValue() && !serverPlayerEntity.isCreative()) {
                 new Thread(() -> {
                     try {
                         Thread.sleep(time);

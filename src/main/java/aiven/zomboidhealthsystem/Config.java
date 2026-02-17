@@ -37,9 +37,6 @@ public class Config {
     public static final FloatCodec INFECTION_CHANCE = (FloatCodec) CONFIG.add(new FloatCodec("infection_chance", 1.0F / 90 / 20));
     public static final FloatCodec COLD_CHANCE = (FloatCodec) CONFIG.add(new FloatCodec("cold_chance", 1.0F / (8 * 60 * 20)));
 
-    public static final FloatCodec COOLING_WORLD_MULTIPLIER = (FloatCodec) CONFIG.add(new FloatCodec("cooling_world_multiplier", 1.1F));
-    public static final FloatCodec HEATING_WORLD_MULTIPLIER = (FloatCodec) CONFIG.add(new FloatCodec("heating_world_multiplier", 0.9F));
-
     public static final FloatCodec MIN_COMFORTABLE_TEMP = (FloatCodec) CONFIG.add(new FloatCodec("min_comfortable_temp", 15.0F));
     public static final FloatCodec MAX_COMFORTABLE_TEMP = (FloatCodec) CONFIG.add(new FloatCodec("max_comfortable_temp", 30.0F));
 
@@ -54,6 +51,8 @@ public class Config {
     public static final FloatCodec HEAT_FROM_LEATHER_BOOTS = (FloatCodec) CONFIG.add(new FloatCodec("heat_from_leather_boots", 4.5F));
 
     public static final FloatCodec HEAT_FROM_OTHER_ARMOR = (FloatCodec) CONFIG.add(new FloatCodec("heat_from_other_armor", 1.0F));
+
+    public static final FloatCodec MAX_HEAT_FROM_BLOCK = (FloatCodec) CONFIG.add(new FloatCodec("max_heat_from_block", 30.0F));
 
     public static final FloatCodec AVERAGE_BLEEDING_CHANCE = (FloatCodec) CONFIG.add(new FloatCodec("average_bleeding_chance", 0.25F));
 

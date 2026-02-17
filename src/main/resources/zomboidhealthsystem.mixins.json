@@ -7,13 +7,14 @@
     "BiomeMixin",
     "CampfireBlockEntityMixin",
     "EntityMixin",
+    "HungerManagerMixin",
     "LivingEntityMixin",
+    "MilkBucketItem",
+    "MinecraftServerMixin",
     "PlayerEntityMixin",
     "PotionItemMixin",
     "ServerPlayerEntityMixin",
-    "ServerWorldMixin",
-    "MinecraftServerMixin",
-    "HungerManagerMixin"
+    "ServerWorldMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -1,5 +1,6 @@
 package aiven.zomboidhealthsystem.foundation.gui.hud;
 
+import aiven.zomboidhealthsystem.foundation.utility.TimeOfDay;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -34,10 +35,7 @@ public class TimeHud {
 
     public String getStringTime() {
         if(client.world != null) {
-            int seconds = (int) (client.world.getTimeOfDay() * 3.6F);
-            int minutes = seconds / 60 % 60;
-            int hours = (seconds / 3600 + 8) % 24;
-            return hours + (minutes >= 10 ? ":" : ":0") + minutes;
+            return new TimeOfDay(client.world.getTimeOfDay()).getModTime();
         } else {
             return null;
         }

@@ -2,6 +2,9 @@ package aiven.zomboidhealthsystem.foundation.mixin;
 
 import aiven.zomboidhealthsystem.Config;
 import aiven.zomboidhealthsystem.foundation.player.Health;
+import aiven.zomboidhealthsystem.foundation.player.bodyparts.BodyPart;
+import aiven.zomboidhealthsystem.foundation.player.moodles.Exhaustion;
+import aiven.zomboidhealthsystem.foundation.player.moodles.Thirst;
 import aiven.zomboidhealthsystem.foundation.world.ModServer;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.entity.Entity;
@@ -13,7 +16,7 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.registry.tag.EntityTypeTags;
@@ -24,10 +27,12 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Difficulty;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.io.IOException;
 
@@ -63,6 +68,8 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
     @Shadow public abstract boolean isSwimming();
 
     @Shadow public abstract boolean isSpectator();
+
+    @Shadow public abstract boolean isCreative();
 
     @Unique
     public Health modHealth;
@@ -260,10 +267,25 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
     @Inject(at = @At("HEAD"), method = "dropInventory")
     private void dropInventory(CallbackInfo ci) {
         if(!getWorld().isClient()) {
-            for(Health.BodyPart part : getModHealth().getBodyParts()) {
+            for(BodyPart part : getModHealth().getBodyParts()) {
                 if(part.isBandaged()) {
                     getPlayer().dropItem(part.unBandage().getDefaultStack(), true, true);
                 }
+            }
+        }
+    }
+
+    @Inject(at = @At("HEAD"), method = "eatFood")
+    private void eatFood(World world, ItemStack stack, CallbackInfoReturnable<ItemStack> cir) {
+        if(!getWorld().isClient()) {
+            Thirst thirst = getModHealth().getThirst();
+            Item item = stack.getItem();
+            if (item.equals(Items.APPLE)) {
+                thirst.drink(0.2F, true);
+            } else if(item.equals(Items.MUSHROOM_STEW)) {
+                thirst.drink(0.4F, true);
+            } else if(item.equals(Items.MELON_SLICE)) {
+                thirst.drink(0.3F, true);
             }
         }
     }
@@ -297,6 +319,10 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
                 this.addExhaustion(0.2F);
             } else {
                 this.addExhaustion(0.05F);
+            }
+            if(!this.getWorld().isClient() && !this.isCreative() && !this.isSpectator()) {
+                Exhaustion exhaustion = this.getModHealth().getExhaustion();
+                exhaustion.addAmount(0.05F * exhaustion.getMultiplier());
             }
         }
     }

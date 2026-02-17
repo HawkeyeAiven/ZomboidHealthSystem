@@ -265,7 +265,7 @@ public class Temperature extends Moodle {
         if(distance == -1 || distance >= 5) {
             return 0;
         }
-        return 25.0F - (distance * 5);
+        return Config.MAX_HEAT_FROM_BLOCK.getValue() - (distance * Config.MAX_HEAT_FROM_BLOCK.getValue());
     }
 
     public boolean isFeelingCold() {

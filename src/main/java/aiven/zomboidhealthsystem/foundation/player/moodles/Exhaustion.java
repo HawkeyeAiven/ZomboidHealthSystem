@@ -3,7 +3,6 @@ package aiven.zomboidhealthsystem.foundation.player.moodles;
 import aiven.zomboidhealthsystem.Config;
 import aiven.zomboidhealthsystem.ModStatusEffects;
 import aiven.zomboidhealthsystem.foundation.player.Health;
-import aiven.zomboidhealthsystem.foundation.utility.Util;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
 
@@ -37,7 +36,7 @@ public class Exhaustion extends Moodle {
         if (this.getPlayer().isSprinting()) {
             this.addAmount(1.0F / 1000 * getMultiplier() * Config.EXHAUSTION_MULTIPLIER.getValue()  * Health.UPDATE_FREQUENCY);
         } else {
-            this.addAmount(-1.0F / 1000 * Config.EXHAUSTION_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
+            this.addAmount(-1.0F / 1000 * (getPlayer().isCrawling() ? 1.25F : 1.0F) * Config.EXHAUSTION_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
         }
 
         if (amount >= 1.5F) {
@@ -47,6 +46,10 @@ public class Exhaustion extends Moodle {
 
         Temperature temperature = getHealth().getTemperature();
         temperature.addHeat(getAmount() * 3);
+    }
+
+    public boolean canPlayerWalk() {
+        return getAmount() < 4.0F;
     }
 
     @Override

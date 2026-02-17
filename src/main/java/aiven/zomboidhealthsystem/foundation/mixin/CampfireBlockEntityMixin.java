@@ -1,5 +1,6 @@
 package aiven.zomboidhealthsystem.foundation.mixin;
 
+import aiven.zomboidhealthsystem.Config;
 import aiven.zomboidhealthsystem.foundation.player.moodles.Temperature;
 import aiven.zomboidhealthsystem.foundation.world.ModServer;
 import net.minecraft.block.BlockState;
@@ -20,7 +21,7 @@ public class CampfireBlockEntityMixin {
             float distance = (float) player.getPos().distanceTo(pos.toCenterPos());
             if(distance < 5){
                 Temperature temperature = ModServer.getHealth(player).getTemperature();
-                temperature.setHeatFromCampfire(Math.max(25 - (distance * 5), temperature.getHeatFromCampfire()));
+                temperature.setHeatFromCampfire(Math.max(Config.MAX_HEAT_FROM_BLOCK.getValue() - (distance * Config.MAX_HEAT_FROM_BLOCK.getValue()), temperature.getHeatFromCampfire()));
             }
         }
     }

@@ -5,6 +5,7 @@ import aiven.zomboidhealthsystem.ZomboidHealthSystem;
 import aiven.zomboidhealthsystem.ZomboidHealthSystemClient;
 import aiven.zomboidhealthsystem.foundation.client.ClientWorldInfo;
 import aiven.zomboidhealthsystem.foundation.gui.hud.BodyPartHud;
+import aiven.zomboidhealthsystem.foundation.utility.TimeOfDay;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -54,10 +55,6 @@ public non-sealed class UIInfo extends UI {
         ClientWorldInfo worldInfo = ZomboidHealthSystemClient.WORLD_INFO;
         World world = MinecraftClient.getInstance().world;
 
-        int seconds = (int) (world.getTimeOfDay() * 3.6F);
-        int minutes = seconds / 60 % 60;
-        int hours = (seconds / 3600 + 8) % 24;
-
         if(worldInfo.getDayLengthMultiplier() > 0) {
             context.drawText(
                     MinecraftClient.getInstance().textRenderer,
@@ -74,7 +71,7 @@ public non-sealed class UIInfo extends UI {
 
         context.drawText(
                 MinecraftClient.getInstance().textRenderer,
-                Text.of( "Time: " + hours + (minutes >= 10 ? ":" : ":0") + minutes),
+                Text.of( "Time: " + new TimeOfDay(world.getTimeOfDay()).getModTime()),
                 (int) pos.x + 10, (int) pos.y + 35, 0xFFffffff, true
         );
 

@@ -1,6 +1,7 @@
 package aiven.zomboidhealthsystem.foundation.mixin;
 
 import aiven.zomboidhealthsystem.foundation.player.Health;
+import aiven.zomboidhealthsystem.foundation.player.bodyparts.BodyPart;
 import aiven.zomboidhealthsystem.foundation.world.ModServer;
 import net.minecraft.entity.*;
 import net.minecraft.entity.damage.DamageSource;
@@ -8,14 +9,12 @@ import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.io.IOException;
@@ -80,7 +79,7 @@ public abstract class LivingEntityMixin extends EntityMixin {
         if(!this.getWorld().isClient && this.isPlayer() && effect.getEffectType().equals(StatusEffects.ABSORPTION)) {
             try {
                 Health health = ModServer.getHealth((PlayerEntity) ((Object) this));
-                for(Health.BodyPart bodyPart : health.getBodyParts()) {
+                for(BodyPart bodyPart : health.getBodyParts()) {
                     bodyPart.setAdditionalHp(Math.max(bodyPart.getAdditionalHp(), ((effect.getAmplifier() + 1.0F) * 4) / health.getBodyParts().length));
                 }
             } catch (Exception e) {

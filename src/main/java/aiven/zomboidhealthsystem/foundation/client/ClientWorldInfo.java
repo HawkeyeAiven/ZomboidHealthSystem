@@ -25,13 +25,12 @@ public class ClientWorldInfo {
             worldInfo.setTemperature((float) temp[0] / 10);
             worldInfo.setWorldTemp((float) temp[1] / 10);
             worldInfo.setSeasonTemp((float) temp[2] / 10);
-            worldInfo.setWind((float) temp[3] / 10);
         } else {
             worldInfo.setTemperature(0);
             worldInfo.setWorldTemp(0);
             worldInfo.setSeasonTemp(0);
-            worldInfo.setWind(0);
         }
+        worldInfo.setWind((float) temp[3] / 10);
         setDayLengthMultiplier(temp[4]);
     }
 

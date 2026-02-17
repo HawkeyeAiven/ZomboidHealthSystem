@@ -19,7 +19,10 @@ public class WeatherCodec extends Codec {
             Weather weather = new Weather(null, null);
             Json json = new Json();
             json.load(string);
-            weather.setWorldTemperature(Float.parseFloat(json.getValue("world_temperature")));
+            String rain = json.getValue("temperature_from_rain");
+            if(rain != null) {
+                weather.setTemperatureFromRain(Float.parseFloat(rain));
+            }
             weather.setWind(Float.parseFloat(json.getValue("wind")));
             setValue(weather);
             return true;

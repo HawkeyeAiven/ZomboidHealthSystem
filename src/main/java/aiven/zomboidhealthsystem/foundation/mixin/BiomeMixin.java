@@ -3,6 +3,7 @@ package aiven.zomboidhealthsystem.foundation.mixin;
 import aiven.zomboidhealthsystem.Config;
 import aiven.zomboidhealthsystem.foundation.world.ModServer;
 import aiven.zomboidhealthsystem.foundation.world.Weather;
+import aiven.zomboidhealthsystem.foundation.world.WorldSettings;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FluidBlock;
 import net.minecraft.fluid.FluidState;
@@ -32,7 +33,8 @@ public abstract class BiomeMixin {
     @Overwrite
     public boolean doesNotSnow(BlockPos pos) {
         if(seasonTemperature == null) {
-            seasonTemperature = Weather.getSeasonTemperature(ModServer.WORLD_SETTINGS_ON_CREATING_WORLD, null);
+            WorldSettings settings = ModServer.WORLD_SETTINGS_ON_CREATING_WORLD;
+            seasonTemperature = Weather.getSeasonTemperature(settings.getDaysInSeason(), settings.getStartTicks());
         }
 
         if (ModServer.WEATHER != null && ModServer.WORLD_SETTINGS.hasTemperature()) {

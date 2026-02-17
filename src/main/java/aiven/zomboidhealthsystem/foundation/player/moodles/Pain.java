@@ -3,6 +3,7 @@ package aiven.zomboidhealthsystem.foundation.player.moodles;
 import aiven.zomboidhealthsystem.Config;
 import aiven.zomboidhealthsystem.ModStatusEffects;
 import aiven.zomboidhealthsystem.foundation.player.Health;
+import aiven.zomboidhealthsystem.foundation.player.bodyparts.BodyPart;
 import aiven.zomboidhealthsystem.infrastructure.config.Json;
 import aiven.zomboidhealthsystem.infrastructure.config.JsonBuilder;
 import net.minecraft.entity.effect.StatusEffect;
@@ -117,7 +118,7 @@ public class Pain extends Moodle {
 
     public float getPain() {
         float pain = 0;
-        for (Health.BodyPart part : this.getHealth().getBodyParts()) {
+        for (BodyPart part : this.getHealth().getBodyParts()) {
             pain += part.getPain() / 2;
         }
         return pain / (painkillerAmount + 1);

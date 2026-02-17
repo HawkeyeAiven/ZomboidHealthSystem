@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ModServer {
     public static WorldSettings WORLD_SETTINGS_ON_CREATING_WORLD = Config.DEFAULT_WORLD_SETTINGS.getValue();
 
-    private static ConcurrentHashMap<PlayerEntity, Health> map = new ConcurrentHashMap<>();
+    public static final ConcurrentHashMap<PlayerEntity, Health> MAP = new ConcurrentHashMap<>();
     public static Weather WEATHER;
     public static WorldSettings WORLD_SETTINGS;
 
@@ -58,21 +58,21 @@ public class ModServer {
     }
 
     public static void registerPlayer(PlayerEntity player, Health health) {
-        Enumeration<PlayerEntity> list = map.keys();
+        Enumeration<PlayerEntity> list = MAP.keys();
         while (list.hasMoreElements()) {
             PlayerEntity user = list.nextElement();
             if(user.getEntityName().equals(player.getEntityName())) {
-                map.remove(user);
+                MAP.remove(user);
             }
         }
-        map.put(player,health);
+        MAP.put(player,health);
     }
 
     public static Health getHealth(PlayerEntity player) {
-        return map.get(player);
+        return MAP.get(player);
     }
 
     public static Enumeration<PlayerEntity> getRegisteredPlayers() {
-        return map.keys();
+        return MAP.keys();
     }
 }
