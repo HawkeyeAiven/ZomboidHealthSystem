@@ -196,8 +196,8 @@ public class Health {
                                 / (this.hasInfection() ? 3 : 1)
                                 * (this.getHealth().getHunger().getAmount() < 0 ? 1.25F : 1.0F)
                                 / (float) Math.sqrt(Math.max(getHealth().getHunger().getAmount(), 1))
-                                * UPDATE_FREQUENCY)
-                ;
+                                * UPDATE_FREQUENCY
+                );
 
                 this.setBandageTime(this.getBandageTime() + UPDATE_FREQUENCY);
 

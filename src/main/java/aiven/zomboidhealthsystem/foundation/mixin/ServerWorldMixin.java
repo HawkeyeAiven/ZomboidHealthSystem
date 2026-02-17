@@ -4,7 +4,6 @@ import aiven.zomboidhealthsystem.foundation.world.ModServer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.GameRules;
-import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.level.ServerWorldProperties;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.*;
@@ -23,10 +22,6 @@ public abstract class ServerWorldMixin {
     @Shadow @NotNull public abstract MinecraftServer getServer();
 
     @Shadow public abstract String toString();
-
-    @Shadow public abstract ServerWorld toServerWorld();
-
-    @Shadow public abstract PersistentStateManager getPersistentStateManager();
 
     @Unique
     private int i = 0;

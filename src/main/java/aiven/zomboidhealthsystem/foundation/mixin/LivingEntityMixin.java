@@ -8,7 +8,6 @@ import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -20,7 +19,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.io.IOException;
-import java.util.Collection;
 
 @Mixin(value = LivingEntity.class, priority = 10000)
 public abstract class LivingEntityMixin extends EntityMixin {
@@ -33,10 +31,6 @@ public abstract class LivingEntityMixin extends EntityMixin {
 
     @Shadow protected abstract float modifyAppliedDamage(DamageSource source, float amount);
 
-    @Shadow public abstract void kill();
-
-    @Shadow public abstract Collection<StatusEffectInstance> getStatusEffects();
-
     @Shadow protected abstract float getJumpVelocity();
 
     @Shadow @Nullable public abstract StatusEffectInstance getStatusEffect(StatusEffect effect);
@@ -44,8 +38,6 @@ public abstract class LivingEntityMixin extends EntityMixin {
     @Shadow public abstract void onDeath(DamageSource damageSource);
 
     @Shadow public abstract float getHealth();
-
-    @Shadow public abstract float getMaxHealth();
 
     @Shadow protected int despawnCounter;
 
@@ -73,13 +65,7 @@ public abstract class LivingEntityMixin extends EntityMixin {
 
     @Shadow public abstract void tiltScreen(double deltaX, double deltaZ);
 
-    @Shadow protected abstract float getSoundVolume();
-
-    @Shadow public abstract float getSoundPitch();
-
     @Shadow public abstract boolean hasStatusEffect(StatusEffect effect);
-
-    @Shadow public abstract boolean isAlive();
 
     @Shadow public abstract boolean damage(DamageSource source, float amount) throws IOException;
 
@@ -88,15 +74,6 @@ public abstract class LivingEntityMixin extends EntityMixin {
     @Shadow public abstract void setHealth(float health);
 
     @Shadow public abstract void wakeUp();
-
-    @Shadow public abstract ItemStack getMainHandStack();
-
-    @Inject(at = @At("HEAD"), method = "sleep")
-    private void sleep(BlockPos pos, CallbackInfo ci){
-        if(!this.getWorld().isClient && this.isPlayer()){
-            ModServer.WEATHER.setSleep(this.getWorld().getTimeOfDay());
-        }
-    }
 
     @Inject(at = @At("HEAD"), method = "addStatusEffect(Lnet/minecraft/entity/effect/StatusEffectInstance;Lnet/minecraft/entity/Entity;)Z")
     private void addStatusEffect(StatusEffectInstance effect, Entity source, CallbackInfoReturnable<Boolean> cir) {

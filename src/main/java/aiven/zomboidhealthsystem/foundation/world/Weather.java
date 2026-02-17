@@ -18,7 +18,6 @@ public final class Weather {
     private ServerWorld world;
     private float wind;
     private boolean newDay = false;
-    private Integer sleep = null;
     private int i = 0;
 
     public Weather(ServerWorld world, WorldSettings worldSettings) {
@@ -36,7 +35,7 @@ public final class Weather {
     private void update() {
         long timeOfDay = this.getWorld().getTimeOfDay();
 
-        if(timeOfDay < 20 * 2L){
+        if(timeOfDay % 24000 < 20 * 2L){
             if(!newDay){
                 this.onNewDay();
                 newDay = true;
@@ -115,16 +114,6 @@ public final class Weather {
         }
     }
 
-    public void onSleep() {
-        if(sleep != null){
-            int ticks = 24000 - sleep;
-            int timeOfDay = sleep;
-            sleep = null;
-
-            worldTemperature = getTemperatureOnTimeOfDay(ticks, timeOfDay);
-        }
-    }
-
     public float getSeasonTemperature(){
         return getSeasonTemperature(this.worldSettings, getWorld());
     }
@@ -143,10 +132,6 @@ public final class Weather {
 
     public void setWind(float wing) {
         this.wind = wing;
-    }
-
-    public void setSleep(long sleep) {
-        this.sleep = (int) (sleep % 24000);
     }
 
     public void setWorldTemperature(float worldTemperature) {

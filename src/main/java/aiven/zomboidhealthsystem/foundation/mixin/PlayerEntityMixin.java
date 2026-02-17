@@ -3,8 +3,6 @@ package aiven.zomboidhealthsystem.foundation.mixin;
 import aiven.zomboidhealthsystem.Config;
 import aiven.zomboidhealthsystem.foundation.player.Health;
 import aiven.zomboidhealthsystem.foundation.world.ModServer;
-import com.mojang.authlib.GameProfile;
-import com.mojang.datafixers.util.Either;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
@@ -13,31 +11,23 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.passive.WolfEntity;
-import net.minecraft.entity.player.HungerManager;
-import net.minecraft.entity.player.ItemCooldownManager;
 import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.registry.tag.EntityTypeTags;
-import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundEvent;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Unit;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.io.IOException;
 
@@ -64,10 +54,6 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
 
     @Shadow protected abstract void damageHelmet(DamageSource source, float amount);
 
-    @Shadow protected abstract SoundEvent getDeathSound();
-
-    @Shadow public abstract void playSound(SoundEvent sound, float volume, float pitch);
-
     @Shadow public abstract void incrementStat(Identifier stat);
 
     @Shadow public abstract void addExhaustion(float exhaustion);
@@ -77,20 +63,6 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
     @Shadow public abstract boolean isSwimming();
 
     @Shadow public abstract boolean isSpectator();
-
-    @Shadow @Final private GameProfile gameProfile;
-
-    @Shadow @Final public PlayerScreenHandler playerScreenHandler;
-
-    @Shadow public abstract HungerManager getHungerManager();
-
-    @Shadow @Final private ItemCooldownManager itemCooldownManager;
-
-    @Shadow public abstract GameProfile getGameProfile();
-
-    @Shadow public abstract Either<PlayerEntity.SleepFailureReason, Unit> trySleep(BlockPos pos);
-
-    @Shadow protected HungerManager hungerManager;
 
     @Unique
     public Health modHealth;

@@ -84,12 +84,14 @@ public enum ServerTasks {
                 new Thread(() -> {
                     try {
                         Thread.sleep(time);
+                        serverPlayerEntity.setPose(pose);
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
                 }).start();
+            } else {
+                serverPlayerEntity.setPose(pose);
             }
-            serverPlayerEntity.setPose(pose);
         } catch (Exception e){
 
             print(
