@@ -1,10 +1,8 @@
 package aiven.zomboidhealthsystem.foundation.gui.screen;
 
-import aiven.zomboidhealthsystem.Config;
 import aiven.zomboidhealthsystem.ModKeyBindings;
 import aiven.zomboidhealthsystem.ZomboidHealthSystem;
 import aiven.zomboidhealthsystem.ZomboidHealthSystemClient;
-import aiven.zomboidhealthsystem.foundation.gui.hud.TimeHud;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -25,6 +23,7 @@ public abstract sealed class UI extends AbstractModScreen permits UIHealth, UIIn
 
     public UI(Vector2f ui) {
         pos = ui;
+        addClickableWidget(ZomboidHealthSystemClient.HUD.getTimeWidget());
     }
 
     @Override
@@ -56,37 +55,27 @@ public abstract sealed class UI extends AbstractModScreen permits UIHealth, UIIn
         super.close();
         LAST_POS = pos;
         LAST_UI = this;
-        TimeHud timeHud = ZomboidHealthSystemClient.HUD.getTimeHud();
-        Config.TIME_HUD_POS.setValue(timeHud.getPos());
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if(mouseX > pos.x && mouseX < pos.x + 8 && mouseY > pos.y && mouseY < pos.y + 8) {
-            close();
+            this.close();
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-
+        super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
         double lastMouseX = mouseX - deltaX, lastMouseY = mouseY - deltaY;
 
-        if(lastMouseX > pos.x + 8 && lastMouseX < pos.x + (int) (498 / 2.5f) && lastMouseY > pos.y && lastMouseY < pos.y + 8) {
+        if(lastMouseX > pos.x + 8 && lastMouseX < pos.x + (int) (498 / 2.5F) && lastMouseY > pos.y && lastMouseY < pos.y + 8) {
             pos.x += (float) deltaX;
             pos.y += (float) deltaY;
+            return true;
+        } else {
+            return false;
         }
-
-        TimeHud timeHud = ZomboidHealthSystemClient.HUD.getTimeHud();
-        int width = timeHud.getSize();
-
-        if(timeHud != null) {
-            if (lastMouseX > timeHud.getPos().x && lastMouseX < timeHud.getPos().x + width && lastMouseY > timeHud.getPos().y && lastMouseY < timeHud.getPos().y + 6) {
-                timeHud.getPos().x += (float) deltaX;
-                timeHud.getPos().y += (float) deltaY;
-            }
-        }
-        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
 }

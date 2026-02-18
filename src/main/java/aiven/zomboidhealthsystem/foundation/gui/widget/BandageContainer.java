@@ -1,7 +1,7 @@
 package aiven.zomboidhealthsystem.foundation.gui.widget;
 
-import aiven.zomboidhealthsystem.foundation.client.ClientHealth;
 import aiven.zomboidhealthsystem.foundation.items.BandageItem;
+import aiven.zomboidhealthsystem.foundation.player.bodyparts.BodyPart;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
@@ -10,7 +10,7 @@ import net.minecraft.text.Text;
 import java.util.ArrayList;
 
 public class BandageContainer extends ButtonsContainer {
-    public BandageContainer(int x, int y, ClientHealth.BodyPart bodyPart, ActionsButton actionsButton) {
+    public BandageContainer(int x, int y, BodyPart bodyPart, ActionsButton actionsButton) {
         super(x, y, 60, 20, Text.of("Bandage"));
         PlayerInventory inventory = MinecraftClient.getInstance().player.getInventory();
         ArrayList<Integer> ids = new ArrayList<>();

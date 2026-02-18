@@ -2,13 +2,11 @@ package aiven.zomboidhealthsystem.foundation.gui.screen;
 
 import aiven.zomboidhealthsystem.ZomboidHealthSystem;
 import aiven.zomboidhealthsystem.ZomboidHealthSystemClient;
-import aiven.zomboidhealthsystem.foundation.gui.hud.BodyPartHud;
 import aiven.zomboidhealthsystem.foundation.gui.widget.ZomboidWidget;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.MutableText;
@@ -20,7 +18,6 @@ import org.joml.Vector2f;
 @Environment(EnvType.CLIENT)
 public non-sealed class UIHealth extends UI {
     public static MutableText damage = Text.translatable("zomboidhealthsystem.health.hud.completely_health");
-    private static float health = 70;
 
     public ZomboidWidget zomboidWidget;
 
@@ -81,12 +78,12 @@ public non-sealed class UIHealth extends UI {
         context.drawTexture(
                 new Identifier(ZomboidHealthSystem.ID,"textures/gui/line.png"),
                 (int) pos.x + 66,
-                (int) pos.y + 119 - (int)health,
+                (int) pos.y + 119 - (int) (ZomboidHealthSystemClient.HEALTH.getPlayerHp() * 0.7F),
                 0,0,5,
-                (int)health,7,90
+                (int)(ZomboidHealthSystemClient.HEALTH.getPlayerHp() * 0.7F),7,90
         );
 
-        BodyPartHud.renderAllParts(context, tickDelta, new Vector2f(pos.x + 14, pos.y + 50));
+        ZomboidHealthSystemClient.HUD.getBodyPartsWidget().render(context, tickDelta, pos.add(14, 50, new Vector2f()));
 
         zomboidWidget.setX((int) pos.x + 75);
         zomboidWidget.setY((int) pos.y + 45);
@@ -108,15 +105,10 @@ public non-sealed class UIHealth extends UI {
     private int ticks = 0;
     @Override
     public void tick() {
-        ClientPlayerEntity player = MinecraftClient.getInstance().player;
-        if(player != null) {
-            health = ZomboidHealthSystemClient.HEALTH.getHp() * 0.7f;
-        }
-
         zomboidWidget.tick();
 
         if(ticks >= ZomboidHealthSystem.UPDATE_FREQUENCY){
-            float sumHp = ZomboidHealthSystemClient.HEALTH.getSumHpPercent();
+            float sumHp = ZomboidHealthSystemClient.HEALTH.getBodyHpPercent();
 
             if(sumHp >= 1.0F) damage = Text.translatable("zomboidhealthsystem.health.hud.completely_health");
             else if(sumHp >= 0.93F) damage = Text.translatable("zomboidhealthsystem.health.hud.minor_damage");
@@ -136,14 +128,5 @@ public non-sealed class UIHealth extends UI {
             client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
         }
         return super.mouseClicked(mouseX, mouseY, button);
-    }
-
-    @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        if(mouseX - deltaX > BodyPartHud.getPos().x && mouseX - deltaX < BodyPartHud.getPos().x + 35 && mouseY - deltaY > BodyPartHud.getPos().y - deltaY && mouseY < BodyPartHud.getPos().y + 73) {
-            BodyPartHud.getPos().x += (float) deltaX;
-            BodyPartHud.getPos().y += (float) deltaY;
-        }
-        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
 }

@@ -1,7 +1,7 @@
 package aiven.zomboidhealthsystem.foundation.gui.widget;
 
 import aiven.zomboidhealthsystem.ZomboidHealthSystemClient;
-import aiven.zomboidhealthsystem.foundation.client.ClientHealth;
+import aiven.zomboidhealthsystem.foundation.player.Health;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.DrawContext;
@@ -13,11 +13,10 @@ import java.util.ArrayList;
 @Environment(EnvType.CLIENT)
 public class ZomboidWidget extends ScrollableWidget {
     private final ArrayList<BodyPartButton> bodyPartButtons = new ArrayList<>();
-    private final int spaceSize = 8;
 
     public ZomboidWidget(int x, int y) {
         super(x, y, 149, 135, null);
-        ClientHealth health = ZomboidHealthSystemClient.HEALTH;
+        Health health = ZomboidHealthSystemClient.HEALTH;
         bodyPartButtons.add(new BodyPartButton(0, 0, health.getHead()));
         bodyPartButtons.add(new BodyPartButton(0, 0, health.getBody()));
         bodyPartButtons.add(new BodyPartButton(0, 0, health.getLeftArm()));
@@ -52,6 +51,7 @@ public class ZomboidWidget extends ScrollableWidget {
         int maxScrollY = 0;
         for (BodyPartButton button : bodyPartButtons) {
             if (button.hasText()) {
+                int spaceSize = 8;
                 maxScrollY += button.getHeight() + spaceSize;
             }
         }

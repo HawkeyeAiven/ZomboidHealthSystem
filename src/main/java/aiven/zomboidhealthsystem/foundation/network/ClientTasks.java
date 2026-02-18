@@ -1,8 +1,7 @@
 package aiven.zomboidhealthsystem.foundation.network;
 
 import aiven.zomboidhealthsystem.ZomboidHealthSystemClient;
-import aiven.zomboidhealthsystem.foundation.client.ClientHealth;
-import aiven.zomboidhealthsystem.foundation.gui.hud.BodyPartHud;
+import aiven.zomboidhealthsystem.foundation.player.Health;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -13,14 +12,9 @@ public enum ClientTasks {
         minecraftClient.player.animateDamage(30);
     }),
     HEALTH((minecraftClient, clientPlayNetworkHandler, packetByteBuf, packetSender) -> {
-        ClientHealth clientHealth = ZomboidHealthSystemClient.HEALTH;
+        Health clientHealth = ZomboidHealthSystemClient.HEALTH;
 
-        clientHealth.onPacket(packetByteBuf);
-
-        for(int i = 0; i < 8; i++) {
-            ClientHealth.BodyPart bodyPart = clientHealth.indexOf(i);
-            BodyPartHud.values()[i].setHp(bodyPart.getHpPercent(), bodyPart.getAdditionalHp() > 0, bodyPart.isBandaged() && !bodyPart.isDirtyBandage());
-        }
+        clientHealth.set(packetByteBuf.readString());
     }),
     WORLD((minecraftClient, clientPlayNetworkHandler, packetByteBuf, packetSender) -> {
         ZomboidHealthSystemClient.WORLD_INFO.onPacket(packetByteBuf);

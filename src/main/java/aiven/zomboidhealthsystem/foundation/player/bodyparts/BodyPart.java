@@ -138,7 +138,7 @@ public abstract class BodyPart {
         this.lastBandageItem = null;
     }
 
-    public Item unBandage() {
+    public BandageItem unBandage() {
         this.bandageTime = 0;
         if (bandageItem != null) {
             this.lastBandageItem = bandageItem;
@@ -149,7 +149,7 @@ public abstract class BodyPart {
         }
     }
 
-    public Item getBandageItem() {
+    public BandageItem getBandageItem() {
         return bandageItem;
     }
 
@@ -246,6 +246,10 @@ public abstract class BodyPart {
                 return d;
             }
         }
+    }
+
+    public float getHpPercent() {
+        return getHp() / getMaxHp();
     }
 
     public String getNbt() {

@@ -19,7 +19,6 @@ import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.registry.tag.TagKey;
@@ -356,6 +355,38 @@ public class Health {
         return wind;
     }
 
+    public Head getHead() {
+        return head;
+    }
+
+    public Body getBody() {
+        return body;
+    }
+
+    public Arm getLeftArm() {
+        return leftArm;
+    }
+
+    public Arm getRightArm() {
+        return rightArm;
+    }
+
+    public Leg getLeftLeg() {
+        return leftLeg;
+    }
+
+    public Leg getRightLeg() {
+        return rightLeg;
+    }
+
+    public Foot getLeftFoot() {
+        return leftFoot;
+    }
+
+    public Foot getRightFoot() {
+        return rightFoot;
+    }
+
     public void stumble(float damage) {
         if (!this.getPlayer().isCrawling()) {
             int random = new Random().nextInt(6, 8);
@@ -475,6 +506,10 @@ public class Health {
         return bodyParts;
     }
 
+    public Moodle[] getMoodles() {
+        return moodles;
+    }
+
     public boolean haveInfection() {
         for (BodyPart part : bodyParts) {
             if (part.hasInfection()) return true;
@@ -545,37 +580,39 @@ public class Health {
         return healthBuilder.toString();
     }
 
-    public static Health parseHealth(PlayerEntity user, String value) {
-        Health health = new Health(user);
-
+    public void set(String health) {
         for (int i = 0; i < 8; i++) {
-            BodyPart bodyPart = health.getBodyParts()[i];
-            String bodyPartValue = Json.getValue(value, bodyPart.getId());
+            BodyPart bodyPart = this.getBodyParts()[i];
+            String bodyPartValue = Json.getValue(health, bodyPart.getId());
             if(bodyPartValue != null) {
                 bodyPart.readNbt(bodyPartValue);
             }
         }
 
-        for(Moodle moodle : health.moodles){
-            String conditionValue = Json.getValue(value, moodle.getId());
+        for(Moodle moodle : this.moodles){
+            String conditionValue = Json.getValue(health, moodle.getId());
             if(conditionValue != null) {
                 moodle.readNbt(conditionValue);
             }
         }
 
-        if (health.head.getHp() <= 0 || health.body.getHp() <= 0) {
-            health.isDead = true;
+        if (this.head.getHp() <= 0 || this.body.getHp() <= 0) {
+            this.isDead = true;
         }
 
         {
-            String player_hp = Json.getValue(value, "player_hp");
+            String player_hp = Json.getValue(health, "player_hp");
             if (player_hp != null) {
-                health.setPlayerHp(Float.parseFloat(player_hp));
+                this.setPlayerHp(Float.parseFloat(player_hp));
             } else {
-                health.setPlayerHp(100);
+                this.setPlayerHp(100);
             }
         }
+    }
 
+    public static Health parseHealth(PlayerEntity user, String value) {
+        Health health = new Health(user);
+        health.set(value);
         return health;
     }
 

@@ -13,7 +13,7 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.text.Text;
 
 public class Drowsiness extends Moodle {
-    private final int drowsinessTime;
+    private int drowsinessTime;
 
     private float caffeine = 0;
     private float max_caffeine = 0;
@@ -24,7 +24,9 @@ public class Drowsiness extends Moodle {
 
     public Drowsiness(Health health) {
         super(health);
-        drowsinessTime = 24000 * ModServer.WORLD_SETTINGS.getDayLengthMultiplier();
+        if(getPlayer() != null && !getPlayer().getWorld().isClient()) {
+            drowsinessTime = 24000 * ModServer.WORLD_SETTINGS.getDayLengthMultiplier();
+        }
     }
 
     @Override

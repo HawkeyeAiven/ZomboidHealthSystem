@@ -24,7 +24,7 @@ public class ModClientEventCallbacks {
             if(!client.options.debugEnabled) {
                 Hud hud = ZomboidHealthSystemClient.HUD;
                 if(hud != null) {
-                    hud.render(context, tickDelta, ZomboidHealthSystemClient.WORLD_INFO);
+                    hud.render(context, tickDelta);
                 }
             }
         });

@@ -1,7 +1,7 @@
 package aiven.zomboidhealthsystem.foundation.gui.widget;
 
-import aiven.zomboidhealthsystem.foundation.client.ClientHealth;
 import aiven.zomboidhealthsystem.foundation.gui.screen.AbstractModScreen;
+import aiven.zomboidhealthsystem.foundation.player.bodyparts.BodyPart;
 import aiven.zomboidhealthsystem.foundation.utility.ColoredText;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -22,10 +22,10 @@ public class BodyPartButton extends ModClickableWidget {
     private final ColoredText bandaged = new ColoredText(0xFF2cb828, Text.translatable("zomboidhealthsystem.health.hud.bandaged"));
     private final ColoredText dirty_bandage = new ColoredText(0xFFc81414,Text.translatable("item.zomboidhealthsystem.dirty_bandage"));
 
-    private final ClientHealth.BodyPart bodyPart;
+    private final BodyPart bodyPart;
     private final ArrayList<ColoredText> texts = new ArrayList<>();
 
-    public BodyPartButton(int x, int y, ClientHealth.BodyPart bodyPart) {
+    public BodyPartButton(int x, int y, BodyPart bodyPart) {
         super(x, y, 90, 5, Text.translatable("zomboidhealthsystem.health." + bodyPart.getId()));
         this.bodyPart = bodyPart;
     }
@@ -61,15 +61,15 @@ public class BodyPartButton extends ModClickableWidget {
                     texts.add(deep_fracture);
                 }
             }
-        } else if(!bodyPart.isDirtyBandage()) {
+        } else if(!bodyPart.getBandageItem().isDirty()) {
             texts.add(bandaged);
         } else {
             texts.add(dirty_bandage);
         }
-        if(bodyPart.isBleeding() && (!bodyPart.isBandaged() || !bodyPart.isBandageStopBleeding())) {
+        if(bodyPart.isBleeding() && (!bodyPart.isBandaged() || !bodyPart.getBandageItem().isStopBleeding())) {
             texts.add(bleeding);
         }
-        if(bodyPart.isInfection()){
+        if(bodyPart.hasInfection()){
             texts.add(infection);
         }
 

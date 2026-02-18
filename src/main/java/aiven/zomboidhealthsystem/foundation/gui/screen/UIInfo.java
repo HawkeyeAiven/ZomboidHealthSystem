@@ -1,10 +1,8 @@
 package aiven.zomboidhealthsystem.foundation.gui.screen;
 
-import aiven.zomboidhealthsystem.Config;
 import aiven.zomboidhealthsystem.ZomboidHealthSystem;
 import aiven.zomboidhealthsystem.ZomboidHealthSystemClient;
 import aiven.zomboidhealthsystem.foundation.client.ClientWorldInfo;
-import aiven.zomboidhealthsystem.foundation.gui.hud.BodyPartHud;
 import aiven.zomboidhealthsystem.foundation.utility.TimeOfDay;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -22,6 +20,7 @@ public non-sealed class UIInfo extends UI {
 
     public UIInfo(Vector2f ui) {
         super(ui);
+        addClickableWidget(ZomboidHealthSystemClient.HUD.getBodyPartsWidget());
     }
 
     @Override
@@ -99,15 +98,12 @@ public non-sealed class UIInfo extends UI {
                 (int) pos.x + 10, (int) pos.y + 75, 0xFFffffff,true
         );
 
-        BodyPartHud.renderAllParts(context, tickDelta);
-
         super.render(context, mouseX, mouseY, tickDelta);
     }
 
     @Override
     public void close() {
         super.close();
-        Config.HEALTH_HUD_POS.setValue(BodyPartHud.getPos());
     }
 
     @Override
@@ -115,16 +111,9 @@ public non-sealed class UIInfo extends UI {
         if(mouseX > pos.x + 24 && mouseX < pos.x + 24 + 24 && mouseY > pos.y + 8 && mouseY < pos.y + 8 + 8) {
             client.setScreen(new UIHealth(pos));
             client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+            return true;
+        } else {
+            return super.mouseClicked(mouseX, mouseY, button);
         }
-        return super.mouseClicked(mouseX, mouseY, button);
-    }
-
-    @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        if(mouseX - deltaX > BodyPartHud.getPos().x && mouseX - deltaX < BodyPartHud.getPos().x + BodyPartHud.getWidth() && mouseY - deltaY > BodyPartHud.getPos().y && mouseY < BodyPartHud.getPos().y + BodyPartHud.getHeight()) {
-            BodyPartHud.POS.x += deltaX;
-            BodyPartHud.POS.y += deltaY;
-        }
-        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
 }
