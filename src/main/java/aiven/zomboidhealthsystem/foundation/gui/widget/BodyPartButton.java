@@ -87,6 +87,23 @@ public class BodyPartButton extends ModClickableWidget {
     }
 
     @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        return this.mouseClicked(mouseX, mouseY, button, 0);
+    }
+
+
+    public boolean mouseClicked(double mouseX, double mouseY, int button, double scrollY) {
+        if(this.active && this.visible){
+            if(this.clicked(mouseX, mouseY + scrollY) && this.isValidClickButton(button)){
+                this.playDownSound(MinecraftClient.getInstance().getSoundManager());
+                this.onClick(mouseX, mouseY);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     protected boolean isValidClickButton(int button) {
         return button == 1;
     }

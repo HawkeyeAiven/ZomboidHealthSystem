@@ -24,6 +24,7 @@ public abstract sealed class UI extends AbstractModScreen permits UIHealth, UIIn
     public UI(Vector2f ui) {
         pos = ui;
         addClickableWidget(ZomboidHealthSystemClient.HUD.getTimeWidget());
+        addClickableWidget(ZomboidHealthSystemClient.HUD.getMoodlesWidget());
     }
 
     @Override

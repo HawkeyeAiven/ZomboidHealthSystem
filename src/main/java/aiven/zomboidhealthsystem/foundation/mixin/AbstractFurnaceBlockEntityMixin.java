@@ -43,7 +43,7 @@ public class AbstractFurnaceBlockEntityMixin {
                     float distance = (float) player.getPos().distanceTo(this.pos.toCenterPos());
                     if (distance < 5) {
                         Temperature temperature = ModServer.getHealth(player).getTemperature();
-                        temperature.setHeatFromFurnace(Math.max(Config.MAX_HEAT_FROM_BLOCK.getValue() - (distance * Config.MAX_HEAT_FROM_BLOCK.getValue()), temperature.getHeatFromFurnace()));
+                        temperature.setHeatFromFurnace(Math.max(Config.MAX_HEAT_FROM_BLOCK.getValue() - (distance * Config.MAX_HEAT_FROM_BLOCK.getValue() / 5), temperature.getHeatFromFurnace()));
                     }
                 }
             }

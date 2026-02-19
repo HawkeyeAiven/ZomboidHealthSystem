@@ -8,7 +8,8 @@ import net.minecraft.util.Identifier;
 public enum ServerPackets {
     DAMAGE(PacketIdentifiers.Client.DAMAGE, ClientTasks.DAMAGE),
     HEALTH(PacketIdentifiers.Client.HEALTH, ClientTasks.HEALTH),
-    WORLD(PacketIdentifiers.Client.WORLD, ClientTasks.WORLD)
+    WORLD(PacketIdentifiers.Client.WORLD, ClientTasks.WORLD),
+    DEATH(PacketIdentifiers.Client.RESPAWN, ClientTasks.RESPAWN)
     ;
     private final Identifier identifier;
 

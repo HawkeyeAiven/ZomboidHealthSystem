@@ -21,7 +21,7 @@ public class CampfireBlockEntityMixin {
             float distance = (float) player.getPos().distanceTo(pos.toCenterPos());
             if(distance < 5){
                 Temperature temperature = ModServer.getHealth(player).getTemperature();
-                temperature.setHeatFromCampfire(Math.max(Config.MAX_HEAT_FROM_BLOCK.getValue() - (distance * Config.MAX_HEAT_FROM_BLOCK.getValue()), temperature.getHeatFromCampfire()));
+                temperature.setHeatFromCampfire(Math.max(Config.MAX_HEAT_FROM_BLOCK.getValue() - (distance * Config.MAX_HEAT_FROM_BLOCK.getValue() / 5), temperature.getHeatFromCampfire()));
             }
         }
     }

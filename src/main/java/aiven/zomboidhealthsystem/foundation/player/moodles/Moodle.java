@@ -1,8 +1,9 @@
 package aiven.zomboidhealthsystem.foundation.player.moodles;
 
+import aiven.zomboidhealthsystem.ZomboidHealthSystem;
 import aiven.zomboidhealthsystem.foundation.player.Health;
-import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.Identifier;
 
 import java.util.HashMap;
 
@@ -15,27 +16,15 @@ public abstract class Moodle {
         this.health = health;
     }
 
-    public boolean hasIcon(){
-        return this.getAmount() >= 1;
+    public boolean showIcon(){
+        return this.getAmplifier() != 0 && getMoodleIconTexture() != null;
     }
 
-    public void update(){
-        if(getEffect() != null) {
-            if (!hasIcon()) {
-                if (this.getPlayer().hasStatusEffect(getEffect())) {
-                    this.getHealth().removeStatusEffect(getEffect());
-                }
-            } else {
-                if (this.getPlayer().hasStatusEffect(getEffect()) && this.getPlayer().getStatusEffect(getEffect()).getAmplifier() != getEffectAmplifier()) {
-                    this.getHealth().removeStatusEffect(getEffect());
-                }
-                this.getHealth().addStatusEffect(getEffect(), Math.min(getEffectAmplifier(), 10 - 1), 15 * 20);
-            }
-        }
+    public Identifier getMoodleIconTexture() {
+        return Identifier.of(ZomboidHealthSystem.ID, "textures/moodle/moodle_icon_%s.png".formatted(this.getId()));
     }
 
     public void onSleep() {
-
     }
 
     boolean once(int time){
@@ -74,8 +63,8 @@ public abstract class Moodle {
         setAmount(getAmount() + amount);
     }
 
-    public int getEffectAmplifier() {
-        return (int) getAmount() - 1;
+    public int getAmplifier() {
+        return (int) getAmount();
     }
 
     public float getMultiplier() {
@@ -94,7 +83,7 @@ public abstract class Moodle {
         return getPlayer().getWorld().equals(getPlayer().getServer().getOverworld());
     }
 
-    abstract StatusEffect getEffect();
-
     public abstract String getId();
+
+    public abstract void update();
 }

@@ -13,11 +13,15 @@ public enum ClientTasks {
     }),
     HEALTH((minecraftClient, clientPlayNetworkHandler, packetByteBuf, packetSender) -> {
         Health clientHealth = ZomboidHealthSystemClient.HEALTH;
-
-        clientHealth.set(packetByteBuf.readString());
+        if(clientHealth != null) {
+            clientHealth.set(packetByteBuf.readString());
+        }
     }),
     WORLD((minecraftClient, clientPlayNetworkHandler, packetByteBuf, packetSender) -> {
         ZomboidHealthSystemClient.WORLD_INFO.onPacket(packetByteBuf);
+    }),
+    RESPAWN((minecraftClient, clientPlayNetworkHandler, packetByteBuf, packetSender) -> {
+        ZomboidHealthSystemClient.HEALTH = new Health(null);
     })
     ;
 

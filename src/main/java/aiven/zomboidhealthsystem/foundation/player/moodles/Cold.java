@@ -2,10 +2,8 @@ package aiven.zomboidhealthsystem.foundation.player.moodles;
 
 import aiven.zomboidhealthsystem.Config;
 import aiven.zomboidhealthsystem.ModDamageTypes;
-import aiven.zomboidhealthsystem.ModStatusEffects;
 import aiven.zomboidhealthsystem.foundation.player.Health;
 import aiven.zomboidhealthsystem.foundation.utility.Util;
-import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
 
 
@@ -15,19 +13,12 @@ public class Cold extends Moodle {
     }
 
     @Override
-    StatusEffect getEffect() {
-        return ModStatusEffects.COLD;
-    }
-
-    @Override
     public String getId() {
         return "cold";
     }
 
     @Override
     public void update() {
-        super.update();
-
         float amplifier = (Temperature.AVERAGE_TEMPERATURE_BODY - getHealth().getTemperature().getAmount()) / 1.5F;
 
         if (amplifier >= 1.0F) {
@@ -43,7 +34,7 @@ public class Cold extends Moodle {
                 getHealth().addStatusEffect(StatusEffects.NAUSEA, 0, 5 * 20);
             }
             if(getAmount() >= 2.0F) {
-                getHealth().addStatusEffect(StatusEffects.SLOWNESS, (int)(getEffectAmplifier() / 3.0F), 15 * 20);
+                getHealth().addStatusEffect(StatusEffects.SLOWNESS, (int)(getAmplifier() / 3.0F), 15 * 20);
                 if (getAmount() >= 4.0F) {
                     getHealth().onDeath(Util.getDamageSource(ModDamageTypes.COLD, getPlayer().getWorld()));
                 }

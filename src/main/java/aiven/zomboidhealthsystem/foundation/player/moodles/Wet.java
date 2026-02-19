@@ -1,11 +1,9 @@
 package aiven.zomboidhealthsystem.foundation.player.moodles;
 
 import aiven.zomboidhealthsystem.Config;
-import aiven.zomboidhealthsystem.ModStatusEffects;
 import aiven.zomboidhealthsystem.foundation.player.Health;
 import aiven.zomboidhealthsystem.foundation.utility.Util;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 
@@ -19,8 +17,6 @@ public class Wet extends Moodle {
 
     @Override
     public void update() {
-        super.update();
-
         PlayerEntity player = getHealth().getPlayer();
         World world = player.getWorld();
 
@@ -49,11 +45,6 @@ public class Wet extends Moodle {
     public void onSleep() {
         super.onSleep();
         setAmount(0);
-    }
-
-    @Override
-    StatusEffect getEffect() {
-        return ModStatusEffects.WET;
     }
 
     @Override

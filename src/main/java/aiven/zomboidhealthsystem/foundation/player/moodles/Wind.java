@@ -1,11 +1,9 @@
 package aiven.zomboidhealthsystem.foundation.player.moodles;
 
-import aiven.zomboidhealthsystem.ModStatusEffects;
 import aiven.zomboidhealthsystem.foundation.player.Health;
 import aiven.zomboidhealthsystem.foundation.utility.Util;
 import aiven.zomboidhealthsystem.foundation.world.ModServer;
 import net.minecraft.entity.EntityPose;
-import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.util.math.BlockPos;
 
 public class Wind extends Moodle {
@@ -15,7 +13,6 @@ public class Wind extends Moodle {
 
     @Override
     public void update() {
-        super.update();
         setAmount(getWind());
 
         getHealth().getTemperature().addHeat(-getAmount() * (getHealth().getWet().getAmount() / 2 + 1));
@@ -36,11 +33,6 @@ public class Wind extends Moodle {
         } else {
             return 0;
         }
-    }
-
-    @Override
-    StatusEffect getEffect() {
-        return ModStatusEffects.WIND;
     }
 
     @Override

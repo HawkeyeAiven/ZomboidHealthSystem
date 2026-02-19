@@ -2,21 +2,14 @@ package aiven.zomboidhealthsystem.foundation.player.moodles;
 
 import aiven.zomboidhealthsystem.Config;
 import aiven.zomboidhealthsystem.ModDamageTypes;
-import aiven.zomboidhealthsystem.ModStatusEffects;
 import aiven.zomboidhealthsystem.foundation.player.Health;
 import aiven.zomboidhealthsystem.foundation.utility.Util;
-import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
 
 public class Thirst extends Moodle {
 
     public Thirst(Health health) {
         super(health);
-    }
-
-    @Override
-    StatusEffect getEffect() {
-        return ModStatusEffects.THIRST;
     }
 
     @Override
@@ -30,7 +23,6 @@ public class Thirst extends Moodle {
 
     @Override
     public void update() {
-        super.update();
         this.addAmount(1.0F / 15000.0F * getMultiplier() * Config.THIRST_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
 
         this.getHealth().getExhaustion().addMultiplier(this, 1.0F);

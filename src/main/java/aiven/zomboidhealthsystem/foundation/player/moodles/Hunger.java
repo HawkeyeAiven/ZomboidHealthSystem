@@ -2,10 +2,8 @@ package aiven.zomboidhealthsystem.foundation.player.moodles;
 
 import aiven.zomboidhealthsystem.Config;
 import aiven.zomboidhealthsystem.ModDamageTypes;
-import aiven.zomboidhealthsystem.ModStatusEffects;
 import aiven.zomboidhealthsystem.foundation.player.Health;
 import aiven.zomboidhealthsystem.foundation.utility.Util;
-import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
 
 public class Hunger extends Moodle {
@@ -20,15 +18,7 @@ public class Hunger extends Moodle {
 
     @Override
     public void update() {
-        super.update();
-
         this.addAmount(1.0F / 15000 * getMultiplier() * (this.getAmount() < 0 ? 2.25F : 1.0F) * Config.HUNGER_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
-
-        if(amount < 0) {
-            this.getHealth().addStatusEffect(ModStatusEffects.SATURATION, (int) (amount * -2.5F) - 1, 15 * 20);
-        } else if(this.getPlayer().hasStatusEffect(ModStatusEffects.SATURATION)) {
-            this.getHealth().removeStatusEffect(ModStatusEffects.SATURATION);
-        }
 
         if(amount >= 1.0F) {
             this.getHealth().getExhaustion().addMultiplier(this, (getAmount() / 3) + 1);
@@ -75,6 +65,15 @@ public class Hunger extends Moodle {
         this.addAmount(0.4F);
     }
 
+    @Override
+    public int getAmplifier() {
+        if(getAmount() > 0) {
+            return super.getAmplifier();
+        } else {
+            return (int) (getAmount() * 4);
+        }
+    }
+
     public void eatFood(int hunger, float saturationModifier) {
         this.addAmount((float)-hunger * getAppetite());
         this.getHealth().healPlayerHp(Config.FOOD_HEAL_AMOUNT.getValue() * hunger);
@@ -95,11 +94,6 @@ public class Hunger extends Moodle {
     @Override
     public void setAmount(float amount) {
         this.amount = Math.max(amount, min_amount);
-    }
-
-    @Override
-    StatusEffect getEffect() {
-        return ModStatusEffects.HUNGER;
     }
 
     @Override

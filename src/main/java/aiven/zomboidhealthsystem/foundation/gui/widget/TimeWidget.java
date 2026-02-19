@@ -57,8 +57,12 @@ public class TimeWidget extends ModClickableWidget {
     }
 
     @Override
-    public void setPosition(int x, int y) {
+    public void setX(int x) {
         this.pos.x = x;
+    }
+
+    @Override
+    public void setY(int y) {
         this.pos.y = y;
     }
 

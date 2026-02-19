@@ -1,12 +1,10 @@
 package aiven.zomboidhealthsystem.foundation.player.moodles;
 
 import aiven.zomboidhealthsystem.Config;
-import aiven.zomboidhealthsystem.ModStatusEffects;
 import aiven.zomboidhealthsystem.foundation.player.Health;
 import aiven.zomboidhealthsystem.foundation.player.bodyparts.BodyPart;
 import aiven.zomboidhealthsystem.infrastructure.config.Json;
 import aiven.zomboidhealthsystem.infrastructure.config.JsonBuilder;
-import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
@@ -22,13 +20,7 @@ public class Pain extends Moodle {
     }
 
     @Override
-    StatusEffect getEffect() {
-        return ModStatusEffects.PAIN;
-    }
-
-    @Override
     public void update() {
-        super.update();
         PlayerEntity player = this.getHealth().getPlayer();
 
         if(painkillerEffect) {

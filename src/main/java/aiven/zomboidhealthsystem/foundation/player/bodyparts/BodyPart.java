@@ -283,6 +283,8 @@ public abstract class BodyPart {
             String hp = Json.getValue(bodyPart, "hp");
             if(hp != null) {
                 this.setHp(Float.parseFloat(hp));
+            } else {
+                this.setHp(getMaxHp());
             }
         }
 
@@ -290,6 +292,8 @@ public abstract class BodyPart {
             String addHp = Json.getValue(bodyPart, "add_hp");
             if(addHp != null) {
                this.setAdditionalHp(Float.parseFloat(addHp));
+            } else {
+                this.setAdditionalHp(0);
             }
         }
 
@@ -299,6 +303,9 @@ public abstract class BodyPart {
             if(bandage_item != null && bandage_time != null) {
                 this.setBandageItem((BandageItem) Item.byRawId(Integer.parseInt(bandage_item)));
                 this.setBandageTime(Integer.parseInt(bandage_time));
+            } else {
+                this.setBandageItem(null);
+                this.setBandageTime(-1);
             }
         }
 
@@ -306,6 +313,8 @@ public abstract class BodyPart {
             String bleeding = Json.getValue(bodyPart, "bleeding");
             if(bleeding != null) {
                 this.setBleeding(Float.parseFloat(bleeding));
+            } else {
+                this.setBleeding(0);
             }
         }
 
@@ -313,6 +322,8 @@ public abstract class BodyPart {
             String infection = Json.getValue(bodyPart, "infection");
             if(infection != null) {
                 this.setInfection(Boolean.parseBoolean(infection));
+            } else {
+                this.setInfection(false);
             }
         }
     }

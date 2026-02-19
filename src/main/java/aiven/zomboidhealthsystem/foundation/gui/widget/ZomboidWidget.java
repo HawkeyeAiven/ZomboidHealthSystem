@@ -99,7 +99,7 @@ public class ZomboidWidget extends ScrollableWidget {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         for(BodyPartButton bodyPartButton : bodyPartButtons) {
-            bodyPartButton.mouseClicked(mouseX, mouseY, button);
+            bodyPartButton.mouseClicked(mouseX, mouseY, button, getScrollY());
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }

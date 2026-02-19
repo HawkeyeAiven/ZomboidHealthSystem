@@ -2,13 +2,11 @@ package aiven.zomboidhealthsystem.foundation.player.moodles;
 
 import aiven.zomboidhealthsystem.Config;
 import aiven.zomboidhealthsystem.ModDamageTypes;
-import aiven.zomboidhealthsystem.ModStatusEffects;
 import aiven.zomboidhealthsystem.foundation.player.Health;
 import aiven.zomboidhealthsystem.foundation.utility.Util;
 import aiven.zomboidhealthsystem.foundation.world.ModServer;
 import aiven.zomboidhealthsystem.infrastructure.config.Json;
 import aiven.zomboidhealthsystem.infrastructure.config.JsonBuilder;
-import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.text.Text;
 
@@ -30,18 +28,12 @@ public class Drowsiness extends Moodle {
     }
 
     @Override
-    StatusEffect getEffect() {
-        return ModStatusEffects.DROWSINESS;
-    }
-
-    @Override
     public String getId() {
         return "drowsiness";
     }
 
     @Override
     public void update() {
-        super.update();
         addTicks(1.0F * 2.0F * getMultiplier() * Config.DROWSINESS_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
 
         if(caffeine_effect) {
@@ -104,14 +96,10 @@ public class Drowsiness extends Moodle {
     }
 
     @Override
-    public boolean hasIcon() {
+    public boolean showIcon() {
         return this.getAmplifier() >= 1;
     }
 
-    @Override
-    public int getEffectAmplifier() {
-        return (int) getAmplifier() - 1;
-    }
 
     @Override
     public String getNbt() {
@@ -168,8 +156,8 @@ public class Drowsiness extends Moodle {
         }
     }
 
-    public float getAmplifier() {
-        return amount - caffeine;
+    public int getAmplifier() {
+        return (int) (amount - caffeine);
     }
 
     public void addCaffeine(float amount) {

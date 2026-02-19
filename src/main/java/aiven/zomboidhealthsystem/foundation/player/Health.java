@@ -2,7 +2,6 @@ package aiven.zomboidhealthsystem.foundation.player;
 
 import aiven.zomboidhealthsystem.Config;
 import aiven.zomboidhealthsystem.ModDamageTypes;
-import aiven.zomboidhealthsystem.ModStatusEffects;
 import aiven.zomboidhealthsystem.ZomboidHealthSystem;
 import aiven.zomboidhealthsystem.foundation.player.bodyparts.*;
 import aiven.zomboidhealthsystem.foundation.player.moodles.*;
@@ -26,6 +25,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class Health {
@@ -164,24 +165,6 @@ public class Health {
             }
 
             this.getPain().applyEffects();
-
-            if(Config.SHOW_INJURED_ICON.getValue()) {
-                float sumHp = getSumOfHp();
-                float maxSumHp = getMaxSumOfHp();
-                if (sumHp <= maxSumHp - 2) {
-                    this.addStatusEffect(ModStatusEffects.INJURED, Math.min(9, (int) ((getMaxSumOfHp() - sumHp) / 2) - 1), 15 * 20);
-                } else if (this.getPlayer().hasStatusEffect(ModStatusEffects.INJURED)) {
-                    this.removeStatusEffect(ModStatusEffects.INJURED);
-                }
-            }
-
-            if(Config.SHOW_BLEEDING_ICON.getValue()) {
-                if (isBleeding()) {
-                    this.addStatusEffect(ModStatusEffects.BLEEDING, 0, 15 * 20);
-                } else if (getPlayer().hasStatusEffect(ModStatusEffects.BLEEDING)) {
-                    this.removeStatusEffect(ModStatusEffects.BLEEDING);
-                }
-            }
         }
     }
 
@@ -508,6 +491,29 @@ public class Health {
 
     public Moodle[] getMoodles() {
         return moodles;
+    }
+
+    public Moodle[] getSortMoodleArray() {
+        ArrayList<Moodle> moodles = new ArrayList<>(List.of(getMoodles()));
+        Moodle[] list = new Moodle[moodles.size()];
+        int index = 0;
+        int max;
+        Moodle moodle;
+        while (index < list.length) {
+            max = -9999;
+            moodle = null;
+            for(Moodle moodle1 : moodles) {
+                if(moodle1.getAmplifier() > max) {
+                    max = moodle1.getAmplifier();
+                    moodle = moodle1;
+                }
+            }
+            moodles.remove(moodle);
+            list[index] = moodle;
+            index++;
+        }
+
+        return list;
     }
 
     public boolean haveInfection() {
