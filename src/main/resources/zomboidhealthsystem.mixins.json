@@ -6,6 +6,7 @@
     "AbstractFurnaceBlockEntityMixin",
     "BiomeMixin",
     "CampfireBlockEntityMixin",
+    "ClientPlayerEntityMixin",
     "EntityMixin",
     "HungerManagerMixin",
     "LivingEntityMixin",

@@ -12,6 +12,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class Temperature extends Moodle {
@@ -57,7 +58,7 @@ public class Temperature extends Moodle {
 
                 if (temperature < minComfortableTemp && isOverWorld) {
                     this.amount -= (((minComfortableTemp - temperature) / 2)
-                            / 11000
+                            / 10000
                             * Math.max(1, (hunger.getAmount() / 2.5F) + 1)
                             * Config.TEMPERATURE_MULTIPLIER.getValue()
                             * UPDATE_FREQUENCY
@@ -66,7 +67,7 @@ public class Temperature extends Moodle {
                     isFeelingHot = false;
                 } else if (temperature > maxComfortableTemp && isOverWorld) {
                     this.amount += (((temperature - maxComfortableTemp) / 2)
-                            / 11000
+                            / 10000
                             * Math.max(1, thirst.getAmount())
                             * Config.TEMPERATURE_MULTIPLIER.getValue()
                             * UPDATE_FREQUENCY
@@ -152,6 +153,17 @@ public class Temperature extends Moodle {
     }
 
     @Override
+    public String getMoodleIconText() {
+        if(this.getAmount() > AVERAGE_TEMPERATURE_BODY + 1.5F) {
+            return Text.translatable("zomboidhealthsystem.text.hyperthermia").getString();
+        } else if(this.getAmount() < AVERAGE_TEMPERATURE_BODY - 1.5F) {
+            return Text.translatable("zomboidhealthsystem.text.hypothermia").getString();
+        } else {
+            return null;
+        }
+    }
+
+    @Override
     public String getId() {
         return "temperature";
     }
@@ -197,7 +209,7 @@ public class Temperature extends Moodle {
 
     @Override
     public int getAmplifier() {
-        return (int) (Math.abs(AVERAGE_TEMPERATURE_BODY - getAmount()) / 1.5F) - 1;
+        return (int) (Math.abs(AVERAGE_TEMPERATURE_BODY - getAmount()) / 1.5F);
     }
 
     public float getPerceivedTemperature() {

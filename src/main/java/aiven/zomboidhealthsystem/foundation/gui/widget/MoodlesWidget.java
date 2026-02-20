@@ -17,7 +17,7 @@ public class MoodlesWidget extends ModClickableWidget {
     private static final int SIZE = Config.MOODLE_ICON_SIZE.getValue();
 
     private final ArrayList<String> iconNames = new ArrayList<>();
-    private final ModClickableWidget iconName = new ModClickableWidget(0,0,0,20,null);
+    private String iconName = null;
     private final Vector2f pos;
 
     public MoodlesWidget() {
@@ -75,7 +75,7 @@ public class MoodlesWidget extends ModClickableWidget {
 
                 this.height += SIZE;
 
-                this.iconNames.add(Text.translatable("zomboidhealthsystem.text.%s".formatted(moodle.getId())).getString() + " " + Math.abs(moodle.getAmplifier()));
+                this.iconNames.add(moodle.getMoodleIconText() + " " + Math.abs(moodle.getAmplifier()));
             }
         }
         if(health.getTemperature().isFeelingHot() || health.getTemperature().isFeelingCold()) {
@@ -121,8 +121,18 @@ public class MoodlesWidget extends ModClickableWidget {
                 this.iconNames.add(Text.translatable("zomboidhealthsystem.text.injured").getString());
             }
         }
-        if(iconName.visible) {
-            iconName.render(context, mouseX, mouseY, delta);
+        if(iconName != null && !MinecraftClient.getInstance().mouse.isCursorLocked()) {
+            Text text = Text.of(iconName);
+            int width = Math.max(MinecraftClient.getInstance().textRenderer.getWidth(text) + 6, 40);
+            context.drawTexture(Identifier.of(ZomboidHealthSystem.ID, "textures/gui/description_bkg.png"),
+                    mouseX - width, mouseY, 0, 0, width, 20, width, 20
+                    );
+            context.drawCenteredTextWithShadow(MinecraftClient.getInstance().textRenderer,
+                    text, mouseX - (width / 2), mouseY + 6, 0xFFffff
+                    );
+
+        } else {
+            iconName = null;
         }
     }
 
@@ -154,17 +164,10 @@ public class MoodlesWidget extends ModClickableWidget {
     public void mouseMoved(double mouseX, double mouseY) {
         if(isMouseOver(mouseX, mouseY)) {
             int iconIndex = (int) (mouseY - getY()) / SIZE;
-            Text text = Text.of(iconNames.get(iconIndex));
-            int width = Math.max(MinecraftClient.getInstance().textRenderer.getWidth(text), 40);
-            iconName.setX((int) mouseX - width);
-            iconName.setY((int) mouseY);
-            iconName.setWidth(width + 6);
-            iconName.setMessage(text);
-            iconName.visible = true;
+            iconName = iconNames.get(iconIndex);
         } else {
-            iconName.visible = false;
+            iconName = null;
         }
-        super.mouseMoved(mouseX, mouseY);
     }
 
     @Override

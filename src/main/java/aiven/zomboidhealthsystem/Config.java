@@ -35,7 +35,9 @@ public class Config {
     public static final FloatCodec WIND_CHANCE = (FloatCodec) CONFIG.add(new FloatCodec("wind_chance", 0.33F));
     public static final FloatCodec SLEEPING_PILLS_SPEED = (FloatCodec) CONFIG.add(new FloatCodec("sleeping_pills_speed", 0.0005F));
     public static final FloatCodec INFECTION_CHANCE = (FloatCodec) CONFIG.add(new FloatCodec("infection_chance", 1.0F / (1.5F * 60 * 20)));
-    public static final FloatCodec COLD_CHANCE = (FloatCodec) CONFIG.add(new FloatCodec("cold_chance", 1.0F / (8 * 60 * 20)));
+    public static final FloatCodec COLD_CHANCE = (FloatCodec) CONFIG.add(new FloatCodec("cold_chance", 1.0F / (9 * 60 * 20)));
+    public static final FloatCodec AVERAGE_BLEEDING_CHANCE = (FloatCodec) CONFIG.add(new FloatCodec("average_bleeding_chance", 0.25F));
+    public static final FloatCodec EXHAUSTION_PER_JUMP = (FloatCodec) CONFIG.add(new FloatCodec("exhaustion_per_jump", 0.04F));
 
     public static final FloatCodec MIN_COMFORTABLE_TEMP = (FloatCodec) CONFIG.add(new FloatCodec("min_comfortable_temp", 15.0F));
     public static final FloatCodec MAX_COMFORTABLE_TEMP = (FloatCodec) CONFIG.add(new FloatCodec("max_comfortable_temp", 30.0F));
@@ -54,15 +56,13 @@ public class Config {
 
     public static final FloatCodec MAX_HEAT_FROM_BLOCK = (FloatCodec) CONFIG.add(new FloatCodec("max_heat_from_block", 30.0F));
 
-    public static final FloatCodec AVERAGE_BLEEDING_CHANCE = (FloatCodec) CONFIG.add(new FloatCodec("average_bleeding_chance", 0.25F));
-
     public static final IntegerCodec HEAL_TIME = (IntegerCodec) CONFIG.add(new IntegerCodec("heal_time", 40 * 60 * 20));
     public static final IntegerCodec FOOD_HEAL_AMOUNT = (IntegerCodec) CONFIG.add(new IntegerCodec("food_heal_amount",2));
     public static final IntegerCodec UPDATE_FREQUENCY = (IntegerCodec) CONFIG.add(new IntegerCodec("update_frequency", 5));
     public static final IntegerCodec MIN_DROWSINESS_FOR_SLEEP = (IntegerCodec) CONFIG.add(new IntegerCodec("min_drowsiness_for_sleep",1));
     public static final IntegerCodec AUTOSAVE_FREQUENCY = (IntegerCodec) CONFIG.add(new IntegerCodec("autosave_frequency", 60 * 20));
     public static final IntegerCodec MOODLE_ICON_SIZE = (IntegerCodec) CONFIG.add(new IntegerCodec("moodle_icon_size", 16));
-    public static final IntegerCodec MOODLE_POSITION_Y = (IntegerCodec) CONFIG.add(new IntegerCodec("moodle_position_y", 70));
+    public static final IntegerCodec MOODLE_POSITION_Y = (IntegerCodec) CONFIG.add(new IntegerCodec("moodle_position_y", 90));
 
     public static final Vector2fCodec HEALTH_HUD_POS = (Vector2fCodec) CONFIG.add(new Vector2fCodec("health_hud_pos", new Vector2f(10, 30)));
     public static final Vector2fCodec TIME_HUD_POS = (Vector2fCodec) CONFIG.add(new Vector2fCodec("time_hud_pos", new Vector2f(6, 6)));

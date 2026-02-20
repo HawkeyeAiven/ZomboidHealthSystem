@@ -44,6 +44,10 @@ public class Exhaustion extends Moodle {
         return getAmount() < 4.0F;
     }
 
+    public void onJump() {
+        this.addAmount(Config.EXHAUSTION_PER_JUMP.getValue() * this.getMultiplier());
+    }
+
     @Override
     public void onSleep() {
         this.setAmount(0);

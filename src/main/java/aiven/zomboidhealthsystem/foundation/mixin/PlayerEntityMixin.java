@@ -322,7 +322,7 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
             }
             if(!this.getWorld().isClient() && !this.isCreative() && !this.isSpectator()) {
                 Exhaustion exhaustion = this.getModHealth().getExhaustion();
-                exhaustion.addAmount(0.05F * exhaustion.getMultiplier());
+                exhaustion.onJump();
             }
         }
     }

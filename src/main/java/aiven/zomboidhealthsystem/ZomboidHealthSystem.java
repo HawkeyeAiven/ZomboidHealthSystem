@@ -6,6 +6,8 @@ import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Random;
+
 public class ZomboidHealthSystem implements ModInitializer {
 	@Override
 	public void onInitialize() {
@@ -31,4 +33,5 @@ public class ZomboidHealthSystem implements ModInitializer {
 	public static final String ID_VER = ID + "-" + VERSION;
 	public static final int UPDATE_FREQUENCY = 5;
 	public static final Logger LOGGER = LoggerFactory.getLogger(ID);
+	public static Random RANDOM = new Random();
 }

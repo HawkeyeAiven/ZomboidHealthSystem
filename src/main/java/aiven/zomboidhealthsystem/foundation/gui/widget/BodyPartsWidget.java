@@ -91,7 +91,7 @@ public class BodyPartsWidget extends ModClickableWidget {
         }
 
         public void renderPart(DrawContext context, float tickDelta, int x, int y){
-            RenderHelper.DrawQuad(context, width, height, this.x + x, this.y + y, getColor(), getBorderColor());
+            RenderHelper.drawQuad(context, this.x + x, this.y + y,  width, height, getColor(), getBorderColor());
         }
 
         private int getBorderColor() {

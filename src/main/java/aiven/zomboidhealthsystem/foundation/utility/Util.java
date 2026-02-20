@@ -1,5 +1,6 @@
 package aiven.zomboidhealthsystem.foundation.utility;
 
+import aiven.zomboidhealthsystem.ZomboidHealthSystem;
 import aiven.zomboidhealthsystem.foundation.items.BandageItem;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -18,11 +19,9 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import java.util.Random;
-
 public class Util {
     public static boolean random(float chance) {
-        return chance > new Random().nextFloat(0, 1.0F);
+        return chance > ZomboidHealthSystem.RANDOM.nextFloat(0, 1.0F);
     }
 
     public static int getArmorCount(PlayerEntity player) {

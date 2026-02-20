@@ -19,9 +19,6 @@ public enum ClientTasks {
     }),
     WORLD((minecraftClient, clientPlayNetworkHandler, packetByteBuf, packetSender) -> {
         ZomboidHealthSystemClient.WORLD_INFO.onPacket(packetByteBuf);
-    }),
-    RESPAWN((minecraftClient, clientPlayNetworkHandler, packetByteBuf, packetSender) -> {
-        ZomboidHealthSystemClient.HEALTH = new Health(null);
     })
     ;
 

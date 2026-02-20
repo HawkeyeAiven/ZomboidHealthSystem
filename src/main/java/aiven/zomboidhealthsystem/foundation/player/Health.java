@@ -655,6 +655,6 @@ public class Health {
     }
 
     public static boolean once(int time) {
-        return new Random().nextInt(0, time / UPDATE_FREQUENCY) == 0;
+        return ZomboidHealthSystem.RANDOM.nextInt(0, time / UPDATE_FREQUENCY) == 0;
     }
 }

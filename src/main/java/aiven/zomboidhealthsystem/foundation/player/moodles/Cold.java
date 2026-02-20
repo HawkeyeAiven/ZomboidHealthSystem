@@ -26,6 +26,7 @@ public class Cold extends Moodle {
                 this.addAmount(1.0F);
             }
         }
+
         getHealth().getExhaustion().addMultiplier(this, (getAmount() / 2) + 1);
         getHealth().getHunger().setAppetite(Hunger.DEFAULT_APPETITE / (getAmount() / 4 + 1));
 

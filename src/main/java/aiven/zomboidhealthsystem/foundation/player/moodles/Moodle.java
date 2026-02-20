@@ -3,6 +3,7 @@ package aiven.zomboidhealthsystem.foundation.player.moodles;
 import aiven.zomboidhealthsystem.ZomboidHealthSystem;
 import aiven.zomboidhealthsystem.foundation.player.Health;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import java.util.HashMap;
@@ -22,6 +23,10 @@ public abstract class Moodle {
 
     public Identifier getMoodleIconTexture() {
         return Identifier.of(ZomboidHealthSystem.ID, "textures/moodle/moodle_icon_%s.png".formatted(this.getId()));
+    }
+
+    public String getMoodleIconText() {
+        return Text.translatable("zomboidhealthsystem.text." + getId()).getString();
     }
 
     public void onSleep() {

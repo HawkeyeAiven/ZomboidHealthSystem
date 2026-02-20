@@ -2,15 +2,11 @@ package aiven.zomboidhealthsystem.foundation.mixin;
 
 import aiven.zomboidhealthsystem.foundation.world.ModServer;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.level.ServerWorldProperties;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.*;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(value = ServerWorld.class)
 public abstract class ServerWorldMixin {
@@ -26,11 +22,6 @@ public abstract class ServerWorldMixin {
     @Shadow @NotNull public abstract MinecraftServer getServer();
 
     @Shadow public abstract String toString();
-
-    @Inject(at = @At("HEAD"), method = "onPlayerRespawned")
-    private void onPlayerRespawned(ServerPlayerEntity player, CallbackInfo ci) {
-        ModServer.sendPacketRespawn(player);
-    }
 
     @Unique
     private int i = 0;
