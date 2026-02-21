@@ -196,7 +196,7 @@ public abstract class BodyPart {
     }
 
     public void sleep(int ticks) {
-        this.heal(1.0F / 10000F * ticks);
+        this.heal(0.75F / 8000F * ticks);
         if(this.isBandaged()) {
             this.setBleeding(this.getBleeding() - (0.3F / 10000 * ticks));
         }

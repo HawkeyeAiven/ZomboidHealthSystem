@@ -109,7 +109,9 @@ public abstract class ServerWorldMixin extends WorldMixin {
             }
 
             for(PlayerEntity player : this.players) {
-                ModServer.getHealth(player).sleep(Config.SLEEP_SPEED.getValue());
+                if(player.isSleeping()) {
+                    ModServer.getHealth(player).sleep(Config.SLEEP_SPEED.getValue());
+                }
             }
 
             if(sleepTicks >= 12000) {

@@ -56,7 +56,7 @@ public class Config {
 
     public static final FloatCodec MAX_HEAT_FROM_BLOCK = (FloatCodec) CONFIG.add(new FloatCodec("max_heat_from_block", 30.0F));
 
-    public static final IntegerCodec SLEEP_SPEED = (IntegerCodec) CONFIG.add(new IntegerCodec("sleep_speed", 20));
+    public static final IntegerCodec SLEEP_SPEED = (IntegerCodec) CONFIG.add(new IntegerCodec("sleep_speed", 10));
     public static final IntegerCodec HEAL_TIME = (IntegerCodec) CONFIG.add(new IntegerCodec("heal_time", 40 * 60 * 20));
     public static final IntegerCodec FOOD_HEAL_AMOUNT = (IntegerCodec) CONFIG.add(new IntegerCodec("food_heal_amount",2));
     public static final IntegerCodec UPDATE_FREQUENCY = (IntegerCodec) CONFIG.add(new IntegerCodec("update_frequency", 5));

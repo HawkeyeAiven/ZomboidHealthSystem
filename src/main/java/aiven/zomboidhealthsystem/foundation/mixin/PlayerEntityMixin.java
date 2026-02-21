@@ -313,7 +313,7 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
             } else if(item.equals(Items.MUSHROOM_STEW)) {
                 thirst.drink(0.4F, true);
             } else if(item.equals(Items.MELON_SLICE)) {
-                thirst.drink(0.3F, true);
+                thirst.drink(0.4F, true);
             }
         }
     }

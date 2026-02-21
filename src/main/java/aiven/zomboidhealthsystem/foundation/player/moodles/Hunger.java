@@ -62,7 +62,7 @@ public class Hunger extends Moodle {
 
     @Override
     public void sleep(int ticks) {
-        this.addAmount(0.5F / 8000 * ticks);
+        this.addAmount(0.5F / 8000 * ticks * getAmount() < 0 ? 2.25F : 1.0F);
     }
 
     @Override
