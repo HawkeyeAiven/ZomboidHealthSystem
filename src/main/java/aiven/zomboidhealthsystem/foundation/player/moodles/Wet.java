@@ -42,10 +42,11 @@ public class Wet extends Moodle {
     }
 
     @Override
-    public void onSleep() {
-        super.onSleep();
-        setAmount(0);
+    public void sleep(int ticks) {
+        super.sleep(ticks);
+        addAmount(-1.0F / 400 * ticks);
     }
+
 
     @Override
     public void setAmount(float amount) {

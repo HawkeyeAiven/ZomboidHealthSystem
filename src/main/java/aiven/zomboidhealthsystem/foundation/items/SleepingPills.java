@@ -62,7 +62,7 @@ public class SleepingPills extends ToolItem {
 
             Health health = ModServer.getHealth(user);
 
-            health.getDrowsiness().addSleepingPills(0.5F);
+            health.getDrowsiness().addSleepingPills(1.0F);
 
             return TypedActionResult.success(stack, true);
         }

@@ -5,6 +5,7 @@ import aiven.zomboidhealthsystem.ModDamageTypes;
 import aiven.zomboidhealthsystem.foundation.player.Health;
 import aiven.zomboidhealthsystem.foundation.utility.Util;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.text.Text;
 
 public class Hunger extends Moodle {
     public static final float DEFAULT_APPETITE = 0.14F;
@@ -60,9 +61,8 @@ public class Hunger extends Moodle {
     }
 
     @Override
-    public void onSleep() {
-        super.onSleep();
-        this.addAmount(0.4F);
+    public void sleep(int ticks) {
+        this.addAmount(0.5F / 8000 * ticks);
     }
 
     @Override
@@ -71,6 +71,15 @@ public class Hunger extends Moodle {
             return super.getAmplifier();
         } else {
             return (int) (getAmount() * 4);
+        }
+    }
+
+    @Override
+    public String getMoodleIconText() {
+        if(getAmount() > 0) {
+            return super.getMoodleIconText();
+        } else {
+            return Text.translatable("zomboidhealthsystem.text.saturation").getString();
         }
     }
 
@@ -99,15 +108,5 @@ public class Hunger extends Moodle {
     @Override
     public String getId() {
         return "hunger";
-    }
-
-    @Override
-    public void readNbt(String value) {
-        super.readNbt(value);
-    }
-
-    @Override
-    public String getNbt() {
-        return super.getNbt();
     }
 }

@@ -387,16 +387,12 @@ public class Health {
         stumble(0.05F);
     }
 
-    public void onSleep() {
-        this.getTemperature().onSleep();
-        this.getHunger().onSleep();
-
+    public void sleep(int ticks) {
         for(Moodle moodle : moodles) {
-            moodle.onSleep();
+            moodle.sleep(ticks);
         }
-
-        for(BodyPart part : bodyParts){
-            part.onSleep();
+        for(BodyPart bodyPart : bodyParts) {
+            bodyPart.sleep(ticks);
         }
     }
 
@@ -590,16 +586,12 @@ public class Health {
         for (int i = 0; i < 8; i++) {
             BodyPart bodyPart = this.getBodyParts()[i];
             String bodyPartValue = Json.getValue(health, bodyPart.getId());
-            if(bodyPartValue != null) {
-                bodyPart.readNbt(bodyPartValue);
-            }
+            bodyPart.readNbt(bodyPartValue);
         }
 
         for(Moodle moodle : this.moodles){
-            String conditionValue = Json.getValue(health, moodle.getId());
-            if(conditionValue != null) {
-                moodle.readNbt(conditionValue);
-            }
+            String moodleValue = Json.getValue(health, moodle.getId());
+            moodle.readNbt(moodleValue);
         }
 
         if (this.head.getHp() <= 0 || this.body.getHp() <= 0) {

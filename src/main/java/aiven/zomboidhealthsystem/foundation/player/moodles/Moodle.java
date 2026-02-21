@@ -29,7 +29,8 @@ public abstract class Moodle {
         return Text.translatable("zomboidhealthsystem.text." + getId()).getString();
     }
 
-    public void onSleep() {
+    public void sleep(int ticks) {
+
     }
 
     boolean once(int time){
@@ -44,8 +45,12 @@ public abstract class Moodle {
         }
     }
 
-    public void readNbt(String value){
-        this.setAmount(Float.parseFloat(value));
+    public void readNbt(String value) {
+        if(value != null) {
+            this.setAmount(Float.parseFloat(value));
+        } else {
+            this.setAmount(0);
+        }
     }
 
     public Health getHealth() {

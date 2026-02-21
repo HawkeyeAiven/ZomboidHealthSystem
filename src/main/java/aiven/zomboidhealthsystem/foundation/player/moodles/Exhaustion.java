@@ -49,7 +49,7 @@ public class Exhaustion extends Moodle {
     }
 
     @Override
-    public void onSleep() {
-        this.setAmount(0);
+    public void sleep(int ticks) {
+        this.addAmount(-1.0F / 400 * ticks);
     }
 }

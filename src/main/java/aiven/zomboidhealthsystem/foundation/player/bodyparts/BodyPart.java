@@ -195,10 +195,10 @@ public abstract class BodyPart {
         }
     }
 
-    public void onSleep(){
-        this.heal(0.5f);
+    public void sleep(int ticks) {
+        this.heal(1.0F / 10000F * ticks);
         if(this.isBandaged()) {
-            this.setBleeding(this.getBleeding() - 0.3f);
+            this.setBleeding(this.getBleeding() - (0.3F / 10000 * ticks));
         }
     }
 
@@ -279,6 +279,10 @@ public abstract class BodyPart {
     }
 
     public void readNbt(String bodyPart) {
+        if(bodyPart == null) {
+            reset();
+            return;
+        }
         {
             String hp = Json.getValue(bodyPart, "hp");
             if(hp != null) {
@@ -326,6 +330,15 @@ public abstract class BodyPart {
                 this.setInfection(false);
             }
         }
+    }
+
+    public void reset() {
+        this.setInfection(false);
+        this.setHp(this.getMaxHp());
+        this.setBleeding(0);
+        this.setBandageItem(null);
+        this.setAdditionalHp(0);
+        this.setBandageTime(0);
     }
 
     public abstract void addEffectAmplifier(EffectAmplifiers effectAmplifiers);

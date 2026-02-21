@@ -34,7 +34,7 @@ public class Drowsiness extends Moodle {
 
     @Override
     public void update() {
-        addTicks(1.0F * 2.0F * getMultiplier() * Config.DROWSINESS_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
+        addTicks(1.0F * 1.90F * getMultiplier() * Config.DROWSINESS_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
 
         if(caffeine_effect) {
             if(caffeine < max_caffeine) {
@@ -60,12 +60,12 @@ public class Drowsiness extends Moodle {
         getHealth().getExhaustion().addMultiplier(this, (getAmplifier() / 2) + 1);
 
         if (this.getAmplifier() >= 1) {
-            if (once((int) (5 * 60 * 20 / this.getAmplifier()))) {
+            if (once(5 * 60 * 20 / this.getAmplifier())) {
                 this.getHealth().addStatusEffect(StatusEffects.BLINDNESS, 0, 5 * 20);
             }
 
             if (this.getAmplifier() >= 2) {
-                if (once((int) (5 * 60 * 20 / (this.getAmplifier() / 2))) && this.getHealth().getPlayer().getMovementSpeed() > 0.1f) {
+                if (once(5 * 60 * 20 / (this.getAmplifier() / 2)) && this.getHealth().getPlayer().getMovementSpeed() > 0.1f) {
                     this.getHealth().stumble();
                 }
 
@@ -78,28 +78,23 @@ public class Drowsiness extends Moodle {
                 }
             }
         }
-
-        if(getPlayer().isSleeping() && getAmplifier() < Config.MIN_DROWSINESS_FOR_SLEEP.getValue()) {
-            getPlayer().wakeUp();
-            getPlayer().sendMessage(Text.translatable("zomboidhealthsystem.message.dont_want_sleep"), true);
-        }
     }
 
+
     @Override
-    public void onSleep() {
-        this.max_caffeine = 0;
-        this.caffeine = 0;
-        this.caffeine_effect = true;
-        this.sleeping_pills = 0;
-        this.max_sleeping_pills = 0;
-        this.amount = 0;
+    public void sleep(int ticks) {
+        this.max_caffeine = Math.max(0, max_caffeine - (float) ticks / 1000.0F);
+        this.caffeine = Math.max(0, caffeine - (float) ticks / 1000.0F);
+        this.caffeine_effect = false;
+        this.sleeping_pills = Math.max(0, sleeping_pills - (float) ticks / 1000.0F);
+        this.max_sleeping_pills = Math.max(0, max_sleeping_pills - (float) ticks / 1000.0F);
+        this.amount = Math.max(0, amount - (float) ticks / 8000.0F);
     }
 
     @Override
     public boolean showIcon() {
         return this.getAmplifier() >= 1;
     }
-
 
     @Override
     public String getNbt() {
@@ -133,6 +128,14 @@ public class Drowsiness extends Moodle {
 
     @Override
     public void readNbt(String value) {
+        if(value == null) {
+            this.caffeine = 0;
+            this.max_caffeine = 0;
+            this.sleeping_pills = 0;
+            this.max_sleeping_pills = 0;
+            this.amount = 0;
+            return;
+        }
         String amount = Json.getValue(value, "amount");
         String caffeine = Json.getValue(value,"caffeine");
         String max_caffeine = Json.getValue(value,"max_caffeine");
@@ -142,17 +145,27 @@ public class Drowsiness extends Moodle {
 
         if(amount != null){
             this.setAmount(Float.parseFloat(amount));
+        } else {
+            this.amount = 0;
         }
         if(caffeine != null && max_caffeine != null){
             this.caffeine = Float.parseFloat(caffeine);
             this.max_caffeine = Float.parseFloat(max_caffeine);
+        } else {
+            this.caffeine = 0;
+            this.max_caffeine = 0;
         }
         if(caffeine_effect != null) {
             this.caffeine_effect = Boolean.parseBoolean(caffeine_effect);
+        } else {
+            this.caffeine_effect = false;
         }
         if(sleeping_pills != null && max_sleeping_pills != null) {
             this.sleeping_pills = Float.parseFloat(sleeping_pills);
             this.max_sleeping_pills = Float.parseFloat(max_sleeping_pills);
+        } else {
+            this.sleeping_pills = 0;
+            this.max_sleeping_pills = 0;
         }
     }
 
@@ -171,6 +184,11 @@ public class Drowsiness extends Moodle {
 
     public boolean hasCaffeine() {
         return caffeine != 0 && max_caffeine != 0;
+    }
+
+    @Override
+    public void setAmount(float amount) {
+        this.amount = Math.max(amount, 0);
     }
 
     public void addTicks(float amount) {

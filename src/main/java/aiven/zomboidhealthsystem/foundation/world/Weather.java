@@ -36,7 +36,7 @@ public final class Weather {
     private void update() {
         long timeOfDay = this.getWorld().getTimeOfDay();
 
-        if(timeOfDay % 24000 < UPDATE_FREQUENCY * 2){
+        if(timeOfDay % 24000 < 1000){
             if(!newDay){
                 this.onNewDay();
                 newDay = true;

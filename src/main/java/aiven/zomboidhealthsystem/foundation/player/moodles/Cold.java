@@ -44,10 +44,10 @@ public class Cold extends Moodle {
     }
 
     @Override
-    public void onSleep(){
+    public void sleep(int ticks) {
         float amplifier = (Temperature.AVERAGE_TEMPERATURE_BODY - getHealth().getTemperature().getAmount()) / 1.5F;
         if(amplifier < 1) {
-            this.addAmount(-1.0F);
+            this.addAmount(-1.0F / 8000 * ticks);
         } else {
             this.addAmount(amplifier);
         }

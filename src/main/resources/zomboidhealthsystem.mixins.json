@@ -15,7 +15,8 @@
     "PlayerEntityMixin",
     "PotionItemMixin",
     "ServerPlayerEntityMixin",
-    "ServerWorldMixin"
+    "ServerWorldMixin",
+    "WorldMixin"
   ],
   "injectors": {
     "defaultRequire": 1

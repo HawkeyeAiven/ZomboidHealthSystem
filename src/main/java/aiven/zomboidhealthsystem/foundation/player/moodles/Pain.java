@@ -47,14 +47,6 @@ public class Pain extends Moodle {
     }
 
     @Override
-    public void onSleep() {
-        super.onSleep();
-        painkillerAmount = 0;
-        painkillerMaxAmount = 0;
-        painkillerEffect = true;
-    }
-
-    @Override
     public float getAmount() {
         return getPain();
     }
@@ -83,17 +75,29 @@ public class Pain extends Moodle {
 
     @Override
     public void readNbt(String value) {
+        if(value == null) {
+            this.painkillerAmount = 0;
+            this.painkillerMaxAmount = 0;
+            this.painkillerEffect = false;
+            return;
+        }
         String amount = Json.getValue(value, "painkiller_amount");
         String max_amount = Json.getValue(value, "painkiller_max_amount");
         String effect = Json.getValue(value, "painkiller_effect");
         if(amount != null) {
             this.painkillerAmount = Float.parseFloat(amount);
+        } else {
+            this.painkillerAmount = 0;
         }
         if(max_amount != null) {
             this.painkillerMaxAmount = Float.parseFloat(max_amount);
+        } else {
+            this.painkillerMaxAmount = 0;
         }
         if(effect != null) {
             this.painkillerEffect = Boolean.parseBoolean(effect);
+        } else {
+            this.painkillerEffect = false;
         }
     }
 

@@ -6,6 +6,7 @@ import aiven.zomboidhealthsystem.foundation.player.bodyparts.BodyPart;
 import aiven.zomboidhealthsystem.foundation.player.moodles.Exhaustion;
 import aiven.zomboidhealthsystem.foundation.player.moodles.Thirst;
 import aiven.zomboidhealthsystem.foundation.world.ModServer;
+import com.mojang.datafixers.util.Either;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
@@ -14,16 +15,22 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.passive.WolfEntity;
+import net.minecraft.entity.player.HungerManager;
+import net.minecraft.entity.player.ItemCooldownManager;
 import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.registry.tag.EntityTypeTags;
+import net.minecraft.screen.PlayerScreenHandler;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Unit;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Difficulty;
@@ -63,13 +70,35 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
 
     @Shadow public abstract void addExhaustion(float exhaustion);
 
-    @Shadow public abstract int getSleepTimer();
-
     @Shadow public abstract boolean isSwimming();
 
     @Shadow public abstract boolean isSpectator();
 
     @Shadow public abstract boolean isCreative();
+
+    @Shadow public int experiencePickUpDelay;
+    @Shadow private int sleepTimer;
+
+    @Shadow protected abstract boolean updateWaterSubmersionState();
+
+    @Shadow public ScreenHandler currentScreenHandler;
+
+    @Shadow protected abstract void closeHandledScreen();
+
+    @Shadow @Final public PlayerScreenHandler playerScreenHandler;
+
+    @Shadow protected abstract void updateCapeAngles();
+
+    @Shadow protected HungerManager hungerManager;
+    @Shadow private ItemStack selectedItem;
+
+    @Shadow public abstract void resetLastAttackedTicks();
+
+    @Shadow protected abstract void updateTurtleHelmet();
+
+    @Shadow @Final private ItemCooldownManager itemCooldownManager;
+
+    @Shadow public abstract void sendMessage(Text message, boolean overlay);
 
     @Unique
     public Health modHealth;
@@ -124,8 +153,7 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
                         amount = 0.0F;
                         if (!source.isIn(DamageTypeTags.IS_PROJECTILE)) {
                             Entity entity = source.getSource();
-                            if (entity instanceof LivingEntity) {
-                                LivingEntity livingEntity = (LivingEntity)entity;
+                            if (entity instanceof LivingEntity livingEntity) {
                                 this.takeShieldHit(livingEntity);
                             }
                         }
@@ -160,25 +188,21 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
 
                     Entity entity2 = source.getAttacker();
                     if (entity2 != null) {
-                        if (entity2 instanceof LivingEntity) {
-                            LivingEntity livingEntity2 = (LivingEntity)entity2;
+                        if (entity2 instanceof LivingEntity livingEntity2) {
                             if (!source.isIn(DamageTypeTags.NO_ANGER)) {
                                 this.setAttacker(livingEntity2);
                             }
                         }
 
-                        if (entity2 instanceof PlayerEntity) {
-                            PlayerEntity playerEntity = (PlayerEntity)entity2;
+                        if (entity2 instanceof PlayerEntity playerEntity) {
                             this.playerHitTimer = 100;
                             this.attackingPlayer = playerEntity;
-                        } else if (entity2 instanceof WolfEntity) {
-                            WolfEntity wolfEntity = (WolfEntity)entity2;
+                        } else if (entity2 instanceof WolfEntity wolfEntity) {
                             if (wolfEntity.isTamed()) {
                                 this.playerHitTimer = 100;
                                 LivingEntity var11 = wolfEntity.getOwner();
                                 if (var11 instanceof PlayerEntity) {
-                                    PlayerEntity playerEntity2 = (PlayerEntity)var11;
-                                    this.attackingPlayer = playerEntity2;
+                                    this.attackingPlayer = (PlayerEntity)var11;
                                 } else {
                                     this.attackingPlayer = null;
                                 }
@@ -188,9 +212,9 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
 
                     if (bl2) {
                         if (bl) {
-                            this.getWorld().sendEntityStatus(this.getPlayer(), (byte)29);
+                            this.getWorld().sendEntityStatus(this.toPlayerEntity(), (byte)29);
                         } else {
-                            this.getWorld().sendEntityDamage(this.getPlayer(), source);
+                            this.getWorld().sendEntityDamage(this.toPlayerEntity(), source);
                         }
 
                         if (!source.isIn(DamageTypeTags.NO_IMPACT) && (!bl || amount > 0.0F)) {
@@ -214,15 +238,15 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
 
                     boolean bl3 = !bl || amount > 0.0F;
 
-                    if (getPlayer() instanceof ServerPlayerEntity) {
-                        Criteria.ENTITY_HURT_PLAYER.trigger((ServerPlayerEntity)getPlayer(), source, f, amount, bl);
+                    if (toPlayerEntity() instanceof ServerPlayerEntity) {
+                        Criteria.ENTITY_HURT_PLAYER.trigger((ServerPlayerEntity) toPlayerEntity(), source, f, amount, bl);
                         if (g > 0.0F && g < 3.4028235E37F) {
-                            (getPlayer()).increaseStat(Stats.DAMAGE_BLOCKED_BY_SHIELD, Math.round(g * 10.0F));
+                            (toPlayerEntity()).increaseStat(Stats.DAMAGE_BLOCKED_BY_SHIELD, Math.round(g * 10.0F));
                         }
                     }
 
                     if (entity2 instanceof ServerPlayerEntity) {
-                        Criteria.PLAYER_HURT_ENTITY.trigger((ServerPlayerEntity)entity2, getPlayer(), source, f, amount, bl);
+                        Criteria.PLAYER_HURT_ENTITY.trigger((ServerPlayerEntity)entity2, toPlayerEntity(), source, f, amount, bl);
                     }
                     amount = this.applyArmorToDamage(source,amount);
                     amount = this.modifyAppliedDamage(source,amount);
@@ -237,16 +261,27 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
         }
     }
 
+    @Inject(at = @At("TAIL"), method = "trySleep")
+    private void trySleep(BlockPos pos, CallbackInfoReturnable<Either<PlayerEntity.SleepFailureReason, Unit>> cir) {
+        this.sleepTimer = 0;
+        if(!getWorld().isClient()) {
+            if(getModHealth().getDrowsiness().getAmplifier() < Config.MIN_DROWSINESS_FOR_SLEEP.getValue()) {
+                this.toPlayerEntity().wakeUp();
+                this.sendMessage(Text.translatable("zomboidhealthsystem.message.dont_want_sleep"), true);
+            }
+        }
+    }
+
     @Inject(at = @At("HEAD"), method = "readCustomDataFromNbt")
     private void readNbt(NbtCompound nbt, CallbackInfo ci) {
         if(!this.getWorld().isClient) {
             String string = nbt.getString("mod_health");
             if(string == null) {
-                this.modHealth = new Health(getPlayer());
+                this.modHealth = new Health(toPlayerEntity());
             } else {
-                this.modHealth = Health.parseHealth(getPlayer(), string);
+                this.modHealth = Health.parseHealth(toPlayerEntity(), string);
             }
-            ModServer.registerPlayer(getPlayer(), getModHealth());
+            ModServer.registerPlayer(toPlayerEntity(), getModHealth());
         }
     }
 
@@ -257,19 +292,12 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
         }
     }
 
-    @Inject(at = @At("HEAD"), method = "wakeUp(ZZ)V")
-    private void wakeUp(boolean skipSleepTimer, boolean updateSleepingPlayers, CallbackInfo ci){
-        if(this.getSleepTimer() >= 100 && !this.getWorld().isClient){
-            this.getModHealth().onSleep();
-        }
-    }
-
     @Inject(at = @At("HEAD"), method = "dropInventory")
     private void dropInventory(CallbackInfo ci) {
         if(!getWorld().isClient()) {
             for(BodyPart part : getModHealth().getBodyParts()) {
                 if(part.isBandaged()) {
-                    getPlayer().dropItem(part.unBandage().getDefaultStack(), true, true);
+                    toPlayerEntity().dropItem(part.unBandage().getDefaultStack(), true, true);
                 }
             }
         }
@@ -397,7 +425,7 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
     }
 
     @Unique
-    public PlayerEntity getPlayer() {
+    public PlayerEntity toPlayerEntity() {
         return (PlayerEntity) (Object) (this);
     }
 
@@ -418,14 +446,14 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
     @Unique
     public void sendPacketHealth() {
         if(!getWorld().isClient) {
-            ModServer.sendPacketHealth((ServerPlayerEntity) getPlayer());
+            ModServer.sendPacketHealth((ServerPlayerEntity) toPlayerEntity());
         }
     }
 
     @Unique
     public void sendPacketDamage(){
         if(!getWorld().isClient) {
-            ModServer.sendPacketDamage((ServerPlayerEntity) getPlayer());
+            ModServer.sendPacketDamage((ServerPlayerEntity) toPlayerEntity());
         }
     }
 }

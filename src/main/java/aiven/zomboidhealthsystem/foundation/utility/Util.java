@@ -38,15 +38,18 @@ public class Util {
 
     public static float getDistance(World world, Block block, BlockPos center, int radius) {
         float distance = -1;
-        for(int x = -radius; x < radius + 1; x++){
-            for(int y = -radius; y < radius + 1; y++){
-                for(int z = -radius; z < radius + 1; z++){
+        for(int x = -radius; x <= radius; x++){
+            for(int y = -radius; y <= radius; y++){
+                for(int z = -radius; z <= radius; z++){
                     BlockPos pos = new BlockPos(x + center.getX(),y + center.getY(),z + center.getZ());
                     if(world.getBlockState(pos).getBlock().equals(block)) {
-                        if(distance != -1) {
-                            distance = (float) Math.min(center.toCenterPos().distanceTo(pos.toCenterPos()), distance);
-                        } else {
-                            distance = (float) center.toCenterPos().distanceTo(pos.toCenterPos());
+                        float dis = (float) center.toCenterPos().distanceTo(pos.toCenterPos());
+                        if(dis <= radius) {
+                            if (distance != -1) {
+                                distance = Math.min(dis, distance);
+                            } else {
+                                distance = dis;
+                            }
                         }
                     }
                 }

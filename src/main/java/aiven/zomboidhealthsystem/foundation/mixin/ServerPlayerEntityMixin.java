@@ -28,6 +28,11 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin {
 
 	@Shadow public abstract boolean shouldDamagePlayer(PlayerEntity player);
 
+	@Unique
+	private ServerPlayerEntity toServerPlayerEntity() {
+		return (ServerPlayerEntity) ((Object) this);
+	}
+
 	/**
 	 * @author Yakui the maid
 	 * @reason Chikoi the maid
@@ -70,8 +75,8 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin {
 	@Inject(at = @At("HEAD"), method = "tick")
 	private void tick(CallbackInfo ci) {
 		if(getModHealth() == null) {
-			this.modHealth = new Health(getPlayer());
-			ModServer.registerPlayer(getPlayer(), getModHealth());
+			this.modHealth = new Health(toPlayerEntity());
+			ModServer.registerPlayer(toPlayerEntity(), getModHealth());
 		}
 		if (ticks++ > ZomboidHealthSystem.UPDATE_FREQUENCY - 1) {
 			sendPacketHealth();
