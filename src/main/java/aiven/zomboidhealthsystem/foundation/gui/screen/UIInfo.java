@@ -20,7 +20,6 @@ public non-sealed class UIInfo extends UI {
 
     public UIInfo(Vector2f ui) {
         super(ui);
-        addClickableWidget(ZomboidHealthSystemClient.HUD.getBodyPartsWidget());
     }
 
     @Override
@@ -99,11 +98,6 @@ public non-sealed class UIInfo extends UI {
         );
 
         super.render(context, mouseX, mouseY, tickDelta);
-    }
-
-    @Override
-    public void close() {
-        super.close();
     }
 
     @Override

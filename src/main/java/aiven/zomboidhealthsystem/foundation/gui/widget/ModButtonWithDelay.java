@@ -18,8 +18,8 @@ public class ModButtonWithDelay extends ModClickableWidget {
     }
 
     @Override
-    protected void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.renderButton(context, mouseX, mouseY, delta);
+    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.renderWidget(context, mouseX, mouseY, delta);
         if(isClicked && isMouseOver(mouseX, mouseY)) {
             d += delta;
             if(d >= delay) {

@@ -16,7 +16,7 @@ public class BodyPartsWidget extends ModClickableWidget {
     }
 
     @Override
-    protected void renderButton(DrawContext context, int mouseX, int mouseY, float tickDelta) {
+    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float tickDelta) {
         render(context, tickDelta, this.pos);
     }
 

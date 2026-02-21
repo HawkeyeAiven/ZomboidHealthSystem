@@ -11,10 +11,10 @@ import net.minecraft.client.gui.widget.ScrollableWidget;
 import java.util.ArrayList;
 
 @Environment(EnvType.CLIENT)
-public class ZomboidWidget extends ScrollableWidget {
+public class BodyPartListWidget extends ScrollableWidget {
     private final ArrayList<BodyPartButton> bodyPartButtons = new ArrayList<>();
 
-    public ZomboidWidget(int x, int y) {
+    public BodyPartListWidget(int x, int y) {
         super(x, y, 149, 135, null);
         Health health = ZomboidHealthSystemClient.HEALTH;
         bodyPartButtons.add(new BodyPartButton(0, 0, health.getHead()));
@@ -26,13 +26,6 @@ public class ZomboidWidget extends ScrollableWidget {
         bodyPartButtons.add(new BodyPartButton(0, 0, health.getLeftFoot()));
         bodyPartButtons.add(new BodyPartButton(0, 0, health.getRightFoot()));
     }
-
-    @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float tickDelta) {
-        renderOverlay(context);
-        renderButton(context, mouseX, mouseY, tickDelta);
-    }
-
 
     public void tick() {
         for (BodyPartButton bodyPartButton : bodyPartButtons) {
@@ -74,7 +67,7 @@ public class ZomboidWidget extends ScrollableWidget {
         for (BodyPartButton button : bodyPartButtons) {
             if (button.hasText()) {
                 button.setPosition(this.getX() + 10, this.getY() + y);
-                button.renderButton(context, mouseX, mouseY, delta);
+                button.renderWidget(context, mouseX, mouseY, delta);
                 y += button.getHeight() + 8;
             }
         }

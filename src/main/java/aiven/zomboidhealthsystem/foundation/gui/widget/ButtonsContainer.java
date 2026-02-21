@@ -67,9 +67,9 @@ public class ButtonsContainer extends ModClickableWidget {
     }
 
     @Override
-    protected void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
+    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
         updatePoses();
-        super.renderButton(context, mouseX, mouseY, delta);
+        super.renderWidget(context, mouseX, mouseY, delta);
         if(!areButtonsHidden) {
             for (ClickableWidget button : buttons) {
                 if(button.visible) {

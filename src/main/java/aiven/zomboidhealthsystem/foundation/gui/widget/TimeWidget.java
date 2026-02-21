@@ -18,7 +18,7 @@ public class TimeWidget extends ModClickableWidget {
     }
 
     @Override
-    public void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
         String time = getStringTime();
         if(time != null) {
             this.width = client.textRenderer.getWidth(time);

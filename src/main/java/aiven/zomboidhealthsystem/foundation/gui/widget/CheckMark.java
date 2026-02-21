@@ -12,8 +12,8 @@ public class CheckMark extends ModClickableWidget {
     }
 
     @Override
-    protected void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.renderButton(context, mouseX, mouseY, delta);
+    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.renderWidget(context, mouseX, mouseY, delta);
         if(enabled){
             context.drawTexture(
                     new Identifier(ZomboidHealthSystem.ID,"textures/gui/checkmark.png"),

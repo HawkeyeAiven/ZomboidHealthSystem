@@ -3,6 +3,7 @@ package aiven.zomboidhealthsystem.foundation.gui.screen;
 import aiven.zomboidhealthsystem.foundation.gui.widget.BackButton;
 import aiven.zomboidhealthsystem.foundation.gui.widget.CheckMark;
 import aiven.zomboidhealthsystem.foundation.gui.widget.ModClickableWidget;
+import aiven.zomboidhealthsystem.foundation.gui.widget.ModTextFieldWidget;
 import aiven.zomboidhealthsystem.foundation.world.ModServer;
 import aiven.zomboidhealthsystem.foundation.world.WorldSettings;
 import net.fabricmc.api.EnvType;
@@ -17,12 +18,12 @@ import net.minecraft.text.Text;
 @Environment(EnvType.CLIENT)
 public class WorldSettingsScreen extends AbstractModScreen {
     private final Screen createWorldScreen;
-    public TextFieldWidget startDay = new TextFieldWidget(MinecraftClient.getInstance().textRenderer,  115,50,80,20, null);
-    public TextFieldWidget daysInSeason = new TextFieldWidget(MinecraftClient.getInstance().textRenderer,  115,80,80,20, null);
-    public TextFieldWidget dayLength = new TextFieldWidget(MinecraftClient.getInstance().textRenderer,  115,110,80,20, null);
-    public CheckMark temperature = new CheckMark(115,140,20);
-    public CheckMark wind = new CheckMark(115,170,20);
-    public ClickableWidget backButton = new BackButton(this);
+    public TextFieldWidget startDay = addClickableWidget(new ModTextFieldWidget(MinecraftClient.getInstance().textRenderer,  115,50,80,20, null));
+    public TextFieldWidget daysInSeason = addClickableWidget(new ModTextFieldWidget(MinecraftClient.getInstance().textRenderer,  115,80,80,20, null));
+    public TextFieldWidget dayLength = addClickableWidget(new ModTextFieldWidget(MinecraftClient.getInstance().textRenderer,  115,110,80,20, null));
+    public CheckMark temperature = addClickableWidget(new CheckMark(115,140,20));
+    public CheckMark wind = addClickableWidget(new CheckMark(115,170,20));
+    public ClickableWidget backButton = addClickableWidget(new BackButton(this));
 
 
     public WorldSettingsScreen(Screen createWorldScreen){
@@ -58,17 +59,6 @@ public class WorldSettingsScreen extends AbstractModScreen {
                 50,176,0xFFffffff
         );
         super.render(context, mouseX, mouseY, tickDelta);
-    }
-
-    @Override
-    public void init() {
-        super.init();
-        addTextField(startDay);
-        addTextField(daysInSeason);
-        addTextField(dayLength);
-        addClickableWidget(temperature);
-        addClickableWidget(wind);
-        addClickableWidget(addSelectableChild(backButton));
     }
 
     @Override

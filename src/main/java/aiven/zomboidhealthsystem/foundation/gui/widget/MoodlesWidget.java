@@ -26,7 +26,7 @@ public class MoodlesWidget extends ModClickableWidget {
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
         this.setX(MinecraftClient.getInstance().getWindow().getScaledWidth() - SIZE);
         Health health = ZomboidHealthSystemClient.HEALTH;
         this.height = 0;
@@ -71,7 +71,7 @@ public class MoodlesWidget extends ModClickableWidget {
                 context.drawTexture(
                         moodle.getMoodleIconTexture(),
                         this.getX(), this.getY() + getHeight(), 0, 0, SIZE, SIZE, SIZE, SIZE
-                        );
+                );
 
                 this.height += SIZE;
 
@@ -126,10 +126,10 @@ public class MoodlesWidget extends ModClickableWidget {
             int width = Math.max(MinecraftClient.getInstance().textRenderer.getWidth(text) + 6, 40);
             context.drawTexture(Identifier.of(ZomboidHealthSystem.ID, "textures/gui/description_bkg.png"),
                     mouseX - width, mouseY, 0, 0, width, 20, width, 20
-                    );
+            );
             context.drawCenteredTextWithShadow(MinecraftClient.getInstance().textRenderer,
                     text, mouseX - (width / 2), mouseY + 6, 0xFFffff
-                    );
+            );
 
         } else {
             iconName = null;

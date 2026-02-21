@@ -2,7 +2,7 @@ package aiven.zomboidhealthsystem.foundation.gui.screen;
 
 import aiven.zomboidhealthsystem.ZomboidHealthSystem;
 import aiven.zomboidhealthsystem.ZomboidHealthSystemClient;
-import aiven.zomboidhealthsystem.foundation.gui.widget.ZomboidWidget;
+import aiven.zomboidhealthsystem.foundation.gui.widget.BodyPartListWidget;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -19,11 +19,11 @@ import org.joml.Vector2f;
 public non-sealed class UIHealth extends UI {
     public static MutableText damage = Text.translatable("zomboidhealthsystem.health.hud.completely_health");
 
-    public ZomboidWidget zomboidWidget;
+    public BodyPartListWidget bodyPartListWidget;
 
     public UIHealth(Vector2f ui) {
         super(ui);
-        zomboidWidget = new ZomboidWidget((int) ui.x + 75, (int) ui.y + 45);
+        bodyPartListWidget = new BodyPartListWidget((int) ui.x + 75, (int) ui.y + 45);
     }
 
     @Override
@@ -85,16 +85,17 @@ public non-sealed class UIHealth extends UI {
 
         ZomboidHealthSystemClient.HUD.getBodyPartsWidget().render(context, tickDelta, pos.add(14, 50, new Vector2f()));
 
-        zomboidWidget.setX((int) pos.x + 75);
-        zomboidWidget.setY((int) pos.y + 45);
+        bodyPartListWidget.setX((int) pos.x + 75);
+        bodyPartListWidget.setY((int) pos.y + 45);
 
         super.render(context, mouseX, mouseY, tickDelta);
     }
 
     @Override
     public void init() {
-        addClickableWidget(zomboidWidget);
-        super.init();
+        addClickableWidget(bodyPartListWidget);
+        addClickableWidget(ZomboidHealthSystemClient.HUD.getTimeWidget());
+        addClickableWidget(ZomboidHealthSystemClient.HUD.getMoodlesWidget());
     }
 
     @Override
@@ -105,7 +106,7 @@ public non-sealed class UIHealth extends UI {
     private int ticks = 0;
     @Override
     public void tick() {
-        zomboidWidget.tick();
+        bodyPartListWidget.tick();
 
         if(ticks >= ZomboidHealthSystem.UPDATE_FREQUENCY){
             float sumHp = ZomboidHealthSystemClient.HEALTH.getBodyHpPercent();

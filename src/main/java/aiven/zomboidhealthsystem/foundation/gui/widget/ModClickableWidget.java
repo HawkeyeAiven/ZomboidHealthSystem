@@ -25,8 +25,7 @@ public class ModClickableWidget extends ClickableWidget {
         this.contentHeight = height;
     }
 
-    @Override
-    protected void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
+    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
         if(isMouseOver(mouseX, mouseY)) {
             currentTexture = getTextureOn();
         } else {
@@ -43,6 +42,11 @@ public class ModClickableWidget extends ClickableWidget {
                     this.getX() + (width / 2), this.getY() + 6, 0xFFffffff
             );
         }
+    }
+
+    @Override
+    protected void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
+        renderWidget(context, mouseX, mouseY, delta);
     }
 
     protected Identifier getTextureOn() {
@@ -72,7 +76,7 @@ public class ModClickableWidget extends ClickableWidget {
 
     public void destroy(){
         if(MinecraftClient.getInstance().currentScreen instanceof AbstractModScreen screen){
-            screen.destroy(this);
+            screen.removeClickableWidget(this);
         }
         this.visible = false;
         this.active = false;

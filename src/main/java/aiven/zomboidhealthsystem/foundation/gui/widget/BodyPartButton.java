@@ -31,7 +31,7 @@ public class BodyPartButton extends ModClickableWidget {
     }
 
     @Override
-    protected void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
+    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
         context.drawText(MinecraftClient.getInstance().textRenderer, getMessage(), getX(), getY(), 0xFFFFFFFF, false);
 
         int y = getY() + 12;

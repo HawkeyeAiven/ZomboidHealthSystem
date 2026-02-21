@@ -12,8 +12,8 @@ public class WorldPropertiesButton extends ModClickableWidget {
     }
 
     @Override
-    protected void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.renderButton(context, mouseX, mouseY, delta);
+    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.renderWidget(context, mouseX, mouseY, delta);
         context.drawTexture(
                 new Identifier(ZomboidHealthSystem.ID,"icon.png"),
                 this.getX(),this.getY(),0,0,getWidth(),getHeight(),getWidth(),getHeight()

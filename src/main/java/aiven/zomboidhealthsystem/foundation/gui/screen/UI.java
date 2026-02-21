@@ -12,7 +12,6 @@ import org.joml.Vector2f;
 
 @Environment(EnvType.CLIENT)
 public abstract sealed class UI extends AbstractModScreen permits UIHealth, UIInfo {
-
     public static Vector2f LAST_POS = new Vector2f(
             150 + ((float) (MinecraftClient.getInstance().getWindow().getScaledWidth() - 640) / 3),
             80 + ((float) (MinecraftClient.getInstance().getWindow().getScaledHeight() - 360) / 3));
@@ -23,8 +22,6 @@ public abstract sealed class UI extends AbstractModScreen permits UIHealth, UIIn
 
     public UI(Vector2f ui) {
         pos = ui;
-        addClickableWidget(ZomboidHealthSystemClient.HUD.getTimeWidget());
-        addClickableWidget(ZomboidHealthSystemClient.HUD.getMoodlesWidget());
     }
 
     @Override
@@ -49,6 +46,13 @@ public abstract sealed class UI extends AbstractModScreen permits UIHealth, UIIn
             return true;
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public void init() {
+        addClickableWidget(ZomboidHealthSystemClient.HUD.getTimeWidget());
+        addClickableWidget(ZomboidHealthSystemClient.HUD.getMoodlesWidget());
+        addClickableWidget(ZomboidHealthSystemClient.HUD.getBodyPartsWidget());
     }
 
     @Override
