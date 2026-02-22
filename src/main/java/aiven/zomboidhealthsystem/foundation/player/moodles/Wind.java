@@ -1,9 +1,11 @@
 package aiven.zomboidhealthsystem.foundation.player.moodles;
 
+import aiven.zomboidhealthsystem.ZomboidHealthSystem;
 import aiven.zomboidhealthsystem.foundation.player.Health;
 import aiven.zomboidhealthsystem.foundation.utility.Util;
 import aiven.zomboidhealthsystem.foundation.world.ModServer;
 import net.minecraft.entity.EntityPose;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
 public class Wind extends Moodle {
@@ -41,11 +43,8 @@ public class Wind extends Moodle {
     }
 
     @Override
-    public void readNbt(String value) {
-    }
-
-    @Override
-    public String getNbt() {
-        return null;
+    public Identifier getBackgroundTexture() {
+        int amplifier = getAmplifier() / 5 + 1;
+        return Identifier.of(ZomboidHealthSystem.ID, "textures/moodle/moodle_bkg_bad_%s.png".formatted(amplifier));
     }
 }

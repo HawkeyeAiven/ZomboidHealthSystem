@@ -1,6 +1,6 @@
 package aiven.zomboidhealthsystem.foundation.gui.widget;
 
-import aiven.zomboidhealthsystem.foundation.items.BandageItem;
+import aiven.zomboidhealthsystem.foundation.item.BandageItem;
 import aiven.zomboidhealthsystem.foundation.player.bodyparts.BodyPart;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerInventory;

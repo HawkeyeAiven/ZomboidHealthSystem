@@ -9,27 +9,56 @@ import net.minecraft.util.Identifier;
 import java.util.HashMap;
 
 public abstract class Moodle {
-    final Health health;
+    protected final Health health;
     protected float amount;
     protected HashMap<Moodle, Float> multipliers = new HashMap<>();
+    private boolean isSleeping = false;
+    private int sleepTicks = 0;
 
     public Moodle(Health health){
         this.health = health;
     }
 
+    public void update() {
+        if(isSleeping && !getPlayer().isSleeping()) {
+            isSleeping = false;
+            onSleep(sleepTicks);
+            sleepTicks = 0;
+        }
+    }
+
     public boolean showIcon(){
-        return this.getAmplifier() != 0 && getMoodleIconTexture() != null;
+        return this.getAmplifier() != 0 && getMoodleIconTexture() != null && getBackgroundTexture() != null;
     }
 
     public Identifier getMoodleIconTexture() {
         return Identifier.of(ZomboidHealthSystem.ID, "textures/moodle/moodle_icon_%s.png".formatted(this.getId()));
     }
 
+    public Identifier getBackgroundTexture() {
+        int amplifier = getAmplifier();
+        amplifier = Math.min(amplifier, 4);
+        amplifier = Math.max(amplifier, -4);
+        if(amplifier > 0) {
+            return Identifier.of(ZomboidHealthSystem.ID, "textures/moodle/moodle_bkg_bad_%s.png".formatted(amplifier));
+        } else {
+            return Identifier.of(ZomboidHealthSystem.ID, "textures/moodle/moodle_bkg_good_%s.png".formatted(-amplifier));
+        }
+    }
+
     public String getMoodleIconText() {
-        return Text.translatable("zomboidhealthsystem.text." + getId()).getString();
+        return Text.translatable("zomboidhealthsystem.moodle." + getId()).getString() + " " + getAmplifier();
     }
 
     public void sleep(int ticks) {
+        if(!isSleeping) {
+            isSleeping = true;
+            sleepTicks = 0;
+        }
+        sleepTicks += ticks;
+    }
+
+    public void onSleep(int sumTicks) {
 
     }
 
@@ -94,6 +123,4 @@ public abstract class Moodle {
     }
 
     public abstract String getId();
-
-    public abstract void update();
 }

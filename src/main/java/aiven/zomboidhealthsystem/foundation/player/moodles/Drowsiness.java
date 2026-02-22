@@ -8,7 +8,6 @@ import aiven.zomboidhealthsystem.foundation.world.ModServer;
 import aiven.zomboidhealthsystem.infrastructure.config.Json;
 import aiven.zomboidhealthsystem.infrastructure.config.JsonBuilder;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.text.Text;
 
 public class Drowsiness extends Moodle {
     private int drowsinessTime;
@@ -19,6 +18,7 @@ public class Drowsiness extends Moodle {
 
     private float sleeping_pills = 0;
     private float max_sleeping_pills = 0;
+    private boolean sleeping_pills_effect = true;
 
     public Drowsiness(Health health) {
         super(health);
@@ -34,6 +34,7 @@ public class Drowsiness extends Moodle {
 
     @Override
     public void update() {
+        super.update();
         addTicks(1.0F * 1.90F * getMultiplier() * Config.DROWSINESS_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
 
         if(caffeine_effect) {
@@ -48,16 +49,23 @@ public class Drowsiness extends Moodle {
             }
         }
 
-        if(sleeping_pills < max_sleeping_pills) {
-            final float speed = Config.SLEEPING_PILLS_SPEED.getValue() * Health.UPDATE_FREQUENCY;
-            sleeping_pills = Math.min(sleeping_pills + speed, max_sleeping_pills);
-            addAmount(speed);
+        if(sleeping_pills_effect) {
+            if(sleeping_pills < max_sleeping_pills) {
+                sleeping_pills += 1.0F / (60 * 20) * Config.SLEEPING_PILLS_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY;
+            } else if(max_sleeping_pills != 0) {
+                sleeping_pills_effect = false;
+            }
         } else {
-            sleeping_pills = 0;
-            max_sleeping_pills = 0;
+            if(sleeping_pills > 0) {
+                sleeping_pills -= 1.0F / (5 * 60 * 20) * Health.UPDATE_FREQUENCY;
+            } else {
+                sleeping_pills = 0;
+                max_sleeping_pills = 0;
+                sleeping_pills_effect = true;
+            }
         }
 
-        getHealth().getExhaustion().addMultiplier(this, (getAmplifier() / 2) + 1);
+        this.getHealth().getExhaustion().addMultiplier(this, ((float) getAmplifier() / 2) + 1);
 
         if (this.getAmplifier() >= 1) {
             if (once(5 * 60 * 20 / this.getAmplifier())) {
@@ -83,12 +91,21 @@ public class Drowsiness extends Moodle {
 
     @Override
     public void sleep(int ticks) {
-        this.max_caffeine = Math.max(0, max_caffeine - (float) ticks / 1000.0F);
-        this.caffeine = Math.max(0, caffeine - (float) ticks / 1000.0F);
-        this.caffeine_effect = false;
-        this.sleeping_pills = Math.max(0, sleeping_pills - (float) ticks / 1000.0F);
-        this.max_sleeping_pills = Math.max(0, max_sleeping_pills - (float) ticks / 1000.0F);
+        super.sleep(ticks);
         this.amount = Math.max(0, amount - (float) ticks / 8000.0F);
+    }
+
+    @Override
+    public void onSleep(int sumTicks) {
+        super.onSleep(sumTicks);
+        if(sumTicks >= 1000) {
+            this.max_caffeine = 0;
+            this.caffeine = 0;
+            this.caffeine_effect = true;
+            this.sleeping_pills = 0;
+            this.max_sleeping_pills = 0;
+            this.sleeping_pills_effect = true;
+        }
     }
 
     @Override
@@ -119,6 +136,9 @@ public class Drowsiness extends Moodle {
             if(this.max_sleeping_pills != 0) {
                 builder.append("max_sleeping_pills", String.valueOf(this.max_sleeping_pills));
             }
+            if(!this.sleeping_pills_effect) {
+                builder.append("sleeping_pills_effect", String.valueOf(this.sleeping_pills_effect));
+            }
 
             return builder.toString();
         } else {
@@ -134,6 +154,8 @@ public class Drowsiness extends Moodle {
             this.sleeping_pills = 0;
             this.max_sleeping_pills = 0;
             this.amount = 0;
+            this.sleeping_pills_effect = true;
+            this.caffeine_effect = true;
             return;
         }
         String amount = Json.getValue(value, "amount");
@@ -142,6 +164,7 @@ public class Drowsiness extends Moodle {
         String caffeine_effect = Json.getValue(value, "caffeine_effect");
         String sleeping_pills = Json.getValue(value, "sleeping_pills");
         String max_sleeping_pills = Json.getValue(value, "max_sleeping_pills");
+        String sleeping_pills_effect = Json.getValue(value, "sleeping_pills_effect");
 
         if(amount != null){
             this.setAmount(Float.parseFloat(amount));
@@ -167,10 +190,15 @@ public class Drowsiness extends Moodle {
             this.sleeping_pills = 0;
             this.max_sleeping_pills = 0;
         }
+        if(sleeping_pills_effect != null) {
+            this.sleeping_pills_effect = Boolean.parseBoolean(sleeping_pills_effect);
+        } else {
+            this.sleeping_pills_effect = true;
+        }
     }
 
     public int getAmplifier() {
-        return (int) (amount - caffeine);
+        return (int) (amount - caffeine + sleeping_pills);
     }
 
     public void addCaffeine(float amount) {
@@ -180,6 +208,7 @@ public class Drowsiness extends Moodle {
 
     public void addSleepingPills(float amount) {
         this.max_sleeping_pills += amount;
+        this.sleeping_pills_effect = true;
     }
 
     public boolean hasCaffeine() {

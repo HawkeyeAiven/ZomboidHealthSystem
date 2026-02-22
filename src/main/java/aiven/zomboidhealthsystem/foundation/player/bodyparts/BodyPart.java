@@ -2,7 +2,7 @@ package aiven.zomboidhealthsystem.foundation.player.bodyparts;
 
 import aiven.zomboidhealthsystem.Config;
 import aiven.zomboidhealthsystem.ModDamageTypes;
-import aiven.zomboidhealthsystem.foundation.items.BandageItem;
+import aiven.zomboidhealthsystem.foundation.item.BandageItem;
 import aiven.zomboidhealthsystem.foundation.player.Health;
 import aiven.zomboidhealthsystem.foundation.utility.EffectAmplifiers;
 import aiven.zomboidhealthsystem.foundation.utility.Util;
@@ -116,8 +116,12 @@ public abstract class BodyPart {
             return 0;
         }
 
+        if(this.getHp() <= 1) {
+            return 1.0F;
+        }
+
         float chance = Config.AVERAGE_BLEEDING_CHANCE.getValue() * damage;
-        chance *= Math.max(1, (this.getMaxHp() - this.getHp()) * 0.75F);
+        chance *= Math.max(1, (this.getMaxHp() - this.getHp()) * 0.875F);
 
         if((source.isOf(DamageTypes.FALL) || source.isOf(DamageTypes.HOT_FLOOR)) && !getHealth().getPlayer().isCrawling()) {
             return chance / 2.25F;
@@ -198,7 +202,7 @@ public abstract class BodyPart {
     public void sleep(int ticks) {
         this.heal(0.75F / 8000F * ticks);
         if(this.isBandaged()) {
-            this.setBleeding(this.getBleeding() - (0.3F / 10000 * ticks));
+            this.setBleeding(this.getBleeding() - (1.0F / 8000 * ticks));
         }
     }
 

@@ -1,4 +1,4 @@
-package aiven.zomboidhealthsystem.foundation.mixin;
+package aiven.zomboidhealthsystem.foundation.mixin.client;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;

@@ -1,6 +1,6 @@
 package aiven.zomboidhealthsystem;
 
-import aiven.zomboidhealthsystem.foundation.items.*;
+import aiven.zomboidhealthsystem.foundation.item.*;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.Item;
@@ -21,9 +21,10 @@ public class ModItems {
 
     public static Item PLASTER = register(new Plaster(),"plaster");
 
-    public static Item COFFEE = register(new Coffee(),"coffee");
-    public static Item PURIFIED_WATER_BOTTLE = register(new PurifiedWaterBottle(),"purified_water_bottle");
-    
+    public static Item CUP_OF_COFFEE = register(new CupOfCoffee(),"cup_of_coffee");
+    public static Item BOTTLE_OF_PURIFIED_WATER = register(new BottleOfPurifiedWater(),"bottle_of_purified_water");
+    public static Item BOTTLE_OF_WINE = register(new BottleOfWine(), "bottle_of_wine");
+
     public static Item EMPTY_CUP = register(new Item(new FabricItemSettings().maxCount(1)),"empty_cup");
 
     public static Item PAINKILLERS = register(new Painkillers(),"painkillers");

@@ -21,6 +21,6 @@ public class ZomboidHealthSystemClient implements ClientModInitializer {
     }
 
     public static ClientWorldInfo WORLD_INFO = new ClientWorldInfo();
-    public static Health HEALTH = new Health(null);
+    public static Health HEALTH = null;
     public static Hud HUD = new Hud(MinecraftClient.getInstance());
 }

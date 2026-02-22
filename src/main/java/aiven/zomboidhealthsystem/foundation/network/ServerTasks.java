@@ -4,7 +4,7 @@ import aiven.zomboidhealthsystem.Config;
 import aiven.zomboidhealthsystem.ModItems;
 import aiven.zomboidhealthsystem.ZomboidHealthSystem;
 import aiven.zomboidhealthsystem.foundation.world.ModServer;
-import aiven.zomboidhealthsystem.foundation.items.BandageItem;
+import aiven.zomboidhealthsystem.foundation.item.BandageItem;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.player.PlayerInventory;

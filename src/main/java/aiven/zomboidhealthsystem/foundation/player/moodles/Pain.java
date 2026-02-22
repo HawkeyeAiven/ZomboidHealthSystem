@@ -21,12 +21,14 @@ public class Pain extends Moodle {
 
     @Override
     public void update() {
+        super.update();
+
         PlayerEntity player = this.getHealth().getPlayer();
 
         if(painkillerEffect) {
             if(painkillerAmount < painkillerMaxAmount) {
                 painkillerAmount += 1.0F / (60 * 20) * Health.UPDATE_FREQUENCY;
-            } else {
+            } else if(painkillerAmount != 0){
                 painkillerEffect = false;
             }
         } else {
@@ -43,6 +45,15 @@ public class Pain extends Moodle {
         if(player.isSleeping() && Config.PAIN_KEEPS_AWAKE.getValue() && this.getAmount() >= 1 && getHealth().getDrowsiness().getAmplifier() < 2){
             player.wakeUp();
             player.sendMessage(Text.translatable("zomboidhealthsystem.message.pain_not_sleep"),true);
+        }
+    }
+
+    @Override
+    public void onSleep(int sumTicks) {
+        if(sumTicks >= 3000) {
+            painkillerEffect = true;
+            painkillerAmount = 0;
+            painkillerMaxAmount = 0;
         }
     }
 
@@ -117,6 +128,6 @@ public class Pain extends Moodle {
         for (BodyPart part : this.getHealth().getBodyParts()) {
             pain += part.getPain() / 2;
         }
-        return pain / (painkillerAmount + 1);
+        return pain / (painkillerAmount + 1) * getMultiplier();
     }
 }

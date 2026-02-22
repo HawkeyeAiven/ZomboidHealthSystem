@@ -5,6 +5,7 @@ import aiven.zomboidhealthsystem.foundation.player.Health;
 import aiven.zomboidhealthsystem.foundation.player.bodyparts.BodyPart;
 import aiven.zomboidhealthsystem.foundation.player.moodles.Exhaustion;
 import aiven.zomboidhealthsystem.foundation.player.moodles.Thirst;
+import aiven.zomboidhealthsystem.foundation.utility.ItemUtil;
 import aiven.zomboidhealthsystem.foundation.world.ModServer;
 import com.mojang.datafixers.util.Either;
 import net.minecraft.advancement.criterion.Criteria;
@@ -14,6 +15,7 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.player.HungerManager;
 import net.minecraft.entity.player.ItemCooldownManager;
@@ -108,7 +110,7 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
      * @reason есть
      */
     @Overwrite
-    public boolean damage(DamageSource source,float amount) throws IOException {
+    public boolean damage(DamageSource source, float amount) throws IOException {
         if (this.isInvulnerableTo(source)) {
             return false;
         } else if (this.abilities.invulnerable && !source.isIn(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
@@ -265,9 +267,20 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
     private void trySleep(BlockPos pos, CallbackInfoReturnable<Either<PlayerEntity.SleepFailureReason, Unit>> cir) {
         this.sleepTimer = 0;
         if(!getWorld().isClient()) {
-            if(getModHealth().getDrowsiness().getAmplifier() < Config.MIN_DROWSINESS_FOR_SLEEP.getValue()) {
+            if(getModHealth().getDrowsiness().getAmplifier() < Config.MIN_DROWSINESS_FOR_SLEEP.getValue() && getModHealth().getDrunkenness().getAmount() < 1) {
                 this.toPlayerEntity().wakeUp();
                 this.sendMessage(Text.translatable("zomboidhealthsystem.message.dont_want_sleep"), true);
+            }
+        }
+    }
+
+    @Inject(at = @At("HEAD"), method = "eatFood")
+    private void eatFood(World world, ItemStack stack, CallbackInfoReturnable<ItemStack> cir) {
+        if(!world.isClient) {
+            Item item = stack.getItem();
+            float amount = ItemUtil.getThirst(item);
+            if(amount != -1) {
+                getModHealth().getThirst().drink(amount, true);
             }
         }
     }
@@ -299,21 +312,6 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
                 if(part.isBandaged()) {
                     toPlayerEntity().dropItem(part.unBandage().getDefaultStack(), true, true);
                 }
-            }
-        }
-    }
-
-    @Inject(at = @At("HEAD"), method = "eatFood")
-    private void eatFood(World world, ItemStack stack, CallbackInfoReturnable<ItemStack> cir) {
-        if(!getWorld().isClient()) {
-            Thirst thirst = getModHealth().getThirst();
-            Item item = stack.getItem();
-            if (item.equals(Items.APPLE)) {
-                thirst.drink(0.2F, true);
-            } else if(item.equals(Items.MUSHROOM_STEW)) {
-                thirst.drink(0.4F, true);
-            } else if(item.equals(Items.MELON_SLICE)) {
-                thirst.drink(0.4F, true);
             }
         }
     }

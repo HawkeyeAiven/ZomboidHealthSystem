@@ -1,4 +1,4 @@
-package aiven.zomboidhealthsystem.foundation.items;
+package aiven.zomboidhealthsystem.foundation.item;
 
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ArmorItem;

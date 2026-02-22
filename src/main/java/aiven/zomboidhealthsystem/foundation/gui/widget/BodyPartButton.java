@@ -13,7 +13,7 @@ public class BodyPartButton extends ModClickableWidget {
     private final ColoredText scrape = new ColoredText(0xFFc81414, Text.translatable("zomboidhealthsystem.health.hud.scrape"));
     private final ColoredText injury = new ColoredText(0xFFc81414, Text.translatable("zomboidhealthsystem.health.hud.injury"));
     private final ColoredText wound = new ColoredText(0xFFc81414,Text.translatable("zomboidhealthsystem.health.hud.wound"));
-    private final ColoredText crack = new ColoredText(0xFFc81414,Text.translatable("zomboidhealthsystem.health.hud.crack"));
+    private final ColoredText crack = new ColoredText(0xFFc81414,Text.translatable("zomboidhealthsystem.health.hud.deep_wound"));
     private final ColoredText laceration = new ColoredText(0xFFc81414, Text.translatable("zomboidhealthsystem.health.hud.laceration"));
     private final ColoredText fracture = new ColoredText(0xFFc81414, Text.translatable("zomboidhealthsystem.health.hud.fracture"));
     private final ColoredText deep_fracture = new ColoredText(0xFFc81414, Text.translatable("zomboidhealthsystem.health.hud.deep_fracture"));

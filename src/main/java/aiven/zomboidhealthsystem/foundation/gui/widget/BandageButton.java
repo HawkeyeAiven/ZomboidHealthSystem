@@ -1,6 +1,6 @@
 package aiven.zomboidhealthsystem.foundation.gui.widget;
 
-import aiven.zomboidhealthsystem.foundation.items.BandageItem;
+import aiven.zomboidhealthsystem.foundation.item.BandageItem;
 import aiven.zomboidhealthsystem.foundation.network.ClientNetwork;
 import aiven.zomboidhealthsystem.foundation.network.PacketIdentifiers;
 import aiven.zomboidhealthsystem.foundation.player.bodyparts.BodyPart;

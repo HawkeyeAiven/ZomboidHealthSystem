@@ -5,7 +5,7 @@ import aiven.zomboidhealthsystem.ModDamageTypes;
 import aiven.zomboidhealthsystem.ZomboidHealthSystem;
 import aiven.zomboidhealthsystem.foundation.player.bodyparts.*;
 import aiven.zomboidhealthsystem.foundation.player.moodles.*;
-import aiven.zomboidhealthsystem.foundation.items.BandageItem;
+import aiven.zomboidhealthsystem.foundation.item.BandageItem;
 import aiven.zomboidhealthsystem.foundation.utility.EffectAmplifiers;
 import aiven.zomboidhealthsystem.foundation.utility.Util;
 import aiven.zomboidhealthsystem.foundation.world.ModServer;
@@ -17,6 +17,7 @@ import net.minecraft.entity.damage.DamageType;
 import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.tag.DamageTypeTags;
@@ -78,6 +79,8 @@ public class Health {
     private final Wet wet;
     private final Hunger hunger;
     private final Wind wind;
+    private final Drunkenness drunkenness;
+    private final Zombification zombification;
 
     private final Moodle[] moodles;
     private final Temperature temperature;
@@ -123,8 +126,10 @@ public class Health {
         this.wet = new Wet(this);
         this.hunger = new Hunger(this);
         this.wind = new Wind(this);
+        this.drunkenness = new Drunkenness(this);
+        this.zombification = new Zombification(this);
 
-        this.moodles = new Moodle[]{pain,drowsiness,thirst,exhaustion,temperature,cold,wet,hunger,wind};
+        this.moodles = new Moodle[]{pain,drowsiness,thirst,exhaustion,temperature,cold,wet,hunger,wind,drunkenness,zombification};
     }
 
     public void tick() {
@@ -199,6 +204,10 @@ public class Health {
     }
 
     public void damage(DamageSource source, float amount) {
+        if(source.getAttacker() != null && source.getAttacker() instanceof ZombieEntity) {
+            getZombification().onAttackByZombie(amount);
+        }
+
         float damageAmount = (float) Util.floor(amount, 10);
 
         this.getPlayer().getDamageTracker().onDamage(source,amount);
@@ -336,6 +345,14 @@ public class Health {
 
     public Wind getWind() {
         return wind;
+    }
+
+    public Drunkenness getDrunkenness() {
+        return drunkenness;
+    }
+
+    public Zombification getZombification() {
+        return zombification;
     }
 
     public Head getHead() {

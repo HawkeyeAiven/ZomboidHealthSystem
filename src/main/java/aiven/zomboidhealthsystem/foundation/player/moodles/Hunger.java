@@ -19,33 +19,35 @@ public class Hunger extends Moodle {
 
     @Override
     public void update() {
+        super.update();
+
         this.addAmount(1.0F / 15000 * getMultiplier() * (this.getAmount() < 0 ? 2.25F : 1.0F) * Config.HUNGER_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
 
         if(amount >= 1.0F) {
             this.getHealth().getExhaustion().addMultiplier(this, (getAmount() / 3) + 1);
             if(amount >= 2.5F) {
                 if(once(5 * 60 * 20)) {
-                    getHealth().addStatusEffect(StatusEffects.NAUSEA, 0, 3 * 20);
+                    getHealth().addStatusEffect(StatusEffects.NAUSEA, 0, 10 * 20);
                 }
                 if(amount >= 4.0F) {
                     getHealth().addStatusEffect(StatusEffects.SLOWNESS, (int)(amount / 3) - 1, 15 * 20);
                     if(amount >= 6.0F) {
                         getHealth().addStatusEffect(StatusEffects.MINING_FATIGUE,(int) (amount / 4) - 1, 15 * 20);
                         if(once(5 * 60 * 20)) {
-                            getHealth().addStatusEffect(StatusEffects.NAUSEA, 0, 3 * 20);
+                            getHealth().addStatusEffect(StatusEffects.NAUSEA, 0, 10 * 20);
                         }
                         if(once(5 * 60 * 20)) {
-                            getHealth().addStatusEffect(StatusEffects.DARKNESS, 0, 3 * 20);
+                            getHealth().addStatusEffect(StatusEffects.DARKNESS, 0, 5 * 20);
                         }
                         if (once(5 * 60 * 20)) {
                             getHealth().stumble(0);
                         }
                         if(amount >= 8.4F) {
                             if(once(3 * 60 * 20)) {
-                                getHealth().addStatusEffect(StatusEffects.NAUSEA, 0, 3 * 20);
+                                getHealth().addStatusEffect(StatusEffects.NAUSEA, 0, 15 * 20);
                             }
                             if(once(3 * 60 * 20)) {
-                                getHealth().addStatusEffect(StatusEffects.DARKNESS, 0, 3 * 20);
+                                getHealth().addStatusEffect(StatusEffects.DARKNESS, 0, 10 * 20);
                             }
                             if (once(3 * 60 * 20)) {
                                 getHealth().stumble(0);
@@ -62,7 +64,8 @@ public class Hunger extends Moodle {
 
     @Override
     public void sleep(int ticks) {
-        this.addAmount(0.5F / 8000 * ticks * getAmount() < 0 ? 2.25F : 1.0F);
+        super.sleep(ticks);
+        this.addAmount(0.5F / 8000 * ticks * (getAmount() < 0 ? 2.25F : 1.0F));
     }
 
     @Override
@@ -79,7 +82,7 @@ public class Hunger extends Moodle {
         if(getAmount() > 0) {
             return super.getMoodleIconText();
         } else {
-            return Text.translatable("zomboidhealthsystem.text.saturation").getString();
+            return Text.translatable("zomboidhealthsystem.moodle.saturation").getString() + " " + (-getAmplifier());
         }
     }
 

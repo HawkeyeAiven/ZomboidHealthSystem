@@ -17,6 +17,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ClientPlayerEntityMixin {
     @Inject(at = @At("TAIL"), method = "<init>")
     private void init(MinecraftClient client, ClientWorld world, ClientPlayNetworkHandler networkHandler, StatHandler stats, ClientRecipeBook recipeBook, boolean lastSneaking, boolean lastSprinting, CallbackInfo ci) {
-        ZomboidHealthSystemClient.HEALTH = new Health(null);
+        ZomboidHealthSystemClient.HEALTH = new Health((ClientPlayerEntity)((Object) this));
     }
 }

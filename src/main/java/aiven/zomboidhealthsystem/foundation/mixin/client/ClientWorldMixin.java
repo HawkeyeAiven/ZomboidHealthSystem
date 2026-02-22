@@ -1,4 +1,4 @@
-package aiven.zomboidhealthsystem.foundation.mixin;
+package aiven.zomboidhealthsystem.foundation.mixin.client;
 
 import aiven.zomboidhealthsystem.ZomboidHealthSystemClient;
 import aiven.zomboidhealthsystem.foundation.client.ClientWorldInfo;

@@ -9,11 +9,10 @@
     "ClientPlayerEntityMixin",
     "EntityMixin",
     "HungerManagerMixin",
+    "ItemMixin",
     "LivingEntityMixin",
-    "MilkBucketItem",
     "MinecraftServerMixin",
     "PlayerEntityMixin",
-    "PotionItemMixin",
     "ServerPlayerEntityMixin",
     "ServerWorldMixin",
     "WorldMixin"
@@ -25,9 +24,9 @@
     "requireAnnotations": false
   },
   "client": [
-    "ClientWorldMixin",
-    "CreateWorldScreenMixin",
-    "InGameHudMixin",
-    "ScreenMixin"
+    "client.ClientWorldMixin",
+    "client.CreateWorldScreenMixin",
+    "client.InGameHudMixin",
+    "client.ScreenMixin"
   ]
 }

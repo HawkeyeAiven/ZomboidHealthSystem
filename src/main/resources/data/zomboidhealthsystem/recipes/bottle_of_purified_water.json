@@ -4,7 +4,7 @@
         "item": "minecraft:potion",
         "nbt": "{Potion:\"minecraft:water\"}"
     },
-    "result": "zomboidhealthsystem:purified_water_bottle",
+    "result": "zomboidhealthsystem:bottle_of_purified_water",
     "experience": 0,
     "cookingtime": 200
 }

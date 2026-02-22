@@ -5,6 +5,7 @@ import aiven.zomboidhealthsystem.ModDamageTypes;
 import aiven.zomboidhealthsystem.foundation.player.Health;
 import aiven.zomboidhealthsystem.foundation.utility.Util;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.item.Item;
 
 public class Thirst extends Moodle {
 
@@ -23,6 +24,8 @@ public class Thirst extends Moodle {
 
     @Override
     public void update() {
+        super.update();
+
         this.addAmount(1.0F / 15000.0F * getMultiplier() * Config.THIRST_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
 
         this.getHealth().getExhaustion().addMultiplier(this, 1.0F);
@@ -30,15 +33,20 @@ public class Thirst extends Moodle {
         if (amount >= 1) {
             this.getHealth().getExhaustion().addMultiplier(this, getAmount());
             if (amount >= 2) {
-
                 if (once(4 * 60 * 20)) {
-                    this.getHealth().addStatusEffect(StatusEffects.BLINDNESS, 0, 10 * 20);
+                    this.getHealth().addStatusEffect(StatusEffects.BLINDNESS, 0, 5 * 20);
+                }
+                if (once(4 * 60 * 20)) {
+                    this.getHealth().addStatusEffect(StatusEffects.NAUSEA, 0, 10 * 20);
                 }
 
                 if (amount >= 2.4F) {
                     this.getHealth().addStatusEffect(StatusEffects.SLOWNESS, (int) (amount - 1.6F), 15 * 20);
                     if (once(2 * 60 * 20)) {
                         this.getHealth().stumble(0);
+                    }
+                    if (once(2 * 60 * 20)) {
+                        this.getHealth().addStatusEffect(StatusEffects.NAUSEA, 0, 10 * 20);
                     }
 
                     if (amount >= 2.8F) {
@@ -65,6 +73,7 @@ public class Thirst extends Moodle {
 
     @Override
     public void sleep(int ticks) {
+        super.sleep(ticks);
         this.setAmount(this.getAmount() + 0.35F / 8000 * ticks);
     }
 }

@@ -1,8 +1,9 @@
-package aiven.zomboidhealthsystem.foundation.items;
+package aiven.zomboidhealthsystem.foundation.item;
+
 
 import aiven.zomboidhealthsystem.ModItems;
 
-public class DirtyRag extends BandageItem {
+public class DirtyBandage extends BandageItem{
     @Override
     public BandageItem getDirtyBandageItem() {
         return this;
@@ -10,11 +11,11 @@ public class DirtyRag extends BandageItem {
 
     @Override
     public float getHealAmount() {
-        return 1.25f;
+        return 2;
     }
 
     @Override
     public BandageItem getCleanBandageItem() {
-        return (BandageItem) ModItems.RAG;
+        return (BandageItem) ModItems.BANDAGE;
     }
 }

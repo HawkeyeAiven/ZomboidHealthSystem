@@ -8,7 +8,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 
 public class Wet extends Moodle {
-    private static final float SPEED = 1.0F / (45 * 20) * Config.WET_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY;
     private static final float MAX_AMOUNT = 3.5F;
 
     public Wet(Health health) {
@@ -17,6 +16,8 @@ public class Wet extends Moodle {
 
     @Override
     public void update() {
+        super.update();
+
         PlayerEntity player = getHealth().getPlayer();
         World world = player.getWorld();
 
@@ -24,10 +25,10 @@ public class Wet extends Moodle {
             this.setAmount(MAX_AMOUNT);
         } else if(world.hasRain(player.getBlockPos())){
             if(Util.getArmorCount(getPlayer()) < 3) {
-                this.addAmount(SPEED);
+                this.addAmount(1.0F / (45 * 20) * Config.WET_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
             }
         } else {
-            this.addAmount(-SPEED);
+            this.addAmount(-1.0F / (45 * 20) * Config.WET_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
         }
 
         if(getHealth().getTemperature().getAmount() > Temperature.AVERAGE_TEMPERATURE_BODY + 1.0F && this.getAmount() < 2.1F) {

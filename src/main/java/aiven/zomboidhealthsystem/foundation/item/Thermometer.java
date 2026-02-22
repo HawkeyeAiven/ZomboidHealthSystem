@@ -1,4 +1,4 @@
-package aiven.zomboidhealthsystem.foundation.items;
+package aiven.zomboidhealthsystem.foundation.item;
 
 import aiven.zomboidhealthsystem.foundation.player.Health;
 import aiven.zomboidhealthsystem.foundation.world.ModServer;

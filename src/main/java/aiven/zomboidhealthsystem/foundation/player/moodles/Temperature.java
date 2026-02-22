@@ -37,6 +37,8 @@ public class Temperature extends Moodle {
 
     @Override
     public void update() {
+        super.update();
+
         float deltaTemp = Math.abs(this.getAmount() - AVERAGE_TEMPERATURE_BODY);
         boolean isOverWorld = isOverWorld();
         if(ModServer.WORLD_SETTINGS.hasTemperature()) {
@@ -93,20 +95,20 @@ public class Temperature extends Moodle {
                     this.getHealth().addStatusEffect(StatusEffects.MINING_FATIGUE, (int) deltaTemp / 2 - 1, 15 * 20);
                     this.getHealth().addStatusEffect(StatusEffects.WEAKNESS, (int) deltaTemp / 2 - 1, 15 * 20);
                     if (once(2 * 60 * 20)) {
-                        this.getHealth().addStatusEffect(StatusEffects.NAUSEA, 0, 5);
+                        this.getHealth().addStatusEffect(StatusEffects.NAUSEA, 0, 10 * 20);
                     }
                     if (once(2 * 60 * 20)) {
-                        this.getHealth().addStatusEffect(StatusEffects.DARKNESS, 0, 5);
+                        this.getHealth().addStatusEffect(StatusEffects.DARKNESS, 0, 5 * 20);
                     }
                     if (deltaTemp >= 4.5F) {
                         if (once(2 * 60 * 20)) {
                             getHealth().stumble(0);
                         }
                         if (once(60 * 20)) {
-                            this.getHealth().addStatusEffect(StatusEffects.NAUSEA, 0, 5);
+                            this.getHealth().addStatusEffect(StatusEffects.NAUSEA, 0, 10 * 20);
                         }
                         if (once(60 * 20)) {
-                            this.getHealth().addStatusEffect(StatusEffects.DARKNESS, 0, 5);
+                            this.getHealth().addStatusEffect(StatusEffects.DARKNESS, 0, 5 * 20);
                         }
                     }
                 }
@@ -139,9 +141,9 @@ public class Temperature extends Moodle {
     @Override
     public String getMoodleIconText() {
         if(this.getAmount() > AVERAGE_TEMPERATURE_BODY + 1.5F) {
-            return Text.translatable("zomboidhealthsystem.text.hyperthermia").getString();
+            return Text.translatable("zomboidhealthsystem.moodle.hyperthermia").getString() + " " + getAmplifier();
         } else if(this.getAmount() < AVERAGE_TEMPERATURE_BODY - 1.5F) {
-            return Text.translatable("zomboidhealthsystem.text.hypothermia").getString();
+            return Text.translatable("zomboidhealthsystem.moodle.hypothermia").getString() + " " + getAmplifier();
         } else {
             return null;
         }

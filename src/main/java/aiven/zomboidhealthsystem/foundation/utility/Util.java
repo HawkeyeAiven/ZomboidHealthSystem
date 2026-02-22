@@ -1,7 +1,7 @@
 package aiven.zomboidhealthsystem.foundation.utility;
 
 import aiven.zomboidhealthsystem.ZomboidHealthSystem;
-import aiven.zomboidhealthsystem.foundation.items.BandageItem;
+import aiven.zomboidhealthsystem.foundation.item.BandageItem;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;

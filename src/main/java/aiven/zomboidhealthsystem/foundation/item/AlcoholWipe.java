@@ -1,16 +1,9 @@
-package aiven.zomboidhealthsystem.foundation.items;
+package aiven.zomboidhealthsystem.foundation.item;
 
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.item.ToolItem;
 import net.minecraft.item.ToolMaterial;
 import net.minecraft.recipe.Ingredient;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
-import net.minecraft.world.World;
 
 public class AlcoholWipe extends ToolItem {
     public static final int DISINFECT_COOLDOWN_TIME = 3 * 20;

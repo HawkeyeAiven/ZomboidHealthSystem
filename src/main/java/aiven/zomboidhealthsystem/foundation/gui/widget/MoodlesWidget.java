@@ -49,33 +49,21 @@ public class MoodlesWidget extends ModClickableWidget {
 
             this.height += SIZE;
 
-            this.iconNames.add(Text.translatable("zomboidhealthsystem.text.bleeding").getString());
+            this.iconNames.add(Text.translatable("zomboidhealthsystem.moodle.bleeding").getString());
         }
 
         for(Moodle moodle : health.getSortMoodleArray()) {
             if(moodle.showIcon()) {
-                int amplifier = moodle.getAmplifier();
-                amplifier = Math.min(amplifier, 4);
-                amplifier = Math.max(amplifier, -4);
-                if(amplifier > 0) {
-                    context.drawTexture(
-                            Identifier.of(ZomboidHealthSystem.ID, "textures/moodle/moodle_bkg_bad_%s.png".formatted(amplifier)),
-                            this.getX(), this.getY() + getHeight(), 0,0, SIZE, SIZE, SIZE, SIZE
-                    );
-                } else {
-                    context.drawTexture(
-                            Identifier.of(ZomboidHealthSystem.ID, "textures/moodle/moodle_bkg_good_%s.png".formatted(-amplifier)),
-                            this.getX(), this.getY() + getHeight(), 0,0, SIZE, SIZE, SIZE, SIZE
-                    );
-                }
+                context.drawTexture(
+                        moodle.getBackgroundTexture(),
+                        this.getX(), this.getY() + getHeight(), 0,0, SIZE, SIZE, SIZE, SIZE
+                );
                 context.drawTexture(
                         moodle.getMoodleIconTexture(),
                         this.getX(), this.getY() + getHeight(), 0, 0, SIZE, SIZE, SIZE, SIZE
                 );
-
                 this.height += SIZE;
-
-                this.iconNames.add(moodle.getMoodleIconText() + " " + Math.abs(moodle.getAmplifier()));
+                this.iconNames.add(moodle.getMoodleIconText());
             }
         }
         if(health.getTemperature().isFeelingHot() || health.getTemperature().isFeelingCold()) {
@@ -88,13 +76,13 @@ public class MoodlesWidget extends ModClickableWidget {
                         Identifier.of(ZomboidHealthSystem.ID, "textures/moodle/moodle_icon_hot_weather.png"),
                         this.getX(), this.getY() + getHeight(), 0,0, SIZE, SIZE, SIZE, SIZE
                 );
-                this.iconNames.add(Text.translatable("zomboidhealthsystem.text.hot_weather").getString());
+                this.iconNames.add(Text.translatable("zomboidhealthsystem.moodle.hot_weather").getString());
             } else {
                 context.drawTexture(
                         Identifier.of(ZomboidHealthSystem.ID, "textures/moodle/moodle_icon_cold_weather.png"),
                         this.getX(), this.getY() + getHeight(), 0,0, SIZE, SIZE, SIZE, SIZE
                 );
-                this.iconNames.add(Text.translatable("zomboidhealthsystem.text.cold_weather").getString());
+                this.iconNames.add(Text.translatable("zomboidhealthsystem.moodle.cold_weather").getString());
             }
             this.height += SIZE;
         }
@@ -118,7 +106,7 @@ public class MoodlesWidget extends ModClickableWidget {
 
                 height += SIZE;
 
-                this.iconNames.add(Text.translatable("zomboidhealthsystem.text.injured").getString());
+                this.iconNames.add(Text.translatable("zomboidhealthsystem.moodle.injured").getString());
             }
         }
         if(iconName != null && !MinecraftClient.getInstance().mouse.isCursorLocked()) {
@@ -130,7 +118,6 @@ public class MoodlesWidget extends ModClickableWidget {
             context.drawCenteredTextWithShadow(MinecraftClient.getInstance().textRenderer,
                     text, mouseX - (width / 2), mouseY + 6, 0xFFffff
             );
-
         } else {
             iconName = null;
         }

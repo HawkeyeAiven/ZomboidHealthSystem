@@ -1,0 +1,23 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "J",
+        "S",
+        "#"
+    ],
+    "key": {
+        "#": {
+            "item": "zomboidhealthsystem:bottle_of_purified_water"
+        },
+        "S": {
+            "item": "minecraft:sweet_berries"
+        },
+        "J": {
+            "item": "minecraft:sugar"
+        }
+    },
+    "result": {
+        "item": "zomboidhealthsystem:bottle_of_wine",
+        "count": 1
+    }
+}

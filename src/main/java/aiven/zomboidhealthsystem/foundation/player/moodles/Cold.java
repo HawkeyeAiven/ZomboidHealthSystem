@@ -19,6 +19,7 @@ public class Cold extends Moodle {
 
     @Override
     public void update() {
+        super.update();
         float amplifier = (Temperature.AVERAGE_TEMPERATURE_BODY - getHealth().getTemperature().getAmount()) / 1.5F;
 
         if (amplifier >= 1.0F) {
@@ -32,7 +33,7 @@ public class Cold extends Moodle {
 
         if(getAmount() > 1.0F) {
             if(Util.random(1.0F / (4 * 60 * 20) * Health.UPDATE_FREQUENCY * getAmount())) {
-                getHealth().addStatusEffect(StatusEffects.NAUSEA, 0, 5 * 20);
+                getHealth().addStatusEffect(StatusEffects.NAUSEA, 0, 10 * 20);
             }
             if(getAmount() >= 2.0F) {
                 getHealth().addStatusEffect(StatusEffects.SLOWNESS, (int)(getAmplifier() / 3.0F), 15 * 20);
@@ -44,12 +45,14 @@ public class Cold extends Moodle {
     }
 
     @Override
-    public void sleep(int ticks) {
-        float amplifier = (Temperature.AVERAGE_TEMPERATURE_BODY - getHealth().getTemperature().getAmount()) / 1.5F;
-        if(amplifier < 1) {
-            this.addAmount(-1.0F / 8000 * ticks);
-        } else {
-            this.addAmount(amplifier);
+    public void onSleep(int sumTicks) {
+        if(sumTicks >= 8000) {
+            float amplifier = (Temperature.AVERAGE_TEMPERATURE_BODY - getHealth().getTemperature().getAmount()) / 1.5F;
+            if (amplifier < 1) {
+                this.addAmount(-1.0F);
+            } else {
+                this.addAmount(amplifier);
+            }
         }
     }
 

@@ -20,7 +20,7 @@ public abstract class AbstractModScreen extends Screen {
 
     public <T extends ClickableWidget> T addClickableWidget(T clickableWidget){
         if(!clickable_widgets.contains(clickableWidget)) {
-            clickable_widgets.add(clickableWidget);
+            clickable_widgets.add(0, clickableWidget);
         }
         return clickableWidget;
     }
@@ -32,7 +32,10 @@ public abstract class AbstractModScreen extends Screen {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         for(ClickableWidget btn : clickable_widgets){
-            btn.mouseClicked(mouseX, mouseY, button);
+            if(btn.mouseClicked(mouseX, mouseY, button)) {
+                setFocused(btn);
+                break;
+            }
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
@@ -40,7 +43,9 @@ public abstract class AbstractModScreen extends Screen {
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
         for(ClickableWidget btn : clickable_widgets){
-            btn.mouseScrolled(mouseX, mouseY, amount);
+            if(btn.mouseScrolled(mouseX, mouseY, amount)) {
+                break;
+            }
         }
         return super.mouseScrolled(mouseX, mouseY, amount);
     }
@@ -48,7 +53,9 @@ public abstract class AbstractModScreen extends Screen {
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         for(ClickableWidget btn : clickable_widgets){
-            btn.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+            if(btn.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
+                break;
+            }
         }
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
@@ -64,15 +71,17 @@ public abstract class AbstractModScreen extends Screen {
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         for(ClickableWidget btn : clickable_widgets) {
-            btn.mouseReleased(mouseX, mouseY, button);
+            if(btn.mouseReleased(mouseX, mouseY, button)) {
+                break;
+            }
         }
         return super.mouseReleased(mouseX, mouseY, button);
     }
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float tickDelta) {
-        for(ClickableWidget clickableWidget : clickable_widgets){
-            clickableWidget.render(context,mouseX,mouseY,tickDelta);
+        for(int i = clickable_widgets.size() - 1; i >= 0; i--) {
+            clickable_widgets.get(i).render(context, mouseX, mouseY, tickDelta);
         }
     }
 
