@@ -78,27 +78,7 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
 
     @Shadow public abstract boolean isCreative();
 
-    @Shadow public int experiencePickUpDelay;
     @Shadow private int sleepTimer;
-
-    @Shadow protected abstract boolean updateWaterSubmersionState();
-
-    @Shadow public ScreenHandler currentScreenHandler;
-
-    @Shadow protected abstract void closeHandledScreen();
-
-    @Shadow @Final public PlayerScreenHandler playerScreenHandler;
-
-    @Shadow protected abstract void updateCapeAngles();
-
-    @Shadow protected HungerManager hungerManager;
-    @Shadow private ItemStack selectedItem;
-
-    @Shadow public abstract void resetLastAttackedTicks();
-
-    @Shadow protected abstract void updateTurtleHelmet();
-
-    @Shadow @Final private ItemCooldownManager itemCooldownManager;
 
     @Shadow public abstract void sendMessage(Text message, boolean overlay);
 

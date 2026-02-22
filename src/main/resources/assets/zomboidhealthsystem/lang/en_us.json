@@ -46,7 +46,7 @@
   "zomboidhealthsystem.health.left_foot": "Left Foot",
   "zomboidhealthsystem.health.right_foot": "Right Foot",
 
-  "zomboidhealthsystem.tooltip.reduces_pain": "Reduces pain by 50%",
+  "zomboidhealthsystem.tooltip.reduces_pain_by_50": "Reduces pain by 50%",
   "zomboidhealthsystem.tooltip.not_stop_bleeding": "Does not stop the bleeding",
   "zomboidhealthsystem.tooltip.right_click_on_water": "Right-click on the water to clean it",
   "zomboidhealthsystem.tooltip.shows_temp_thermometer": "Shows body temperature and perceived temperature",
@@ -54,6 +54,8 @@
   "zomboidhealthsystem.tooltip.doesnt_stop_bleeding": "Doesn't stop the bleeding",
   "zomboidhealthsystem.tooltip.hunger": "Hunger",
   "zomboidhealthsystem.tooltip.thirst": "Thirst",
+  "zomboidhealthsystem.tooltip.allows_sleep_without_drowsiness": "Allows you to sleep without drowsiness",
+  "zomboidhealthsystem.tooltip.reduces_pain": "Reduces pain",
 
   "zomboidhealthsystem.health.hud.scrape": "Scrape",
   "zomboidhealthsystem.health.hud.injury": "Injury",

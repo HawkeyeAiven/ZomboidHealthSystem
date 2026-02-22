@@ -32,13 +32,13 @@ public class Config {
     public static final FloatCodec DAMAGE_MULTIPLIER = (FloatCodec) CONFIG.add(new FloatCodec("damage_multiplier", 1.1F));
     public static final FloatCodec SLEEPING_PILLS_MULTIPLIER = (FloatCodec) CONFIG.add(new FloatCodec("sleeping_pills_multiplier", 1.0F));
 
-    public static final FloatCodec MAX_SEASON_TEMPERATURE = (FloatCodec) CONFIG.add(new FloatCodec("max_season_temperature", 20.0F));
+    public static final FloatCodec MAX_SEASON_TEMPERATURE = (FloatCodec) CONFIG.add(new FloatCodec("max_season_temperature", 21.1F));
     public static final FloatCodec WIND_CHANCE = (FloatCodec) CONFIG.add(new FloatCodec("wind_chance", 0.33F));
     public static final FloatCodec INFECTION_CHANCE = (FloatCodec) CONFIG.add(new FloatCodec("infection_chance", 1.0F / (1.5F * 60 * 20)));
     public static final FloatCodec COLD_CHANCE = (FloatCodec) CONFIG.add(new FloatCodec("cold_chance", 1.0F / (9 * 60 * 20)));
     public static final FloatCodec AVERAGE_BLEEDING_CHANCE = (FloatCodec) CONFIG.add(new FloatCodec("average_bleeding_chance", 0.25F));
     public static final FloatCodec ZOMBIFICATION_CHANCE = (FloatCodec) CONFIG.add(new FloatCodec("zombification_chance", 0.25F));
-    public static final FloatCodec EXHAUSTION_PER_JUMP = (FloatCodec) CONFIG.add(new FloatCodec("exhaustion_per_jump", 0.04F));
+    public static final FloatCodec EXHAUSTION_PER_JUMP = (FloatCodec) CONFIG.add(new FloatCodec("exhaustion_per_jump", 0.033F));
 
     public static final FloatCodec MIN_COMFORTABLE_TEMP = (FloatCodec) CONFIG.add(new FloatCodec("min_comfortable_temp", 15.0F));
     public static final FloatCodec MAX_COMFORTABLE_TEMP = (FloatCodec) CONFIG.add(new FloatCodec("max_comfortable_temp", 30.0F));

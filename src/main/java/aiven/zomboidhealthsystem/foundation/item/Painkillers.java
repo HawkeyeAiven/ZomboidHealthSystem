@@ -56,7 +56,7 @@ public class Painkillers extends ToolItem {
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        tooltip.add(Text.translatable("zomboidhealthsystem.tooltip.reduces_pain").formatted(Formatting.GOLD));
+        tooltip.add(Text.translatable("zomboidhealthsystem.tooltip.reduces_pain_by_50").formatted(Formatting.GOLD));
         tooltip.add(Text.translatable("zomboidhealthsystem.tooltip.works_over_time").formatted(Formatting.GOLD));
     }
 

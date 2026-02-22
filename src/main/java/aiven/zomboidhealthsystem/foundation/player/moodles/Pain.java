@@ -23,6 +23,8 @@ public class Pain extends Moodle {
     public void update() {
         super.update();
 
+        this.setAmount(getPain());
+
         PlayerEntity player = this.getHealth().getPlayer();
 
         if(painkillerEffect) {
@@ -58,26 +60,26 @@ public class Pain extends Moodle {
     }
 
     @Override
-    public float getAmount() {
-        return getPain();
-    }
-
-    @Override
-    public void setAmount(float amount) {
-    }
-
-    @Override
     public String getId() {
         return "pain";
     }
 
     @Override
     public String getNbt() {
-        if(this.painkillerAmount != 0) {
+        if(getAmount() != 0 || painkillerMaxAmount != 0 || painkillerAmount != 0) {
             JsonBuilder builder = new JsonBuilder();
-            builder.append("painkiller_amount", String.valueOf(painkillerAmount));
-            builder.append("painkiller_max_amount", String.valueOf(painkillerMaxAmount));
-            builder.append("painkiller_effect", String.valueOf(painkillerEffect));
+            if(getAmount() != 0) {
+                builder.append("amount", String.valueOf(getAmount()));
+            }
+            if(painkillerAmount != 0) {
+                builder.append("painkiller_amount", String.valueOf(painkillerAmount));
+            }
+            if(painkillerMaxAmount != 0) {
+                builder.append("painkiller_max_amount", String.valueOf(painkillerMaxAmount));
+            }
+            if(!painkillerEffect) {
+                builder.append("painkiller_effect", String.valueOf(painkillerEffect));
+            }
             return builder.toString();
         } else {
             return null;
@@ -87,28 +89,35 @@ public class Pain extends Moodle {
     @Override
     public void readNbt(String value) {
         if(value == null) {
+            this.amount = 0;
             this.painkillerAmount = 0;
             this.painkillerMaxAmount = 0;
             this.painkillerEffect = false;
             return;
         }
-        String amount = Json.getValue(value, "painkiller_amount");
-        String max_amount = Json.getValue(value, "painkiller_max_amount");
-        String effect = Json.getValue(value, "painkiller_effect");
+        String amount = Json.getValue(value, "amount");
+        String painkiller_amount = Json.getValue(value, "painkiller_amount");
+        String painkiller_max_amount = Json.getValue(value, "painkiller_max_amount");
+        String painkiller_effect = Json.getValue(value, "painkiller_effect");
         if(amount != null) {
-            this.painkillerAmount = Float.parseFloat(amount);
+            this.amount = Float.parseFloat(amount);
+        } else {
+            this.amount = 0;
+        }
+        if(painkiller_amount != null) {
+            this.painkillerAmount = Float.parseFloat(painkiller_amount);
         } else {
             this.painkillerAmount = 0;
         }
-        if(max_amount != null) {
-            this.painkillerMaxAmount = Float.parseFloat(max_amount);
+        if(painkiller_max_amount != null) {
+            this.painkillerMaxAmount = Float.parseFloat(painkiller_max_amount);
         } else {
             this.painkillerMaxAmount = 0;
         }
-        if(effect != null) {
-            this.painkillerEffect = Boolean.parseBoolean(effect);
+        if(painkiller_effect != null) {
+            this.painkillerEffect = Boolean.parseBoolean(painkiller_effect);
         } else {
-            this.painkillerEffect = false;
+            this.painkillerEffect = true;
         }
     }
 
@@ -126,7 +135,12 @@ public class Pain extends Moodle {
     public float getPain() {
         float pain = 0;
         for (BodyPart part : this.getHealth().getBodyParts()) {
-            pain += part.getPain() / 2;
+            float d = (part.getMaxHp() - part.getHp()) / 2.0F * (part.hasInfection() ? 2.0F : 1.0F);
+            if (part.isBandaged())
+                pain += d / 1.25F;
+            else {
+                pain += d;
+            }
         }
         return pain / (painkillerAmount + 1) * getMultiplier();
     }

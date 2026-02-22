@@ -46,7 +46,7 @@
   "zomboidhealthsystem.health.left_foot": "Левая ступня",
   "zomboidhealthsystem.health.right_foot": "Правая ступня",
 
-  "zomboidhealthsystem.tooltip.reduces_pain": "Снижает боль на 50%",
+  "zomboidhealthsystem.tooltip.reduces_pain_by_50": "Снижает боль на 50%",
   "zomboidhealthsystem.tooltip.not_stop_bleeding": "Не останавливает кровотечение",
   "zomboidhealthsystem.tooltip.right_click_on_water": "Пкм по воде, чтобы очистить",
   "zomboidhealthsystem.tooltip.shows_temp_thermometer": "Показывает температуру тела и ощущаемую температуру",
@@ -54,6 +54,8 @@
   "zomboidhealthsystem.tooltip.doesnt_stop_bleeding": "Не останавливает кровотечение",
   "zomboidhealthsystem.tooltip.hunger": "Голод",
   "zomboidhealthsystem.tooltip.thirst": "Жажда",
+  "zomboidhealthsystem.tooltip.allows_sleep_without_drowsiness": "Позволяет спать без сонливости",
+  "zomboidhealthsystem.tooltip.reduces_pain": "Уменьшает боль",
 
   "zomboidhealthsystem.health.hud.scrape": "Царапина",
   "zomboidhealthsystem.health.hud.injury": "Ушиб",

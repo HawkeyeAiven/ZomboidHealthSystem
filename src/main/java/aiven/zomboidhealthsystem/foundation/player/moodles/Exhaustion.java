@@ -28,9 +28,9 @@ public class Exhaustion extends Moodle {
         getHealth().getDrowsiness().addMultiplier(this, getAmount() + 1.0F);
 
         if (this.getPlayer().isSprinting()) {
-            this.addAmount(1.0F / 1000 * getMultiplier() * Config.EXHAUSTION_MULTIPLIER.getValue()  * Health.UPDATE_FREQUENCY);
+            this.addAmount(1.0F / 1100 * getMultiplier() * Config.EXHAUSTION_MULTIPLIER.getValue()  * Health.UPDATE_FREQUENCY);
         } else {
-            this.addAmount(-1.0F / 1000 * (getPlayer().isCrawling() ? 1.25F : 1.0F) * Config.EXHAUSTION_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
+            this.addAmount(-1.0F / 1100 * (getPlayer().isCrawling() ? 1.25F : 1.0F) * Config.EXHAUSTION_MULTIPLIER.getValue() * Health.UPDATE_FREQUENCY);
         }
 
         if (amount >= 1.5F) {
@@ -47,7 +47,7 @@ public class Exhaustion extends Moodle {
     }
 
     public void onJump() {
-        this.addAmount(Config.EXHAUSTION_PER_JUMP.getValue() * this.getMultiplier());
+        this.addAmount(Config.EXHAUSTION_PER_JUMP.getValue() * this.getMultiplier() * Config.EXHAUSTION_MULTIPLIER.getValue());
     }
 
     @Override

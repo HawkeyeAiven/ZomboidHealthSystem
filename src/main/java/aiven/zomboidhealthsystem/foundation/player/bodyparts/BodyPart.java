@@ -238,20 +238,6 @@ public abstract class BodyPart {
         return this.getHp() >= this.getMaxHp();
     }
 
-    public float getPain() {
-        if (this.getHp() <= 0.2f) {
-            return 5f;
-        } else {
-            float d = (this.getMaxHp() - this.getHp());
-
-            if (this.isBandaged())
-                return d / 1.25f;
-            else {
-                return d;
-            }
-        }
-    }
-
     public float getHpPercent() {
         return getHp() / getMaxHp();
     }

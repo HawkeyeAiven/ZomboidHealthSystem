@@ -12,7 +12,7 @@ public class Drunkenness extends Moodle {
     public void update() {
         super.update();
         this.addAmount(-1.0F / (10 * 60 * 20) * Health.UPDATE_FREQUENCY);
-        this.getHealth().getPain().addMultiplier(this, 1.0F / (this.getAmount() * 2 + 1));
+        this.getHealth().getPain().addMultiplier(this, 1.0F / (this.getAmount() * 1.5F + 1));
         this.getHealth().getExhaustion().addMultiplier(this, getAmount() / 2 + 1);
         if(getAmount() >= 1) {
             if(once((int) (2.0F * 60 * 20 / getAmount()))) {

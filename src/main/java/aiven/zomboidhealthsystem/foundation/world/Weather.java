@@ -173,18 +173,18 @@ public final class Weather {
             time = (yearDuration - (seasonDuration / 2)) + (time) + 1;
         }
         float temp;
-        long d;
-        float divisor = 27 / MAX_TEMP;
+        float d;
+        float divisor = 28 / MAX_TEMP;
         if(time > yearDuration / 2){
             time %= yearDuration / 2;
-            d = time / (seasonDuration / 28);
+            d = (float) time / ((float) seasonDuration / 28);
             temp = MAX_TEMP * -1;
-            temp += (float) d / divisor;
+            temp += d / divisor;
         } else {
             time %= yearDuration / 2;
-            d = time / (seasonDuration / 28);
+            d = (float) time / ((float) seasonDuration / 28);
             temp = MAX_TEMP;
-            temp -= (float) d / divisor;
+            temp -= d / divisor;
         }
 
         return temp;
