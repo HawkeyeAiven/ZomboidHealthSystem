@@ -12,7 +12,6 @@ public class PacketIdentifiers {
         public static final Identifier DAMAGE = create("damage");
         public static final Identifier HEALTH = create("health");
         public static final Identifier WORLD = create("world");
-        public static final Identifier RESPAWN = create("respawn");
     }
 
     public static class Server {

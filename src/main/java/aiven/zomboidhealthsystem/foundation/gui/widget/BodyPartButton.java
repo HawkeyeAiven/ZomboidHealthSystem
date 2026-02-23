@@ -74,7 +74,6 @@ public class BodyPartButton extends ModClickableWidget {
         }
 
         this.height = (texts.size() + 1) * 12;
-        this.contentHeight = height;
     }
 
     public boolean hasText() {

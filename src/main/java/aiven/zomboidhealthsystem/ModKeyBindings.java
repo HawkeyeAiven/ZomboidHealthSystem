@@ -1,9 +1,7 @@
 package aiven.zomboidhealthsystem;
 
 import aiven.zomboidhealthsystem.foundation.gui.screen.UI;
-import aiven.zomboidhealthsystem.foundation.gui.screen.UIInfo;
 import aiven.zomboidhealthsystem.foundation.network.ClientNetwork;
-import aiven.zomboidhealthsystem.foundation.gui.screen.UIHealth;
 import aiven.zomboidhealthsystem.foundation.network.ClientPackets;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -12,6 +10,10 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.entity.SpawnGroup;
+import net.minecraft.entity.mob.ZombieEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.world.MobSpawnerLogic;
 import org.lwjgl.glfw.GLFW;
 
 @Environment(EnvType.CLIENT)
@@ -30,11 +32,8 @@ public class ModKeyBindings {
     ));
 
     public static void health(){
-        if(UI.LAST_UI instanceof UIInfo) {
-            MinecraftClient.getInstance().setScreen(new UIInfo(UI.LAST_POS));
-        } else {
-            MinecraftClient.getInstance().setScreen(new UIHealth(UI.LAST_POS));
-        }
+        MinecraftClient.getInstance().setScreen(new UI());
+
     }
 
     public static void crawl(){

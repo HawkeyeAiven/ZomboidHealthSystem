@@ -57,10 +57,6 @@ public class ModServer {
         }
     }
 
-    public static void sendPacketRespawn(ServerPlayerEntity player) {
-        ServerNetwork.send(PacketIdentifiers.Client.RESPAWN, player, PacketByteBufs.create());
-    }
-
     public static void registerPlayer(PlayerEntity player, Health health) {
         Enumeration<PlayerEntity> list = MAP.keys();
         while (list.hasMoreElements()) {

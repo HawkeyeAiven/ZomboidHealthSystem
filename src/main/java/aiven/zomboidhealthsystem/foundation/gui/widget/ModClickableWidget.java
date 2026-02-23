@@ -15,14 +15,9 @@ import net.minecraft.util.Identifier;
 @Environment(EnvType.CLIENT)
 public class ModClickableWidget extends ClickableWidget {
     protected Identifier currentTexture = getTextureOff();
-    protected int contentX, contentY, contentWidth, contentHeight;
 
     public ModClickableWidget(int x, int y, int width, int height, Text message) {
         super(x, y, width, height, message);
-        this.contentX = x;
-        this.contentY = y;
-        this.contentWidth = width;
-        this.contentHeight = height;
     }
 
     protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
@@ -82,45 +77,17 @@ public class ModClickableWidget extends ClickableWidget {
         this.active = false;
     }
 
-    public int getLowestPoint() {
-        return Math.max(getY() + getHeight(), getContentY() + getContentHeight());
-    }
-
-    public int getHighestPoint() {
-        return Math.min(getY(), getContentY());
-    }
-
-    public int getContentX() {
-        return contentX;
-    }
-
-    public int getContentY() {
-        return contentY;
-    }
-
-    public int getContentWidth() {
-        return contentWidth;
-    }
-
-    public int getContentHeight() {
-        return contentHeight;
-    }
-
     @Override
     public void setX(int x) {
-        this.contentX = x;
         super.setX(x);
     }
 
     @Override
     public void setY(int y) {
-        this.contentY = y;
         super.setY(y);
     }
 
     @Override
     protected void appendClickableNarrations(NarrationMessageBuilder builder) {
     }
-
-
 }

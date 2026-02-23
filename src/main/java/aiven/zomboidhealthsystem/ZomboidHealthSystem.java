@@ -31,7 +31,7 @@ public class ZomboidHealthSystem implements ModInitializer {
 
 	public static final String ID = "zomboidhealthsystem";
 	public static final String NAME = "Zomboid Health System";
-	public static final String VERSION = "1.5";
+	public static final String VERSION = "1.5.1";
 	public static final String ID_VER = ID + "-" + VERSION;
 	public static final int UPDATE_FREQUENCY = 5;
 	public static final Logger LOGGER = LoggerFactory.getLogger(ID);

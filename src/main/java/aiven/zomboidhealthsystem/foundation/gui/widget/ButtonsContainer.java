@@ -1,5 +1,6 @@
 package aiven.zomboidhealthsystem.foundation.gui.widget;
 
+import aiven.zomboidhealthsystem.foundation.utility.Util;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -14,10 +15,12 @@ public class ButtonsContainer extends ModClickableWidget {
     public boolean areButtonsHidden;
 
     public CopyOnWriteArrayList<ModClickableWidget> buttons = new CopyOnWriteArrayList<>();
+    private final int buttonHeight;
 
     public ButtonsContainer(int x, int y, int width, int height, Text text, boolean areButtonsHidden){
         super(x, y, width, height, text);
         this.areButtonsHidden = areButtonsHidden;
+        this.buttonHeight = height;
     }
 
     public ButtonsContainer(int x, int y, int width, int height, Text text) {
@@ -33,21 +36,16 @@ public class ButtonsContainer extends ModClickableWidget {
     }
 
     private void updatePoses(){
-        this.contentHeight = 20;
+        this.height = buttonHeight;
         if(!areButtonsHidden) {
             for (ModClickableWidget button : this.buttons) {
                 if (button.visible) {
-                    button.setY(this.getY() + this.contentHeight);
+                    button.setY(this.getY() + this.getHeight());
                     button.setX(this.getX() + 10);
-                    this.contentHeight += button.getLowestPoint() - button.getY();
+                    this.height += button.getHeight();
                 }
             }
         }
-    }
-
-    @Override
-    public int getHeight() {
-        return this.height;
     }
 
     public void hideButtons(){
@@ -68,8 +66,23 @@ public class ButtonsContainer extends ModClickableWidget {
 
     @Override
     protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+        if(isMouseOver(mouseX, mouseY)) {
+            currentTexture = getTextureOn();
+        } else {
+            currentTexture = getTextureOff();
+        }
+        context.drawTexture(
+                currentTexture,
+                this.getX(), this.getY(),0,0, this.getWidth(), this.buttonHeight, this.getWidth(), this.buttonHeight
+        );
+        if(this.getMessage() != null) {
+            context.drawCenteredTextWithShadow(
+                    MinecraftClient.getInstance().textRenderer,
+                    Util.reduce(this.getMessage().getString(), width - 6),
+                    this.getX() + (width / 2), this.getY() + 6, 0xFFffffff
+            );
+        }
         updatePoses();
-        super.renderWidget(context, mouseX, mouseY, delta);
         if(!areButtonsHidden) {
             for (ClickableWidget button : buttons) {
                 if(button.visible) {
@@ -131,5 +144,15 @@ public class ButtonsContainer extends ModClickableWidget {
             return true;
         }
         return bl;
+    }
+
+    @Override
+    protected boolean clicked(double mouseX, double mouseY) {
+        return this.active && this.visible && mouseX >= (double)this.getX() && mouseY >= (double)this.getY() && mouseX < (double)(this.getX() + this.width) && mouseY < (double)(this.getY() + this.buttonHeight);
+    }
+
+    @Override
+    public boolean isMouseOver(double mouseX, double mouseY) {
+        return this.active && this.visible && mouseX >= (double)this.getX() && mouseY >= (double)this.getY() && mouseX < (double)(this.getX() + this.width) && mouseY < (double)(this.getY() + this.buttonHeight);
     }
 }

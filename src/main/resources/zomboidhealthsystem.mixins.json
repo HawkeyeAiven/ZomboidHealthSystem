@@ -15,6 +15,7 @@
     "PlayerEntityMixin",
     "ServerPlayerEntityMixin",
     "ServerWorldMixin",
+    "SpawnGroupMixin",
     "WorldMixin"
   ],
   "injectors": {

@@ -32,9 +32,10 @@ public abstract class AbstractModScreen extends Screen {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         for(ClickableWidget btn : clickable_widgets){
-            if(btn.mouseClicked(mouseX, mouseY, button)) {
-                setFocused(btn);
-                break;
+            if(btn.visible && btn.active) {
+                if(btn.mouseClicked(mouseX, mouseY, button)) {
+                    setFocused(btn);
+                }
             }
         }
         return super.mouseClicked(mouseX, mouseY, button);
@@ -43,8 +44,8 @@ public abstract class AbstractModScreen extends Screen {
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
         for(ClickableWidget btn : clickable_widgets){
-            if(btn.mouseScrolled(mouseX, mouseY, amount)) {
-                break;
+            if(btn.visible && btn.active) {
+                btn.mouseScrolled(mouseX, mouseY, amount);
             }
         }
         return super.mouseScrolled(mouseX, mouseY, amount);
@@ -53,8 +54,8 @@ public abstract class AbstractModScreen extends Screen {
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         for(ClickableWidget btn : clickable_widgets){
-            if(btn.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
-                break;
+            if(btn.visible && btn.active) {
+                btn.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
             }
         }
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
@@ -64,15 +65,17 @@ public abstract class AbstractModScreen extends Screen {
     public void mouseMoved(double mouseX, double mouseY) {
         super.mouseMoved(mouseX, mouseY);
         for(ClickableWidget btn : clickable_widgets) {
-            btn.mouseMoved(mouseX, mouseY);
+            if(btn.visible && btn.active) {
+                btn.mouseMoved(mouseX, mouseY);
+            }
         }
     }
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         for(ClickableWidget btn : clickable_widgets) {
-            if(btn.mouseReleased(mouseX, mouseY, button)) {
-                break;
+            if(btn.visible && btn.active) {
+                btn.mouseReleased(mouseX, mouseY, button);
             }
         }
         return super.mouseReleased(mouseX, mouseY, button);
@@ -81,13 +84,11 @@ public abstract class AbstractModScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float tickDelta) {
         for(int i = clickable_widgets.size() - 1; i >= 0; i--) {
-            clickable_widgets.get(i).render(context, mouseX, mouseY, tickDelta);
+            ClickableWidget btn = clickable_widgets.get(i);
+            if(btn.visible) {
+                clickable_widgets.get(i).render(context, mouseX, mouseY, tickDelta);
+            }
         }
-    }
-
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
