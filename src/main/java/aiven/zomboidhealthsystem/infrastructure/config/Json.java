@@ -78,9 +78,12 @@ public class Json {
         return builder.toString();
     }
 
-    public static String getValue(String config, String name) {
-        StringBuilder content = new StringBuilder(Objects.requireNonNull(config));
-        String str = "\n\t\"" + name + "\": ";
+    public static String getValue(String json, String key) {
+        Objects.requireNonNull(json);
+        Objects.requireNonNull(key);
+
+        StringBuilder content = new StringBuilder(json);
+        String str = "\n\t\"" + key + "\": ";
 
         int startIndex = content.indexOf(str);
         if(startIndex == -1) {
@@ -96,38 +99,19 @@ public class Json {
             }
         }
 
-        int index = startIndex;
-        StringBuilder value = new StringBuilder();
-
-        while (index != endIndex) {
-            value.append(content.charAt(index));
-            index++;
-        }
-
-        return value.toString().trim().replace("\n\t", "\n");
+        return json.substring(startIndex, endIndex).replace("\n\t", "\n");
     }
 
-    public static String[] getKeys(String config) {
-        ArrayList<String> names = new ArrayList<>();
-        StringBuilder content = new StringBuilder(config);
-
-        int lastIndex = 0;
-        int index;
-
-        while ((index = content.indexOf("\n\t\"", lastIndex)) != -1) {
-            index += 3;
-            lastIndex = index + 1;
-
-            StringBuilder name = new StringBuilder();
-            char sym;
-            while ((sym = content.charAt(index)) != '"') {
-                name.append(sym);
-                index++;
-            }
-
-            names.add(name.toString());
+    public static String[] getKeys(String json) {
+        StringBuilder builder = new StringBuilder(Objects.requireNonNull(json));
+        int index = 0;
+        ArrayList<String> keys = new ArrayList<>();
+        String s = "\n\t\"";
+        while ((index = builder.indexOf(s, index)) != -1) {
+            index+=s.length();
+            int endIndex = builder.indexOf("\"", index);
+            keys.add(builder.substring(index, endIndex));
         }
-
-        return names.toArray(new String[names.size()]);
+        return keys.toArray(new String[0]);
     }
 }

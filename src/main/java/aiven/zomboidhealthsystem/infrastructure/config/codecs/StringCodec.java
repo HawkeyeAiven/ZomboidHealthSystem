@@ -8,7 +8,6 @@ public class StringCodec extends Codec {
     @Override
     public String getValue() {
         return (String) super.getValue();
-
     }
 
     @Override

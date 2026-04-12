@@ -26,11 +26,6 @@ public class JsonBuilder {
         return this;
     }
 
-    public JsonBuilder add(String string){
-        result.append(string);
-        return this;
-    }
-
     public int size() {
         return objects;
     }
