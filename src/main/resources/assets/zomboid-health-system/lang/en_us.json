@@ -64,10 +64,11 @@
   "zomboid-health-system.health.hud.deep_wound": "Deep Wound",
   "zomboid-health-system.health.hud.fracture": "Fracture",
   "zomboid-health-system.health.hud.deep_fracture": "Severe Fracture",
-  "zomboid-health-system.health.hud.band_it_up": "Bandage",
+
   "zomboid-health-system.health.hud.bandaged": "Bandaged",
   "zomboid-health-system.health.hud.bleeding": "Bleeding",
   "zomboid-health-system.health.hud.infection": "Infection",
+
   "zomboid-health-system.health.hud.body_status": "Overall Condition",
   "zomboid-health-system.health.hud.completely_health": "Completely Healthy",
   "zomboid-health-system.health.hud.minor_damage": "Minor Injuries",

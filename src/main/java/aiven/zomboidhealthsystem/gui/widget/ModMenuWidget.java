@@ -124,7 +124,7 @@ public class ModMenuWidget extends ModContainer {
 
             context.drawString(
                     Minecraft.getInstance().font,
-                    Component.literal("Wind: " + Util.floor(health.getWind().getAmount(), 10) + "m/s"),
+                    Component.literal("Wind: " + Util.floor(health.getWind().getValue(), 10) + "m/s"),
                     10, 45, 0xFFffffff,true
             );
         }

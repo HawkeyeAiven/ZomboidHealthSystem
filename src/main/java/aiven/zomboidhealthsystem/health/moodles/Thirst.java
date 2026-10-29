@@ -20,13 +20,13 @@ public final class Thirst extends SimpleMoodle {
 
     @Override
     public void update() {
-        this.addAmount(1.0F / 15000.0F * getMultiplier() * Config.getInstance().thirst_multiplier * Health.UPDATE_FREQUENCY);
+        this.addAmount(1.0F / 10000.0F * getMultiplier() * Config.getInstance().thirst_multiplier * Health.UPDATE_FREQUENCY);
 
         this.getHealth().getExhaustion().setMultiplier(this, 1.0F);
 
-        if (amount >= 1) {
-            this.getHealth().getExhaustion().setMultiplier(this, getAmount());
-            if (amount >= 2) {
+        if (value >= 1) {
+            this.getHealth().getExhaustion().setMultiplier(this, getValue());
+            if (value >= 2) {
                 if (once(4 * 60 * 20)) {
                     this.getHealth().addMobEffect(MobEffects.BLINDNESS, 0, 5 * 20);
                 }
@@ -34,16 +34,16 @@ public final class Thirst extends SimpleMoodle {
                     this.getHealth().addMobEffect(MobEffects.CONFUSION, 0, 10 * 20);
                 }
 
-                if (amount >= 2.4F) {
-                    this.getHealth().addMobEffect(MobEffects.MOVEMENT_SLOWDOWN, (int) (amount - 1.6F), 15 * 20);
+                if (value >= 2.4F) {
+                    this.getHealth().addMobEffect(MobEffects.MOVEMENT_SLOWDOWN, (int) (value - 1.6F), 15 * 20);
                     if (once(2 * 60 * 20)) {
                         this.getHealth().addMobEffect(MobEffects.CONFUSION, 0, 10 * 20);
                     }
 
-                    if (amount >= 2.8F) {
+                    if (value >= 2.8F) {
                         this.getHealth().addMobEffect(MobEffects.BLINDNESS, 0, 15 * 20);
 
-                        if (amount >= 3.1F) {
+                        if (value >= 3.1F) {
                             this.getHealth().die(Util.getDamageSource(ModDamageTypes.THIRST, getPlayer().level()));
                         }
                     }
@@ -54,7 +54,7 @@ public final class Thirst extends SimpleMoodle {
 
     @Override
     public void sleep(int sumTicks) {
-        this.setAmount(this.getAmount() + 0.35F / 8000 * sumTicks);
+        this.setValue(this.getValue() + 0.35F / 8000 * sumTicks);
     }
 
     public void drink(float amount, boolean clean) {

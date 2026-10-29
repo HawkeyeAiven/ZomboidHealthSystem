@@ -29,7 +29,7 @@ public final class Wet extends SimpleMoodle {
         Level level = player.level();
 
         if(level.getBlockState(player.blockPosition()).getBlock().equals(Blocks.WATER) && player.getVehicle() == null){
-            this.setAmount(maxValue());
+            this.setValue(maxValue());
         } else if(level.isRainingAt(player.blockPosition())){
             if(Util.getArmorCount(getPlayer()) < 3) {
                 this.addAmount(1.0F / (45 * 20) * Config.getInstance().wet_multiplier * Health.UPDATE_FREQUENCY);
@@ -38,15 +38,15 @@ public final class Wet extends SimpleMoodle {
             this.addAmount(-1.0F / (45 * 20) * Config.getInstance().wet_multiplier * Health.UPDATE_FREQUENCY);
         }
 
-        if(getHealth().getTemperature().getAmount() > Temperature.AVERAGE_TEMPERATURE_BODY + 1.0F && this.getAmount() < 2.1F) {
+        if(getHealth().getTemperature().getValue() > Temperature.AVERAGE_TEMPERATURE_BODY + 1.0F && this.getValue() < 2.1F) {
             this.addAmount(0.035F / 20 * Health.UPDATE_FREQUENCY);
         }
 
-        if(getHealth().getExhaustion().getAmount() >= 1.5F && getAmount() < 1.5F && !getHealth().getTemperature().isFeelingCold()) {
+        if(getHealth().getExhaustion().getValue() >= 1.5F && getValue() < 1.5F && !getHealth().getTemperature().isFeelingCold()) {
             this.getHealth().getWet().addAmount(1 / 500F * (Util.getArmorCount(getPlayer()) >= 3 ? 1.5F : 1.0F) * Health.UPDATE_FREQUENCY);
         }
 
-        getHealth().getTemperature().addHeat(getAmount() * -2.5F);
+        getHealth().getTemperature().addHeat(getValue() * -2.5F);
     }
 
     @Override

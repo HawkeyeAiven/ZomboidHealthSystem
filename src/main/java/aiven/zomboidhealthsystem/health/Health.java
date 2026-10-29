@@ -194,8 +194,8 @@ public final class Health {
                 }
             }
 
-            if(getHunger().getAmount() < 2) {
-                this.healPlayerHp(0.003F * (getHunger().getAmount() < 0 ? 1.25F : 1.0F) * UPDATE_FREQUENCY);
+            if(getHunger().getValue() < 2) {
+                this.healPlayerHp(0.003F * (getHunger().getValue() < 0 ? 1.25F : 1.0F) * UPDATE_FREQUENCY);
             }
 
             for(Moodle moodle : this.moodles){

@@ -18,9 +18,13 @@
     "requireAnnotations": true
   },
   "client": [
+    "client.AbstractBandageItemMixin",
     "client.AbstractClientPlayerMixin",
+    "client.AbstractContainerScreenMixin",
+    "client.EffectRenderingInventoryScreenMixin",
     "client.InGameHudMixin",
+    "client.InventoryScreenMixin",
     "client.LocalPlayerMixin",
-    "client.AbstractBandageItemMixin"
+    "client.ScreenMixin"
   ]
 }

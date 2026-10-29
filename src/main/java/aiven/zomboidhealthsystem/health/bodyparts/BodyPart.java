@@ -91,8 +91,8 @@ public abstract class BodyPart {
                     bandageItem.getHealAmount()
                             / Health.BANDAGE_HEAL_TIME
                             / (this.hasInfection() ? 3 : 1)
-                            * (this.getHealth().getHunger().getAmount() < 0 ? 1.25F : 1.0F)
-                            / (float) Math.sqrt(Math.max(getHealth().getHunger().getAmount(), 1))
+                            * (this.getHealth().getHunger().getValue() < 0 ? 1.25F : 1.0F)
+                            / (float) Math.sqrt(Math.max(getHealth().getHunger().getValue(), 1))
                             * Health.UPDATE_FREQUENCY
             );
 

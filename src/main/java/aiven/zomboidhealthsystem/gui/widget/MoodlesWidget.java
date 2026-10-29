@@ -4,8 +4,8 @@ import aiven.zomboidhealthsystem.Config;
 import aiven.zomboidhealthsystem.ZomboidHealthSystem;
 import aiven.zomboidhealthsystem.health.Health;
 import aiven.zomboidhealthsystem.health.moodles.Moodle;
-
 import aiven.zomboidhealthsystem.utility.ClientUtil;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -34,6 +34,10 @@ public class MoodlesWidget extends AbstractMovableWidget {
         Health health = ClientUtil.getHealth();
 
         if(health == null) {
+            return;
+        }
+
+        if(Minecraft.getInstance().player.isCreative() || Minecraft.getInstance().player.isSpectator()) {
             return;
         }
 

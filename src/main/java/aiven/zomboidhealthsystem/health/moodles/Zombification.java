@@ -22,24 +22,24 @@ public final class Zombification extends SimpleMoodle {
 
     @Override
     public void update() {
-        if(this.getAmount() >= 1) {
+        if(this.getValue() >= 1) {
             this.addAmount(1.0F / (4 * 60 * 20) * Health.UPDATE_FREQUENCY);
-            if(this.getAmount() >= 1.25F) {
-                getHealth().getExhaustion().setMultiplier(this, getAmount());
-                getHealth().getHunger().setMultiplier(this, getAmount() * 2.50F);
-                getHealth().getThirst().setMultiplier(this, getAmount() * 1.75F);
-                if(once((int) (3 * 60 * 20 / getAmount()))) {
+            if(this.getValue() >= 1.25F) {
+                getHealth().getExhaustion().setMultiplier(this, getValue());
+                getHealth().getHunger().setMultiplier(this, getValue() * 2.50F);
+                getHealth().getThirst().setMultiplier(this, getValue() * 1.75F);
+                if(once((int) (3 * 60 * 20 / getValue()))) {
                     getHealth().addMobEffect(MobEffects.CONFUSION, 0, 10 * 20);
                 }
-                if(once((int) (3 * 60 * 20 / getAmount()))) {
+                if(once((int) (3 * 60 * 20 / getValue()))) {
                     getHealth().addMobEffect(MobEffects.BLINDNESS, 0, 10 * 20);
                 }
-                if(this.getAmount() >= 2.0F) {
+                if(this.getValue() >= 2.0F) {
                     Wet wet = getHealth().getWet();
-                    if(wet.getAmount() <= 2.1F) {
+                    if(wet.getValue() <= 2.1F) {
                         wet.addAmount(1.0F / (30 * 20) * Health.UPDATE_FREQUENCY);
                     }
-                    if(getAmount() >= 4.2F) {
+                    if(getValue() >= 4.2F) {
                         Zombie zombieEntity = new Zombie(getPlayer().level());
                         Vec3 pos = getPlayer().position();
                         zombieEntity.moveTo(pos.x, pos.y, pos.z);
@@ -58,10 +58,10 @@ public final class Zombification extends SimpleMoodle {
     }
 
     public void onAttackByZombie(float damage) {
-        if(this.getAmount() == 0) {
+        if(this.getValue() == 0) {
             float chance = (float) (Config.getInstance().zombification_chance * Math.cbrt(damage / 3));
             if (Util.random(chance)) {
-                this.setAmount(1.0F);
+                this.setValue(1.0F);
             }
         }
     }

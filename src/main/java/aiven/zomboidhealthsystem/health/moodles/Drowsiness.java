@@ -40,7 +40,7 @@ public final class Drowsiness extends SimpleMoodle {
 
     @Override
     public void update() {
-        addTicks(1.0F * 1.90F * getMultiplier() * Config.getInstance().drowsiness_multiplier * Health.UPDATE_FREQUENCY);
+        addTicks(1.0F * 1.58F * getMultiplier() * Config.getInstance().drowsiness_multiplier * Health.UPDATE_FREQUENCY);
 
         if(caffeine_effect) {
             if(caffeine_value < max_caffeine_value) {
@@ -106,7 +106,7 @@ public final class Drowsiness extends SimpleMoodle {
             this.max_sleeping_pills_value = 0;
             this.sleeping_pills_effect = true;
         }
-        this.amount = Math.max(0, amount - (float) sumTicks / 8000.0F);
+        this.value = Math.max(0, value - (float) sumTicks / 8000.0F);
     }
 
     @Override
@@ -116,10 +116,10 @@ public final class Drowsiness extends SimpleMoodle {
 
     @Override
     public String getNbt() {
-        if(this.getAmount() != 0 || this.caffeine_value != 0 || this.max_caffeine_value != 0) {
+        if(this.getValue() != 0 || this.caffeine_value != 0 || this.max_caffeine_value != 0) {
             ObjectNode objectNode = new ObjectNode(JsonNodeFactory.instance);
 
-            objectNode.put("amount", this.getAmount());
+            objectNode.put("amount", this.getValue());
             objectNode.put("caffeine_value", this.caffeine_value);
             objectNode.put("max_caffeine_value", this.max_caffeine_value);
             objectNode.put("caffeine_effect", this.caffeine_effect);
@@ -139,13 +139,13 @@ public final class Drowsiness extends SimpleMoodle {
             this.max_caffeine_value = 0;
             this.sleeping_pills_value = 0;
             this.max_sleeping_pills_value = 0;
-            this.amount = 0;
+            this.value = 0;
             this.sleeping_pills_effect = true;
             this.caffeine_effect = true;
         } else {
             ObjectNode objectNode = mapper.readTree(value).asObject();
 
-            this.amount = objectNode.get("amount").asFloat();
+            this.value = objectNode.get("amount").asFloat();
             this.caffeine_value = objectNode.get("caffeine_value").asFloat();
             this.max_caffeine_value = objectNode.get("max_caffeine_value").asFloat();
             this.caffeine_effect = objectNode.get("caffeine_effect").asBoolean();
@@ -157,7 +157,7 @@ public final class Drowsiness extends SimpleMoodle {
 
     @Override
     public int getAmplifier() {
-        return (int) (amount - caffeine_value + sleeping_pills_value);
+        return (int) (value - caffeine_value + sleeping_pills_value);
     }
 
     public void addCaffeine(float amount) {

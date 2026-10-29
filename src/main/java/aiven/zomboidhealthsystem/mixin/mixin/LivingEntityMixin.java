@@ -16,7 +16,7 @@ import net.minecraft.world.level.gameevent.GameEvent;
 
 import org.spongepowered.asm.mixin.*;
 
-@Mixin(value = LivingEntity.class, priority = 999)
+@Mixin(value = LivingEntity.class, priority = 10000)
 public abstract class LivingEntityMixin extends EntityMixin {
 
     @Shadow

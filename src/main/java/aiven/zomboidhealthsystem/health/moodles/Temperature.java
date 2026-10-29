@@ -14,7 +14,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
+
 public final class Temperature extends SimpleMoodle {
+    private static final ObjectMapper mapper = new ObjectMapper();
+
     public static final float MIN_COMFORTABLE_TEMPERATURE = Config.getInstance().min_comfortable_temp;
     public static final float MAX_COMFORTABLE_TEMPERATURE = Config.getInstance().max_comfortable_temp;
 
@@ -33,7 +39,7 @@ public final class Temperature extends SimpleMoodle {
 
     public Temperature(Health health) {
         super(health);
-        setAmount(AVERAGE_TEMPERATURE_BODY);
+        setValue(AVERAGE_TEMPERATURE_BODY);
     }
 
     @Override
@@ -53,7 +59,7 @@ public final class Temperature extends SimpleMoodle {
 
     @Override
     public void update() {
-        float deltaTemp = Math.abs(this.getAmount() - AVERAGE_TEMPERATURE_BODY);
+        float deltaTemp = Math.abs(this.getValue() - AVERAGE_TEMPERATURE_BODY);
         boolean isOverWorld = isOverWorld();
         if(Config.getInstance().temperature) {
             Thirst thirst = getHealth().getThirst();
@@ -68,18 +74,18 @@ public final class Temperature extends SimpleMoodle {
             float maxComfortableTemp = getMaxComfortableTemperature();
 
             if (temperature < minComfortableTemp && isOverWorld) {
-                this.amount -= (((minComfortableTemp - temperature) / 2)
+                this.value -= (((minComfortableTemp - temperature) / 2)
                         / 10000
-                        * Math.max(1, (hunger.getAmount() / 2.5F) + 1)
+                        * Math.max(1, (hunger.getValue() / 2.5F) + 1)
                         * Config.getInstance().temperature_multiplier
                         * Health.UPDATE_FREQUENCY
                 );
                 isFeelingCold = true;
                 isFeelingHot = false;
             } else if (temperature > maxComfortableTemp && isOverWorld) {
-                this.amount += (((temperature - maxComfortableTemp) / 2)
+                this.value += (((temperature - maxComfortableTemp) / 2)
                         / 10000
-                        * Math.max(1, thirst.getAmount())
+                        * Math.max(1, thirst.getValue())
                         * Config.getInstance().temperature_multiplier
                         * Health.UPDATE_FREQUENCY
                 );
@@ -88,14 +94,14 @@ public final class Temperature extends SimpleMoodle {
             } else {
                 isFeelingHot = false;
                 isFeelingCold = false;
-                if (this.amount < AVERAGE_TEMPERATURE_BODY - 0.1F) {
-                    this.amount += 0.003F
+                if (this.value < AVERAGE_TEMPERATURE_BODY - 0.1F) {
+                    this.value += 0.003F
                             * Config.getInstance().temperature_multiplier
                             * Health.UPDATE_FREQUENCY;
                     hunger.setMultiplier(this, 1.33F);
-                } else if (this.amount > AVERAGE_TEMPERATURE_BODY + 0.1F) {
-                    this.amount -= 0.003F
-                            / ((thirst.getAmount() + 1.0F) * 1.5F)
+                } else if (this.value > AVERAGE_TEMPERATURE_BODY + 0.1F) {
+                    this.value -= 0.003F
+                            / ((thirst.getValue() + 1.0F) * 1.5F)
                             * Config.getInstance().temperature_multiplier
                             * Health.UPDATE_FREQUENCY;
                     thirst.setMultiplier(this, 1.33F);
@@ -125,10 +131,10 @@ public final class Temperature extends SimpleMoodle {
                 }
             }
 
-            if (this.amount < MIN_TEMPERATURE_BODY) {
+            if (this.value < MIN_TEMPERATURE_BODY) {
                 this.getHealth().die(Util.getDamageSource(ModDamageTypes.HYPOTHERMIA, getPlayer().level()));
             }
-            if (this.amount > MAX_TEMPERATURE_BODY) {
+            if (this.value > MAX_TEMPERATURE_BODY) {
                 this.getHealth().die(Util.getDamageSource(ModDamageTypes.HYPERTHERMIA, getPlayer().level()));
             }
         }
@@ -139,10 +145,33 @@ public final class Temperature extends SimpleMoodle {
     }
 
     @Override
+    public void readNbt(String value) {
+        if(value != null) {
+            ObjectNode objectNode = mapper.readTree(value).asObject();
+            setValue(objectNode.get("value").asFloat());
+            isFeelingCold = objectNode.get("cold").asBoolean();
+            isFeelingHot = objectNode.get("hot").asBoolean();
+        } else {
+            setValue(defaultValue());
+            isFeelingHot = false;
+            isFeelingCold = false;
+        }
+    }
+
+    @Override
+    public String getNbt() {
+        ObjectNode objectNode = new ObjectNode(JsonNodeFactory.instance);
+        objectNode.put("value", getValue());
+        objectNode.put("cold", isFeelingCold);
+        objectNode.put("hot", isFeelingHot);
+        return mapper.writeValueAsString(objectNode);
+    }
+
+    @Override
     public ResourceLocation getMoodleIconTexture() {
-        if(this.getAmount() > AVERAGE_TEMPERATURE_BODY + 1.5F) {
+        if(this.getValue() > AVERAGE_TEMPERATURE_BODY + 1.5F) {
             return ZomboidHealthSystem.getResourceLocation("textures/moodle/moodle_icon_hyperthermia.png");
-        } else if(this.getAmount() < AVERAGE_TEMPERATURE_BODY - 1.5F) {
+        } else if(this.getValue() < AVERAGE_TEMPERATURE_BODY - 1.5F) {
             return ZomboidHealthSystem.getResourceLocation("textures/moodle/moodle_icon_hypothermia.png");
         } else {
             return null;
@@ -151,9 +180,9 @@ public final class Temperature extends SimpleMoodle {
 
     @Override
     public String getMoodleIconText() {
-        if (this.getAmount() > AVERAGE_TEMPERATURE_BODY + 1.5F) {
+        if (this.getValue() > AVERAGE_TEMPERATURE_BODY + 1.5F) {
             return Component.translatable(ZomboidHealthSystem.ID + ".moodle.hyperthermia").getString() + " " + getAmplifier();
-        } else if (this.getAmount() < AVERAGE_TEMPERATURE_BODY - 1.5F) {
+        } else if (this.getValue() < AVERAGE_TEMPERATURE_BODY - 1.5F) {
             return Component.translatable(ZomboidHealthSystem.ID + ".moodle.hypothermia").getString() + " " + getAmplifier();
         } else {
             return null;
@@ -162,7 +191,7 @@ public final class Temperature extends SimpleMoodle {
 
     @Override
     public int getAmplifier() {
-        return (int) (Math.abs(AVERAGE_TEMPERATURE_BODY - getAmount()) / 1.5F);
+        return (int) (Math.abs(AVERAGE_TEMPERATURE_BODY - getValue()) / 1.5F);
     }
 
     @Override
@@ -201,26 +230,26 @@ public final class Temperature extends SimpleMoodle {
         Health health = getHealth();
         Thirst thirst = health.getThirst();
         float hpPercent = (float) Math.sqrt(health.getBodyHpPercent());
-        float foodLvl = Math.max(getHealth().getHunger().getAmount(), 1);
+        float foodLvl = Math.max(getHealth().getHunger().getValue(), 1);
         foodLvl = (float) (Math.cbrt(Math.cbrt(foodLvl)));
-        return MIN_COMFORTABLE_TEMPERATURE / hpPercent * foodLvl + ((Math.max(thirst.getAmount() - 1,0)) * 2);
+        return MIN_COMFORTABLE_TEMPERATURE / hpPercent * foodLvl + ((Math.max(thirst.getValue() - 1,0)) * 2);
     }
 
     private float getMaxComfortableTemperature() {
         Health health = getHealth();
         Thirst thirst = health.getThirst();
-        return MAX_COMFORTABLE_TEMPERATURE - ((Math.max(thirst.getAmount() - 1,0)) * 2);
+        return MAX_COMFORTABLE_TEMPERATURE - ((Math.max(thirst.getValue() - 1,0)) * 2);
     }
 
     public void heal(int divisor){
-        setTemperature(((AVERAGE_TEMPERATURE_BODY * divisor) + this.getAmount()) / (2 + (divisor - 1)));
+        setTemperature(((AVERAGE_TEMPERATURE_BODY * divisor) + this.getValue()) / (2 + (divisor - 1)));
     }
 
     public void cool(float amount){
-        if(this.getAmount() - amount > AVERAGE_TEMPERATURE_BODY) {
-            this.amount -= amount;
+        if(this.getValue() - amount > AVERAGE_TEMPERATURE_BODY) {
+            this.value -= amount;
         } else {
-            this.amount -= amount / 2;
+            this.value -= amount / 2;
         }
     }
 
@@ -245,7 +274,7 @@ public final class Temperature extends SimpleMoodle {
     }
 
     public void setTemperature(float temperature) {
-        this.amount = temperature;
+        this.value = temperature;
     }
 
     public void addHeat(float heat) {

@@ -20,7 +20,7 @@ public final class Cold extends SimpleMoodle {
 
     @Override
     public void update() {
-        float amplifier = (Temperature.AVERAGE_TEMPERATURE_BODY - getHealth().getTemperature().getAmount()) / 1.5F;
+        float amplifier = (Temperature.AVERAGE_TEMPERATURE_BODY - getHealth().getTemperature().getValue()) / 1.5F;
 
         if (amplifier >= 1.0F) {
             if(Util.random(Config.getInstance().cold_chance * Health.UPDATE_FREQUENCY * amplifier * getMultiplier())) {
@@ -28,16 +28,16 @@ public final class Cold extends SimpleMoodle {
             }
         }
 
-        getHealth().getExhaustion().setMultiplier(this, (getAmount() / 2) + 1);
-        getHealth().getHunger().setAppetite(Hunger.DEFAULT_APPETITE / (getAmount() / 4 + 1));
+        getHealth().getExhaustion().setMultiplier(this, (getValue() / 2) + 1);
+        getHealth().getHunger().setAppetite(Hunger.DEFAULT_APPETITE / (getValue() / 4 + 1));
 
-        if(getAmount() > 1.0F) {
-            if(Util.random(1.0F / (4 * 60 * 20) * Health.UPDATE_FREQUENCY * getAmount())) {
+        if(getValue() > 1.0F) {
+            if(Util.random(1.0F / (4 * 60 * 20) * Health.UPDATE_FREQUENCY * getValue())) {
                 getHealth().addMobEffect(MobEffects.CONFUSION, 0, 10 * 20);
             }
-            if(getAmount() >= 2.0F) {
+            if(getValue() >= 2.0F) {
                 getHealth().addMobEffect(MobEffects.MOVEMENT_SLOWDOWN, (int)(getAmplifier() / 3.0F), 15 * 20);
-                if (getAmount() >= 4.0F) {
+                if (getValue() >= 4.0F) {
                     getHealth().die(Util.getDamageSource(ModDamageTypes.COLD, getPlayer().level()));
                 }
             }
@@ -47,7 +47,7 @@ public final class Cold extends SimpleMoodle {
     @Override
     public void sleep(int sumTicks) {
         if(sumTicks >= 8000) {
-            float amplifier = (Temperature.AVERAGE_TEMPERATURE_BODY - getHealth().getTemperature().getAmount()) / 1.5F;
+            float amplifier = (Temperature.AVERAGE_TEMPERATURE_BODY - getHealth().getTemperature().getValue()) / 1.5F;
             if (amplifier < 1) {
                 this.addAmount(-1.0F);
             } else {

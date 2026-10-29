@@ -4,7 +4,7 @@ import aiven.zomboidhealthsystem.health.Health;
 import aiven.zomboidhealthsystem.utility.Util;
 
 public abstract class SimpleMoodle extends Moodle {
-    protected float amount;
+    protected float value;
 
     public SimpleMoodle(Health health) {
         super(health);
@@ -24,35 +24,35 @@ public abstract class SimpleMoodle extends Moodle {
 
     @Override
     public String getNbt(){
-        if (amount == 0) {
+        if (value == 0) {
             return null;
         } else {
-            return String.valueOf(getAmount());
+            return String.valueOf(getValue());
         }
     }
 
     @Override
     public void readNbt(String value) {
         if(value != null) {
-            this.setAmount(Float.parseFloat(value));
+            this.setValue(Float.parseFloat(value));
         } else {
-            this.setAmount(defaultValue());
+            this.setValue(defaultValue());
         }
     }
 
-    public float getAmount() {
-        return amount;
+    public float getValue() {
+        return value;
     }
 
-    public void setAmount(float amount) {
-        this.amount = Util.clamp(amount, minValue(), maxValue());
+    public void setValue(float value) {
+        this.value = Util.clamp(value, minValue(), maxValue());
     }
 
     public void addAmount(float amount) {
-        setAmount(getAmount() + amount);
+        setValue(getValue() + amount);
     }
 
     public int getAmplifier() {
-        return (int) getAmount();
+        return (int) getValue();
     }
 }

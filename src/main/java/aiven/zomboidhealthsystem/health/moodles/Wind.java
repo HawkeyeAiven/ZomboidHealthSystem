@@ -23,7 +23,7 @@ public final class Wind extends SimpleMoodle {
     public void update() {
         amount = getWind();
 
-        getHealth().getTemperature().addHeat(-amount * (getHealth().getWet().getAmount() / 2 + 1));
+        getHealth().getTemperature().addHeat(-amount * (getHealth().getWet().getValue() / 2 + 1));
     }
 
     @Override

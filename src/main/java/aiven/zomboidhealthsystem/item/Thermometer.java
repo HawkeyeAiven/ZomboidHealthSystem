@@ -32,7 +32,7 @@ public class Thermometer extends Item {
     public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
         if(!level.isClientSide && player instanceof PlayerAccess playerAccess) {
             Health health = playerAccess.zomboid_health_system$getModHealth();
-            float temperature = Util.floor(health.getTemperature().getAmount(), 10);
+            float temperature = Util.floor(health.getTemperature().getValue(), 10);
             float perceived = Util.floor(health.getTemperature().getPerceivedTemperature(), 10);
 
             player.sendSystemMessage(Component.literal("""

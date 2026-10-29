@@ -21,6 +21,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 
 import org.jetbrains.annotations.Nullable;
+
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -37,6 +38,12 @@ public abstract class PlayerMixin extends LivingEntityMixin implements PlayerAcc
 
     @Shadow
     public abstract @Nullable ItemEntity drop(ItemStack itemStack, boolean bl, boolean bl2);
+
+    @Shadow
+    public abstract boolean isCreative();
+
+    @Shadow
+    public abstract boolean isSpectator();
 
     @Unique
     private static final String healthId = ZomboidHealthSystem.ID + ".health";
@@ -103,6 +110,13 @@ public abstract class PlayerMixin extends LivingEntityMixin implements PlayerAcc
                 AbstractBandageItem bandageItem = bodyPart.unBandage();
                 drop(bandageItem.getDefaultInstance(), true, false);
             }
+        }
+    }
+
+    @Inject(at = @At("RETURN"), method = "jumpFromGround")
+    public void jump(CallbackInfo ci) {
+        if(!level().isClientSide && !isCreative() && !isSpectator()) {
+            zomboid_health_system$getModHealth().getExhaustion().onJump();
         }
     }
 

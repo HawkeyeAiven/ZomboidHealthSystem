@@ -29,32 +29,32 @@ public final class Hunger extends SimpleMoodle {
 
     @Override
     public void update() {
-        this.addAmount(1.0F / 15000 * getMultiplier() * (this.getAmount() < 0 ? 2.25F : 1.0F) * Config.getInstance().hunger_multiplier * Health.UPDATE_FREQUENCY);
+        this.addAmount(1.0F / 10000 * getMultiplier() * (this.getValue() < 0 ? 2.25F : 1.0F) * Config.getInstance().hunger_multiplier * Health.UPDATE_FREQUENCY);
 
-        if(amount >= 1.0F) {
-            this.getHealth().getExhaustion().setMultiplier(this, (getAmount() / 3) + 1);
-            if(amount >= 2.5F) {
+        if(value >= 1.0F) {
+            this.getHealth().getExhaustion().setMultiplier(this, (getValue() / 3) + 1);
+            if(value >= 2.5F) {
                 if(once(5 * 60 * 20)) {
                     getHealth().addMobEffect(MobEffects.CONFUSION, 0, 10 * 20);
                 }
-                if(amount >= 4.0F) {
-                    getHealth().addMobEffect(MobEffects.MOVEMENT_SLOWDOWN, (int)(amount / 3) - 1, 15 * 20);
-                    if(amount >= 6.0F) {
-                        getHealth().addMobEffect(MobEffects.DIG_SLOWDOWN,(int) (amount / 4) - 1, 15 * 20);
+                if(value >= 4.0F) {
+                    getHealth().addMobEffect(MobEffects.MOVEMENT_SLOWDOWN, (int)(value / 3) - 1, 15 * 20);
+                    if(value >= 6.0F) {
+                        getHealth().addMobEffect(MobEffects.DIG_SLOWDOWN,(int) (value / 4) - 1, 15 * 20);
                         if(once(5 * 60 * 20)) {
                             getHealth().addMobEffect(MobEffects.CONFUSION, 0, 10 * 20);
                         }
                         if(once(5 * 60 * 20)) {
                             getHealth().addMobEffect(MobEffects.DARKNESS, 0, 5 * 20);
                         }
-                        if(amount >= 8.4F) {
+                        if(value >= 8.4F) {
                             if(once(3 * 60 * 20)) {
                                 getHealth().addMobEffect(MobEffects.CONFUSION, 0, 15 * 20);
                             }
                             if(once(3 * 60 * 20)) {
                                 getHealth().addMobEffect(MobEffects.DARKNESS, 0, 10 * 20);
                             }
-                            if (amount >= 10.5F) {
+                            if (value >= 10.5F) {
                                 this.getHealth().die(Util.getDamageSource(ModDamageTypes.HUNGER, getPlayer().level()));
                             }
                         }
@@ -66,21 +66,21 @@ public final class Hunger extends SimpleMoodle {
 
     @Override
     public int getAmplifier() {
-        if(getAmount() > 0) {
+        if(getValue() > 0) {
             return super.getAmplifier();
         } else {
-            return (int) (getAmount() * 4);
+            return (int) (getValue() * 4);
         }
     }
 
     @Override
     public void sleep(int sumTicks) {
-        this.addAmount(0.5F / 8000 * sumTicks * (getAmount() < 0 ? 2.25F : 1.0F));
+        this.addAmount(0.5F / 8000 * sumTicks * (getValue() < 0 ? 2.25F : 1.0F));
     }
 
     @Override
     public String getMoodleIconText() {
-        if(getAmount() > 0) {
+        if(getValue() > 0) {
             return super.getMoodleIconText();
         } else {
             return Component.translatable("zomboid-health-system.moodle.saturation").getString() + " " + (-getAmplifier());
@@ -95,7 +95,7 @@ public final class Hunger extends SimpleMoodle {
     }
 
     public boolean canEat() {
-        return getAmount() >= minValue() + 0.35F;
+        return getValue() >= minValue() + 0.35F;
     }
 
     public float getAppetite() {
