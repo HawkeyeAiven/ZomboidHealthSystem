@@ -1,0 +1,23 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "#B",
+        "P "
+    ],
+    "key": {
+        "#": {
+            "item": "minecraft:potion",
+            "nbt": "{Potion:\"minecraft:water\"}"
+        },
+        "B": {
+            "item": "minecraft:sugar"
+        },
+        "P": {
+            "item": "zomboid-health-system:rag"
+        }
+    },
+    "result": {
+        "item": "zomboid-health-system:alcohol_wipe",
+        "count": 1
+    }
+}

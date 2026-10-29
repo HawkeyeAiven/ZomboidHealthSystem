@@ -1,18 +1,21 @@
 package aiven.zomboidhealthsystem;
 
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
 
-public class ModItemGroups {
-    public static ItemGroup MAIN_GROUP = register(ModItems.BANDAGE,ZomboidHealthSystem.NAME, ZomboidHealthSystem.ID,
+public final class ModItemGroups {
+
+    private ModItemGroups() {
+
+    }
+
+    public static CreativeModeTab MAIN_GROUP = register(ModItems.BANDAGE,ZomboidHealthSystem.NAME, ZomboidHealthSystem.ID,
             ModItems.BANDAGE,
             ModItems.RAG,
             ModItems.ALCOHOL_WIPE,
@@ -30,21 +33,25 @@ public class ModItemGroups {
             ModItems.WOOL_BOOTS
     );
 
-    private static ItemGroup register(Item icon, String name, String id, Item...items){
-        final RegistryKey<ItemGroup> groupKey = RegistryKey.of(Registries.ITEM_GROUP.getKey(), new Identifier(ZomboidHealthSystem.ID, id));
-        final ItemGroup group = FabricItemGroup.builder()
-                .icon(() -> new ItemStack(icon))
-                .displayName(Text.translatable(name))
+    public static CreativeModeTab register(Item icon, String name, String id, Item...items) {
+        ResourceKey<CreativeModeTab> key = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), new ResourceLocation(ZomboidHealthSystem.ID, id));
+        CreativeModeTab creativeModeTab = CreativeModeTab.builder(CreativeModeTab.Row.TOP, 0)
+                .icon(icon::getDefaultInstance)
+                .title(Component.literal(name))
                 .build();
 
-        ItemGroup itemGroup = Registry.register(Registries.ITEM_GROUP, groupKey, group);
-        for(Item i:items) {
-            ItemGroupEvents.modifyEntriesEvent(groupKey).register(itemGroup1 -> {
-                itemGroup1.add(i);
-            });
-        }
-        return itemGroup;
+        Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, key, creativeModeTab);
+
+        ItemGroupEvents.modifyEntriesEvent(key).register(itemGroup -> {
+            for(Item item : items) {
+                itemGroup.accept(item);
+            }
+        });
+
+        return creativeModeTab;
     }
 
-    public static void initialize(){}
+    public static void initialize() {
+
+    }
 }

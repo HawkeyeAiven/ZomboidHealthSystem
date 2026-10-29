@@ -1,26 +1,25 @@
 package aiven.zomboidhealthsystem;
 
-import aiven.zomboidhealthsystem.foundation.client.ClientWorldInfo;
-import aiven.zomboidhealthsystem.foundation.network.ClientTasks;
-import aiven.zomboidhealthsystem.foundation.network.ServerPackets;
-import aiven.zomboidhealthsystem.foundation.gui.hud.Hud;
-import aiven.zomboidhealthsystem.foundation.player.Health;
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
+import aiven.zomboidhealthsystem.gui.widget.HudWidgetGroup;
+import aiven.zomboidhealthsystem.network.ClientNetworking;
 
-@Environment(EnvType.CLIENT)
-public class ZomboidHealthSystemClient implements ClientModInitializer {
+import net.fabricmc.api.ClientModInitializer;
+
+import net.minecraft.client.Minecraft;
+
+public final class ZomboidHealthSystemClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        ServerPackets.initialize();
-        ModKeyBindings.initialize();
+        hud = new HudWidgetGroup(Minecraft.getInstance());
+
         ModClientEventCallbacks.initialize();
-        ClientTasks.initialize();
+        ModKeyBindings.initialize();
+        ClientNetworking.initialize();
     }
 
-    public static ClientWorldInfo WORLD_INFO = new ClientWorldInfo();
-    public static Health HEALTH = null;
-    public static Hud HUD = new Hud(MinecraftClient.getInstance());
+    private static HudWidgetGroup hud;
+
+    public static HudWidgetGroup getHud() {
+        return hud;
+    }
 }

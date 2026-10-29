@@ -1,18 +1,22 @@
 package aiven.zomboidhealthsystem;
 
-import aiven.zomboidhealthsystem.foundation.item.*;
-import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
+import aiven.zomboidhealthsystem.item.*;
 
-public class ModItems {
-    private static final WoolArmor woolArmorMaterial = new WoolArmor();
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.Item;
+
+public final class ModItems {
+    private static final WoolArmorMaterial woolArmorMaterial = new WoolArmorMaterial();
+
+    private ModItems() {
+
+    }
 
     public static Item BANDAGE = register(new Bandage(),"bandage");
-    public static Item DIRTY_BANDAGE = register(new DirtyBandage(),"dirty_bandage");
+    public static Item DIRTY_BANDAGE = register(new DirtyAbstractBandage(),"dirty_bandage");
 
     public static Item RAG = register(new Rag(),"rag");
     public static Item DIRTY_RAG = register(new DirtyRag(),"dirty_rag");
@@ -25,7 +29,7 @@ public class ModItems {
     public static Item BOTTLE_OF_PURIFIED_WATER = register(new BottleOfPurifiedWater(),"bottle_of_purified_water");
     public static Item BOTTLE_OF_WINE = register(new BottleOfWine(), "bottle_of_wine");
 
-    public static Item EMPTY_CUP = register(new Item(new FabricItemSettings().maxCount(1)),"empty_cup");
+    public static Item EMPTY_CUP = register(new EmptyCupItem(),"empty_cup");
 
     public static Item PAINKILLERS = register(new Painkillers(),"painkillers");
 
@@ -37,7 +41,7 @@ public class ModItems {
             new ArmorItem(
                     woolArmorMaterial,
                     ArmorItem.Type.HELMET,
-                    new Item.Settings()
+                    new Item.Properties()
             ),
             "wool_helmet"
     );
@@ -46,7 +50,7 @@ public class ModItems {
             new ArmorItem(
                     woolArmorMaterial,
                     ArmorItem.Type.CHESTPLATE,
-                    new Item.Settings()
+                    new Item.Properties()
             ),
             "wool_chestplate"
     );
@@ -55,7 +59,7 @@ public class ModItems {
             new ArmorItem(
                     woolArmorMaterial,
                     ArmorItem.Type.LEGGINGS,
-                    new Item.Settings()
+                    new Item.Properties()
             ),
             "wool_leggings"
     );
@@ -64,14 +68,17 @@ public class ModItems {
             new ArmorItem(
                     woolArmorMaterial,
                     ArmorItem.Type.BOOTS,
-                    new Item.Settings()
+                    new Item.Properties()
             ),
             "wool_boots"
     );
 
-    public static Item register(Item item, String name){
-        return Registry.register(Registries.ITEM, new Identifier(ZomboidHealthSystem.ID,name),item);
+    public static Item register(Item item, String id) {
+        ResourceLocation itemID = ZomboidHealthSystem.getResourceLocation(id);
+        return Registry.register(BuiltInRegistries.ITEM, itemID, item);
     }
 
-    public static void initialize(){}
+    public static void initialize() {
+
+    }
 }

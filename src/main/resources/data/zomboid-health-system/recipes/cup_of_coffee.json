@@ -1,0 +1,24 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "#",
+        "P",
+        "H"
+    ],
+    "key": {
+        "#": {
+            "item": "minecraft:cocoa_beans"
+        },
+        "P": {
+            "item": "minecraft:potion",
+            "nbt": "{Potion:\"minecraft:water\"}"
+        },
+        "H": {
+            "item": "zomboid-health-system:empty_cup"
+        }
+    },
+    "result": {
+        "item": "zomboid-health-system:cup_of_coffee",
+        "count": 1
+    }
+}
