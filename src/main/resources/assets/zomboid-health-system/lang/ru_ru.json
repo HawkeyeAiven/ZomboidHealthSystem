@@ -82,7 +82,6 @@
   "zomboid-health-system.message.dont_want_sleep" : "Вы не хотите спать",
 
   "key.zomboid-health-system.overlay": "Меню",
-  "key.zomboid-health-system.crawl": "Ползти",
   "key.kategory.zomboid-health-system.zomboid": "Zomboid Health System",
 
   "death.attack.bleeding" : "%s умер от кровотечения",
