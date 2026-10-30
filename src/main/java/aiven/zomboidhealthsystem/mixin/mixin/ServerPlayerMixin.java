@@ -1,5 +1,6 @@
 package aiven.zomboidhealthsystem.mixin.mixin;
 
+import aiven.zomboidhealthsystem.health.Health;
 import aiven.zomboidhealthsystem.network.ServerNetworking;
 import aiven.zomboidhealthsystem.network.packet.ModHealthPacket;
 
@@ -14,10 +15,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(value = ServerPlayer.class, priority = 10000)
 public abstract class ServerPlayerMixin extends PlayerMixin {
 
+    @Unique
+    private int i = 0;
+
     @Inject(at = @At("HEAD"), method = "doTick")
     public void doTick(CallbackInfo ci) {
-        //TODO оптимизировать
-        ServerNetworking.send(toServerPlayer(), new ModHealthPacket(zomboid_health_system$getModHealth()));
+        if(i++ >= Health.UPDATE_FREQUENCY - 1) {
+            ServerNetworking.send(toServerPlayer(), new ModHealthPacket(zomboid_health_system$getModHealth()));
+        }
     }
 
     @Unique

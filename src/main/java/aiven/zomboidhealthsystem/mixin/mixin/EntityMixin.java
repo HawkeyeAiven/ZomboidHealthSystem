@@ -1,5 +1,6 @@
 package aiven.zomboidhealthsystem.mixin.mixin;
 
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -7,12 +8,19 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 
 @Mixin(value = Entity.class, priority = 10000)
 public abstract class EntityMixin {
+    @Shadow
+    @Final
+    protected SynchedEntityData entityData;
+
+    @Shadow public abstract boolean isRemoved();
+
     @Shadow
     public abstract void gameEvent(GameEvent gameEvent);
 

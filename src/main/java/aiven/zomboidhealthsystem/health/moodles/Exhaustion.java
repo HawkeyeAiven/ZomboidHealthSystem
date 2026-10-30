@@ -24,9 +24,9 @@ public final class Exhaustion extends SimpleMoodle {
         getHealth().getDrowsiness().setMultiplier(this, getValue() + 1.0F);
 
         if (this.getPlayer().isSprinting()) {
-            this.addAmount(1.0F / 1100 * getMultiplier() * Config.getInstance().exhaustion_multiplier  * Health.UPDATE_FREQUENCY);
+            this.addValue(1.0F / 1100 * getMultiplier() * Config.getInstance().exhaustion_multiplier  * Health.UPDATE_FREQUENCY);
         } else {
-            this.addAmount(-1.0F / 1100 * (isFasterRest() ? 1.25F : 1.0F) * Config.getInstance().exhaustion_multiplier * Health.UPDATE_FREQUENCY);
+            this.addValue(-1.0F / 1100 * (isFasterRest() ? 1.25F : 1.0F) * Config.getInstance().exhaustion_multiplier * Health.UPDATE_FREQUENCY);
         }
 
         if (value >= 1.5F) {
@@ -40,11 +40,11 @@ public final class Exhaustion extends SimpleMoodle {
 
     @Override
     public void sleep(int sumTicks) {
-        this.addAmount(-1.0F / 400 * sumTicks);
+        this.addValue(-1.0F / 400 * sumTicks);
     }
 
     public void onJump() {
-        this.addAmount(Config.getInstance().exhaustion_per_jump * this.getMultiplier() * Config.getInstance().exhaustion_multiplier);
+        this.addValue(Config.getInstance().exhaustion_per_jump * this.getMultiplier() * Config.getInstance().exhaustion_multiplier);
     }
 
     private boolean isFasterRest() {

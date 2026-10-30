@@ -4,17 +4,17 @@ import aiven.zomboidhealthsystem.health.Health;
 import aiven.zomboidhealthsystem.utility.Util;
 
 public abstract class SimpleMoodle extends Moodle {
-    protected float value;
+    protected float value = defaultValue();
 
     public SimpleMoodle(Health health) {
         super(health);
     }
 
-    protected float minValue() {
+    public float minValue() {
         return 0;
     }
 
-    protected float maxValue() {
+    public float maxValue() {
         return Float.MAX_VALUE;
     }
 
@@ -48,7 +48,7 @@ public abstract class SimpleMoodle extends Moodle {
         this.value = Util.clamp(value, minValue(), maxValue());
     }
 
-    public void addAmount(float amount) {
+    public void addValue(float amount) {
         setValue(getValue() + amount);
     }
 

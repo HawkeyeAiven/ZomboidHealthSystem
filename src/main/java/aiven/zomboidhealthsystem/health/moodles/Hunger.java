@@ -3,12 +3,13 @@ package aiven.zomboidhealthsystem.health.moodles;
 import aiven.zomboidhealthsystem.Config;
 import aiven.zomboidhealthsystem.ModDamageTypes;
 import aiven.zomboidhealthsystem.health.Health;
-import aiven.zomboidhealthsystem.utility.Util;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffects;
 
-public final class Hunger extends SimpleMoodle {
+public final class Hunger extends ImportantMoodle {
     public static final float DEFAULT_APPETITE = 0.14F;
 
     private float appetite = DEFAULT_APPETITE;
@@ -23,13 +24,23 @@ public final class Hunger extends SimpleMoodle {
     }
 
     @Override
-    protected float minValue() {
+    public float maxValue() {
+        return 10.5F;
+    }
+
+    @Override
+    public boolean canPlayerLive() {
+        return getValue() != maxValue();
+    }
+
+    @Override
+    public float minValue() {
         return -1.0F;
     }
 
     @Override
-    public void update() {
-        this.addAmount(1.0F / 10000 * getMultiplier() * (this.getValue() < 0 ? 2.25F : 1.0F) * Config.getInstance().hunger_multiplier * Health.UPDATE_FREQUENCY);
+    protected void _update() {
+        this.addValue(1.0F / 10000 * getMultiplier() * (this.getValue() < 0 ? 2.25F : 1.0F) * Config.getInstance().hunger_multiplier * Health.UPDATE_FREQUENCY);
 
         if(value >= 1.0F) {
             this.getHealth().getExhaustion().setMultiplier(this, (getValue() / 3) + 1);
@@ -54,9 +65,6 @@ public final class Hunger extends SimpleMoodle {
                             if(once(3 * 60 * 20)) {
                                 getHealth().addMobEffect(MobEffects.DARKNESS, 0, 10 * 20);
                             }
-                            if (value >= 10.5F) {
-                                this.getHealth().die(Util.getDamageSource(ModDamageTypes.HUNGER, getPlayer().level()));
-                            }
                         }
                     }
                 }
@@ -75,7 +83,12 @@ public final class Hunger extends SimpleMoodle {
 
     @Override
     public void sleep(int sumTicks) {
-        this.addAmount(0.5F / 8000 * sumTicks * (getValue() < 0 ? 2.25F : 1.0F));
+        this.addValue(0.5F / 8000 * sumTicks * (getValue() < 0 ? 2.25F : 1.0F));
+    }
+
+    @Override
+    protected ResourceKey<DamageType> getDamageType() {
+        return ModDamageTypes.HUNGER;
     }
 
     @Override
@@ -89,8 +102,8 @@ public final class Hunger extends SimpleMoodle {
 
     public void eatFood(int hunger, float saturationModifier) {
         if(!getLevel().isClientSide) {
-            this.addAmount((float) -hunger * getAppetite());
-            this.getHealth().healPlayerHp(Config.getInstance().food_heal_amount * hunger);
+            this.addValue((float) -hunger * getAppetite());
+            this.health.getBlood().addValue(Config.getInstance().food_heal_amount * hunger);
         }
     }
 

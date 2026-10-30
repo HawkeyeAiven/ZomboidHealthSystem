@@ -43,7 +43,7 @@ public class BottleOfWine extends Item {
 
         if(livingEntity instanceof ServerPlayer player) {
             Health health = ((PlayerAccess) player).zomboid_health_system$getModHealth();
-            health.getDrunkenness().addAmount(1.75F);
+            health.getDrunkenness().addValue(1.75F);
         }
 
         livingEntity.eat(level, itemStack);

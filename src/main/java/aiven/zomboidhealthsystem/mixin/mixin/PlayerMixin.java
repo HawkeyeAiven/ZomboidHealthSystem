@@ -87,7 +87,7 @@ public abstract class PlayerMixin extends LivingEntityMixin implements PlayerAcc
             if (damage != 0.0F) {
                 this.getCombatTracker().recordDamage(damageSource, damage);
                 Health health = zomboid_health_system$getModHealth();
-                health.damage(damageSource, damage);
+                health.actuallyHurt(damageSource, damage);
                 if (damage < 3.4028235E37F) {
                     this.awardStat(Stats.DAMAGE_TAKEN, Math.round(damage * 10.0F));
                 }
@@ -97,9 +97,20 @@ public abstract class PlayerMixin extends LivingEntityMixin implements PlayerAcc
         }
     }
 
+    /**
+     * @author Aiven
+     * @reason Перенаправление на {@link Health#isHurt()}
+     */
+    @Overwrite
+    public boolean isHurt() {
+        return modHealth.isHurt();
+    }
+
     @Inject(at = @At("HEAD"), method = "tick")
     public void tick(CallbackInfo ci) {
-        modHealth.tick();
+        if(modHealth.isAlive()) {
+            modHealth.tick();
+        }
     }
 
     @Inject(at = @At("RETURN"), method = "dropEquipment")

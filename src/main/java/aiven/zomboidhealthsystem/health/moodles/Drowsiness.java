@@ -4,16 +4,17 @@ import aiven.zomboidhealthsystem.Config;
 import aiven.zomboidhealthsystem.ModDamageTypes;
 import aiven.zomboidhealthsystem.ZomboidHealthSystem;
 import aiven.zomboidhealthsystem.health.Health;
-import aiven.zomboidhealthsystem.utility.Util;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffects;
 
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.node.JsonNodeFactory;
 import tools.jackson.databind.node.ObjectNode;
 
-public final class Drowsiness extends SimpleMoodle {
+public final class Drowsiness extends ImportantMoodle {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     private int drowsinessTime;
@@ -39,7 +40,12 @@ public final class Drowsiness extends SimpleMoodle {
     }
 
     @Override
-    public void update() {
+    public boolean canPlayerLive() {
+        return getAmplifier() < 5;
+    }
+
+    @Override
+    protected void _update() {
         addTicks(1.0F * 1.58F * getMultiplier() * Config.getInstance().drowsiness_multiplier * Health.UPDATE_FREQUENCY);
 
         if(caffeine_effect) {
@@ -80,10 +86,6 @@ public final class Drowsiness extends SimpleMoodle {
             if (this.getAmplifier() >= 2) {
                 if (this.getAmplifier() >= 3) {
                     this.getHealth().addMobEffect(MobEffects.DIG_SLOWDOWN, (this.getAmplifier() / 2) - 1, 15 * 20);
-
-                    if(this.getAmplifier() >= 5){
-                        this.getHealth().die(Util.getDamageSource(ModDamageTypes.DROWSINESS, getPlayer().level()));
-                    }
                 }
             }
         }
@@ -156,6 +158,11 @@ public final class Drowsiness extends SimpleMoodle {
     }
 
     @Override
+    protected ResourceKey<DamageType> getDamageType() {
+        return ModDamageTypes.DROWSINESS;
+    }
+
+    @Override
     public int getAmplifier() {
         return (int) (value - caffeine_value + sleeping_pills_value);
     }
@@ -175,6 +182,6 @@ public final class Drowsiness extends SimpleMoodle {
     }
 
     public void addTicks(float amount) {
-        addAmount(amount / drowsinessTime);
+        addValue(amount / drowsinessTime);
     }
 }

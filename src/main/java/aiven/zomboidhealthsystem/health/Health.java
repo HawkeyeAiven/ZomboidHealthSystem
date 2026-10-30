@@ -32,8 +32,6 @@ import java.util.concurrent.atomic.AtomicReference;
 public final class Health {
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    public static final float MAX_PLAYER_HP = 100.0F;
-
     // все числа должны быть четными, сумма == 100
     private static final int
             HEAD_CHANCE_HIT = 24,
@@ -64,7 +62,7 @@ public final class Health {
     public static final int UPDATE_FREQUENCY = Config.getInstance().update_frequency;
     public static final int MAX_SLOWNESS_AMPLIFIER = 4 - 1;
 
-    private Player player;
+    private final Player player;
 
     private final Head head;
     private final Body body;
@@ -74,6 +72,7 @@ public final class Health {
 
     private final BodyPart[] bodyParts;
 
+    private final Blood blood;
     private final Pain pain;
     private final Drowsiness drowsiness;
     private final Thirst thirst;
@@ -87,8 +86,6 @@ public final class Health {
 
     private final Moodle[] moodles;
     private final Temperature temperature;
-
-    private float playerHp = MAX_PLAYER_HP;
 
     private int i = 0;
 
@@ -119,6 +116,7 @@ public final class Health {
 
         bodyParts = new BodyPart[]{head, body, leftArm, rightArm, leftLeg, rightLeg, leftFoot, rightFoot};
 
+        this.blood = new Blood(this);
         this.pain = new Pain(this);
         this.drowsiness = new Drowsiness(this);
         this.thirst = new Thirst(this);
@@ -131,7 +129,7 @@ public final class Health {
         this.drunkenness = new Drunkenness(this);
         this.zombification = new Zombification(this);
 
-        this.moodles = new Moodle[]{pain,drowsiness,thirst,exhaustion,temperature,cold,wet,hunger,wind,drunkenness,zombification};
+        this.moodles = new Moodle[]{blood,pain,drowsiness,thirst,exhaustion,temperature,cold,wet,hunger,wind,drunkenness,zombification};
     }
 
     public void tick() {
@@ -141,9 +139,36 @@ public final class Health {
         }
     }
 
-    public void applyEffects() {
-        if (this.getPlayer().isAlive() && !this.getPlayer().isCreative()) {
+    private void update() {
+        if (player != null && isAlive() && !player.isCreative() && !player.isSpectator() && !player.level().isClientSide()) {
+            for (BodyPart part : bodyParts) {
+                part.update();
+            }
 
+            applyEffects();
+
+            if (this.getPlayer().hasEffect(MobEffects.REGENERATION)) {
+                int amplifier = this.getPlayer().getEffect(MobEffects.REGENERATION).getAmplifier();
+                this.healAllParts(((float) amplifier + 1) / 100.0F * UPDATE_FREQUENCY);
+            }
+
+            if(!this.getPlayer().hasEffect(MobEffects.ABSORPTION)) {
+                for(BodyPart bodyPart : bodyParts) {
+                    bodyPart.setAdditionalHp(0);
+                }
+            }
+
+            for(Moodle moodle : this.moodles) {
+                if(!isAlive()) {
+                    return;
+                }
+                moodle.update();
+            }
+        }
+    }
+
+    private void applyEffects() {
+        if (player != null && isAlive() && !player.isCreative() && !player.isSpectator() && !player.level().isClientSide()) {
             AtomicReference<Float> weaknessAmplifier = new AtomicReference<>(0.0F);
             AtomicReference<Float> slownessAmplifier = new AtomicReference<>(0.0F);
             AtomicReference<Float> fatigueAmplifier = new AtomicReference<>(0.0F);
@@ -166,51 +191,13 @@ public final class Health {
                 addMobEffect(MobEffects.WEAKNESS, weaknessAmplifier.get().intValue() - 1, 15 * 20);
             }
 
-            if (this.getPlayerHp() <= 0) {
-                this.die(Util.getDamageSource(ModDamageTypes.BLEEDING,  player.level()));
-            }
-
             this.getPain().applyEffects();
         }
     }
 
-    public void update() {
-        if (player != null && player.isAlive() && !player.isCreative() && !player.isSpectator() && !player.level().isClientSide()){
-            for (BodyPart part : bodyParts) {
-                part.update();
-            }
-
-            applyEffects();
-
-            if (this.getPlayer().hasEffect(MobEffects.REGENERATION)) {
-                int amplifier = this.getPlayer().getEffect(MobEffects.REGENERATION).getAmplifier();
-                this.healAllParts(((float) amplifier + 1) / 100.0F * UPDATE_FREQUENCY);
-                this.healPlayerHp(((float) amplifier + 1) / 100.0F * UPDATE_FREQUENCY);
-            }
-
-            if(!this.getPlayer().hasEffect(MobEffects.ABSORPTION)) {
-                for(BodyPart bodyPart : bodyParts) {
-                    bodyPart.setAdditionalHp(0);
-                }
-            }
-
-            if(getHunger().getValue() < 2) {
-                this.healPlayerHp(0.003F * (getHunger().getValue() < 0 ? 1.25F : 1.0F) * UPDATE_FREQUENCY);
-            }
-
-            for(Moodle moodle : this.moodles){
-                moodle.update();
-            }
-        }
-    }
-
-    public void damage(DamageSource source, float amount) {
+    public void actuallyHurt(DamageSource source, float amount) {
         if (!player.level().isClientSide()) {
-            if(!player.isAlive()) {
-                return;
-            }
-
-            if(getNotNullHpBodyPartCount() == 0) {
+            if(!isAlive()) {
                 return;
             }
 
@@ -219,7 +206,6 @@ public final class Health {
                     bodyPart.setHp(0);
                     bodyPart.setAdditionalHp(0);
                 }
-                die(source);
                 return;
             }
 
@@ -230,19 +216,17 @@ public final class Health {
             }
 
             if (source.getEntity() != null && source.getEntity() instanceof Zombie) {
-                getZombification().onAttackByZombie(amount);
+                zombification.onAttackByZombie(amount);
             }
 
-            if (isPlayerHpDamage(source)) {
-                damagePlayerHp(source, amount * 5);
-                if (getPlayerHp() <= 0) {
-                    die(source);
-                }
-            } else if (isPointDamage(source)) {
+            if(isBloodDamage(source)) {
 
+                blood.addValue(-amount * 5);
+
+            } else if (isPointDamage(source)) {
                 float d = randomHit().damage(amount, source);
-                if (d > 0.1F && this.checkImportantBodyPartsAlive(source)) {
-                    damage(source, d);
+                if(d != 0) {
+                    actuallyHurt(source, d);
                 }
 
             } else if (isFootDamage(source)) {
@@ -270,29 +254,28 @@ public final class Health {
                     part.damage(amount / getNotNullHpBodyPartCount(), source);
                 }
 
-                checkImportantBodyPartsAlive(source);
-
             } else {
-
-                int random = new Random().nextInt(0, 9);
-                float d = bodyParts[random].damage(amount, source);
-                if (d > 0.2F && this.checkImportantBodyPartsAlive(source)) {
-                    damage(source, d);
-                }
+                do {
+                    amount = damageRandom(source, amount);
+                } while ((amount != 0) && isAlive());
 
             }
             applyEffects();
         }
     }
 
-    public void damagePlayerHp(DamageSource source, float amount) {
-        if (amount > 0) {
-            this.setPlayerHp(Math.max(this.getPlayerHp() - amount, 0));
+    private float damageRandom(DamageSource source, float value) {
+        if(getNotNullHpBodyPartCount() == 0) {
+            return value;
         }
-    }
-
-    public void healPlayerHp(float amount) {
-        setPlayerHp(Math.min(100, getPlayerHp() + amount));
+        ArrayList<BodyPart> aliveBodyParts = new ArrayList<>();
+        for(BodyPart bodyPart : bodyParts) {
+            if(bodyPart.getHp() != 0) {
+                aliveBodyParts.add(bodyPart);
+            }
+        }
+        int random = new Random().nextInt(0, aliveBodyParts.size());
+        return aliveBodyParts.get(random).damage(value, source);
     }
 
     public void healRandom(float amount) {
@@ -315,13 +298,179 @@ public final class Health {
         }
     }
 
-    public boolean isBleeding() {
+    public boolean hasBleeding() {
         for(BodyPart part : bodyParts) {
             if(part.isBleeding() && (!part.isBandaged() || !part.getBandageItem().isStopBleeding())) {
                 return true;
             }
         }
         return false;
+    }
+
+    public boolean isAlive() {
+        // Хотелось бы так, но из-за этого слишком много багов, поэтому проще в мудлах убивать игрока через kill();
+//        for(Moodle moodle : moodles) {
+//            if(moodle instanceof ImportantMoodle importantMoodle) {
+//                if (!importantMoodle.canPlayerLive()) {
+//                    return false;
+//                }
+//            }
+//        }
+        for(BodyPart bodyPart : bodyParts) {
+            if(bodyPart instanceof ImportartBodyPart importartBodyPart) {
+                if (!importartBodyPart.canPlayerLive()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public void sleep(int ticks) {
+        for(Moodle moodle : moodles) {
+            moodle.sleep(ticks);
+        }
+        for(BodyPart bodyPart : bodyParts) {
+            bodyPart.sleep(ticks);
+        }
+    }
+
+    public boolean isHurt() {
+        return getHpSum() < getMaxHpSum() || blood.getValue() < blood.maxValue();
+    }
+
+    public float getHpSum() {
+        float sum = 0;
+        for (BodyPart part : bodyParts) {
+            sum += part.getHp();
+        }
+        return sum;
+    }
+
+    public float getBleedingSum() {
+        float sum = 0;
+        for (BodyPart part : bodyParts) {
+            sum += part.getBleedingValue();
+        }
+        return sum;
+    }
+
+    public int getNotNullHpBodyPartCount() {
+        int count = 0;
+        for (BodyPart part : bodyParts) {
+            if (part.getHp() > 0) count++;
+        }
+        return count;
+    }
+
+    public float getAdditionalHpSum() {
+        float d = 0;
+        for (BodyPart part : bodyParts) {
+            d += part.getAdditionalHp();
+        }
+        return d;
+    }
+
+    public float getMaxHpSum() {
+        float d = 0;
+        for (BodyPart part : bodyParts) {
+            d += part.getMaxHp();
+        }
+        return d;
+    }
+
+    public float getBodyHpPercent() {
+        return getHpSum() / getMaxHpSum();
+    }
+
+    public void kill(DamageSource source) {
+        this.player.hurt(source, Float.MAX_VALUE);
+    }
+
+    public boolean isFullHp() {
+        for (BodyPart part : bodyParts) {
+            if (!part.isFullHp()) return false;
+        }
+        return true;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public BodyPart[] getBodyParts() {
+        return bodyParts;
+    }
+
+    public Moodle[] getMoodles() {
+        return moodles;
+    }
+
+    public Moodle[] getSortMoodleArray() {
+        ArrayList<Moodle> moodles = new ArrayList<>(List.of(getMoodles()));
+        Moodle[] list = new Moodle[moodles.size()];
+        int index = 0;
+        int max;
+        Moodle moodle;
+        while (index < list.length) {
+            max = -9999;
+            moodle = null;
+            for (Moodle moodle1 : moodles) {
+                if (moodle1.getAmplifier() > max) {
+                    max = moodle1.getAmplifier();
+                    moodle = moodle1;
+                }
+            }
+            moodles.remove(moodle);
+            list[index] = moodle;
+            index++;
+        }
+
+        return list;
+    }
+
+    public BodyPart randomHit() {
+        int random = new Random().nextInt(0, 101);
+
+        if (random <= HEAD_CHANCE_HIT)
+            return head;
+        else if (random <= BODY_CHANCE_HIT + HEAD_CHANCE_HIT)
+            return body;
+        else if (random <= HEAD_CHANCE_HIT + BODY_CHANCE_HIT + (ARMS_CHANCE_HIT / 2))
+            return leftArm;
+        else if (random <= HEAD_CHANCE_HIT + BODY_CHANCE_HIT + ARMS_CHANCE_HIT)
+            return rightArm;
+        else if (random <= HEAD_CHANCE_HIT + BODY_CHANCE_HIT + ARMS_CHANCE_HIT + (LEGS_CHANCE_HIT / 2))
+            return leftLeg;
+        else if (random <= HEAD_CHANCE_HIT + BODY_CHANCE_HIT + ARMS_CHANCE_HIT + LEGS_CHANCE_HIT)
+            return rightLeg;
+        else if (random <= HEAD_CHANCE_HIT + BODY_CHANCE_HIT + ARMS_CHANCE_HIT + LEGS_CHANCE_HIT + (FOOTS_CHANCE_HIT / 2))
+            return leftFoot;
+        else
+            return rightFoot;
+    }
+
+    public void removeMobEffect(MobEffect effect){
+        if(this.getPlayer().hasEffect(effect)){
+            this.getPlayer().removeEffect(effect);
+        }
+    }
+
+    public void addMobEffect(MobEffect effect, int amplifier, int duration) {
+        Util.addMobEffect(this.getPlayer(),effect,duration,amplifier,false,true);
+    }
+
+    public BodyPart getBodyPart(String id) {
+        for(BodyPart part : bodyParts) {
+            if (part.getId().equals(id)) {
+                return part;
+            }
+        }
+        return null;
+    }
+
+    public Blood getBlood() {
+        return blood;
     }
 
     public Pain getPain() {
@@ -400,183 +549,6 @@ public final class Health {
         return rightFoot;
     }
 
-    public void sleep(int ticks) {
-        for(Moodle moodle : moodles) {
-            moodle.sleep(ticks);
-        }
-        for(BodyPart bodyPart : bodyParts) {
-            bodyPart.sleep(ticks);
-        }
-    }
-
-    public boolean checkImportantBodyPartsAlive(DamageSource source) {
-        boolean bl = true;
-        for(BodyPart bodyPart : getBodyParts()) {
-            if(bodyPart instanceof ImportartBodyPart importartBodyPart) {
-                if(importartBodyPart.getHp() <= 0) {
-                    bl = false;
-                    break;
-                }
-            }
-        }
-        if (!bl && this.player.isAlive()) {
-            die(source);
-        }
-        return bl;
-    }
-
-    public float getHpSum() {
-        float sum = 0;
-        for (BodyPart part : bodyParts) {
-            sum += part.getHp();
-        }
-        return sum;
-    }
-
-    public float getBleedingSum() {
-        float sum = 0;
-        for (BodyPart part : bodyParts) {
-            sum += part.getBleedingValue();
-        }
-        return sum;
-    }
-
-    public int getNotNullHpBodyPartCount() {
-        int count = 0;
-        for (BodyPart part : bodyParts) {
-            if (part.getHp() > 0) count++;
-        }
-        return count;
-    }
-
-    public float getAdditionalHpSum() {
-        float d = 0;
-        for (BodyPart part : bodyParts) {
-            d += part.getAdditionalHp();
-        }
-        return d;
-    }
-
-    public float getMaxHpSum() {
-        float d = 0;
-        for (BodyPart part : bodyParts) {
-            d += part.getMaxHp();
-        }
-        return d;
-    }
-
-    public float getBodyHpPercent() {
-        return getHpSum() / getMaxHpSum();
-    }
-
-    public void die(DamageSource source) {
-        if (this.player.isAlive()) {
-            this.player.setHealth(0);
-            this.getPlayer().die(source);
-        }
-    }
-
-    public boolean isFullHp() {
-        for (BodyPart part : bodyParts) {
-            if (!part.isFullHp()) return false;
-        }
-        return true;
-    }
-
-    public Player getPlayer() {
-        return player;
-    }
-
-    public float getPlayerHp() {
-        return playerHp;
-    }
-
-    public void setPlayerHp(float playerHp) {
-        this.playerHp = playerHp;
-    }
-
-    public BodyPart[] getBodyParts() {
-        return bodyParts;
-    }
-
-    public Moodle[] getMoodles() {
-        return moodles;
-    }
-
-    public Moodle[] getSortMoodleArray() {
-        ArrayList<Moodle> moodles = new ArrayList<>(List.of(getMoodles()));
-        Moodle[] list = new Moodle[moodles.size()];
-        int index = 0;
-        int max;
-        Moodle moodle;
-        while (index < list.length) {
-            max = -9999;
-            moodle = null;
-            for(Moodle moodle1 : moodles) {
-                if(moodle1.getAmplifier() > max) {
-                    max = moodle1.getAmplifier();
-                    moodle = moodle1;
-                }
-            }
-            moodles.remove(moodle);
-            list[index] = moodle;
-            index++;
-        }
-
-        return list;
-    }
-
-    public boolean hasInfection() {
-        for (BodyPart part : bodyParts) {
-            if (part.hasInfection()) return true;
-        }
-        return false;
-    }
-
-    public BodyPart randomHit() {
-        int random = new Random().nextInt(0, 101);
-
-        if (random <= HEAD_CHANCE_HIT)
-            return head;
-        else if (random <= BODY_CHANCE_HIT + HEAD_CHANCE_HIT)
-            return body;
-        else if (random <= HEAD_CHANCE_HIT + BODY_CHANCE_HIT + (ARMS_CHANCE_HIT / 2))
-            return leftArm;
-        else if (random <= HEAD_CHANCE_HIT + BODY_CHANCE_HIT + ARMS_CHANCE_HIT)
-            return rightArm;
-        else if (random <= HEAD_CHANCE_HIT + BODY_CHANCE_HIT + ARMS_CHANCE_HIT + (LEGS_CHANCE_HIT / 2))
-            return leftLeg;
-        else if (random <= HEAD_CHANCE_HIT + BODY_CHANCE_HIT + ARMS_CHANCE_HIT + LEGS_CHANCE_HIT)
-            return rightLeg;
-        else if (random <= HEAD_CHANCE_HIT + BODY_CHANCE_HIT + ARMS_CHANCE_HIT + LEGS_CHANCE_HIT + (FOOTS_CHANCE_HIT / 2))
-            return leftFoot;
-        else
-            return rightFoot;
-    }
-
-    public void removeMobEffect(MobEffect effect){
-        if(this.getPlayer().hasEffect(effect)){
-            this.getPlayer().removeEffect(effect);
-        }
-    }
-
-    public void addMobEffect(MobEffect effect, int amplifier, int duration) {
-        Util.addMobEffect(this.getPlayer(),effect,duration,amplifier,false,true);
-    }
-
-    public BodyPart getBodyPart(String id) {
-        for(BodyPart part : bodyParts) {
-            if (part.getId().equals(id)) {
-                return part;
-            }
-        }
-        return null;
-    }
-
-    public void setPlayer(Player player) {
-        this.player = player;
-    }
-
     @Override
     public String toString() {
         return new String(getNbt(), StandardCharsets.UTF_8);
@@ -584,10 +556,6 @@ public final class Health {
 
     public byte[] getNbt() {
         ObjectNode objectNode = new ObjectNode(JsonNodeFactory.instance);
-
-        if (this.getPlayerHp() != 100) {
-            objectNode.put("player_hp", this.playerHp);
-        }
 
         for(Moodle moodle : moodles){
             String value = moodle.getNbt();
@@ -616,14 +584,6 @@ public final class Health {
         for(Moodle moodle : this.moodles){
             moodle.readNbt(objectNode.get(moodle.getId()) == null ? null : objectNode.get(moodle.getId()).asString());
         }
-
-        {
-            if(objectNode.get("player_hp") != null) {
-                playerHp = objectNode.get("player_hp").asFloat();
-            } else {
-                playerHp = MAX_PLAYER_HP;
-            }
-        }
     }
 
     public static Health parseHealth(Player player, byte[] bytes) {
@@ -632,12 +592,19 @@ public final class Health {
         return health;
     }
 
-    public static Health parseHealth(byte[] bytes) {
-        return parseHealth(null, bytes);
-    }
-
-    public static boolean isPlayerHpDamage(DamageSource source) {
-        return source.is(DamageTypes.DROWN) || source.is(DamageTypes.INDIRECT_MAGIC) || source.is(DamageTypes.MAGIC) || source.is(DamageTypes.ON_FIRE);
+    public static boolean isBloodDamage(DamageSource source) {
+        for(ResourceKey<DamageType> key : new ResourceKey[]{
+                DamageTypes.DROWN,
+                DamageTypes.INDIRECT_MAGIC,
+                DamageTypes.MAGIC,
+                DamageTypes.ON_FIRE,
+                ModDamageTypes.BLEEDING
+        }) {
+            if(source.is(key)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static boolean isItDamageToEntireBody(DamageSource source) {

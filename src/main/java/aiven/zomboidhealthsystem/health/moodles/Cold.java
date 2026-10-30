@@ -5,9 +5,11 @@ import aiven.zomboidhealthsystem.ModDamageTypes;
 import aiven.zomboidhealthsystem.health.Health;
 import aiven.zomboidhealthsystem.utility.Util;
 
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffects;
 
-public final class Cold extends SimpleMoodle {
+public final class Cold extends ImportantMoodle {
 
     public Cold(Health health){
         super(health);
@@ -19,12 +21,22 @@ public final class Cold extends SimpleMoodle {
     }
 
     @Override
-    public void update() {
+    public float maxValue() {
+        return 4.0F;
+    }
+
+    @Override
+    public boolean canPlayerLive() {
+        return getValue() != maxValue();
+    }
+
+    @Override
+    protected void _update() {
         float amplifier = (Temperature.AVERAGE_TEMPERATURE_BODY - getHealth().getTemperature().getValue()) / 1.5F;
 
         if (amplifier >= 1.0F) {
             if(Util.random(Config.getInstance().cold_chance * Health.UPDATE_FREQUENCY * amplifier * getMultiplier())) {
-                this.addAmount(1.0F);
+                this.addValue(1.0F);
             }
         }
 
@@ -37,9 +49,6 @@ public final class Cold extends SimpleMoodle {
             }
             if(getValue() >= 2.0F) {
                 getHealth().addMobEffect(MobEffects.MOVEMENT_SLOWDOWN, (int)(getAmplifier() / 3.0F), 15 * 20);
-                if (getValue() >= 4.0F) {
-                    getHealth().die(Util.getDamageSource(ModDamageTypes.COLD, getPlayer().level()));
-                }
             }
         }
     }
@@ -49,10 +58,15 @@ public final class Cold extends SimpleMoodle {
         if(sumTicks >= 8000) {
             float amplifier = (Temperature.AVERAGE_TEMPERATURE_BODY - getHealth().getTemperature().getValue()) / 1.5F;
             if (amplifier < 1) {
-                this.addAmount(-1.0F);
+                this.addValue(-1.0F);
             } else {
-                this.addAmount(amplifier);
+                this.addValue(amplifier);
             }
         }
+    }
+
+    @Override
+    protected ResourceKey<DamageType> getDamageType() {
+        return ModDamageTypes.COLD;
     }
 }

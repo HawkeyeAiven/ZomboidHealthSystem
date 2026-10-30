@@ -16,7 +16,7 @@ public class ModScreen extends AbstractModScreen {
         super(Component.literal(ZomboidHealthSystem.NAME));
 
         if(modMenuWidget == null) {
-            modMenuWidget = new ModMenuWidget(100, 75) {
+            modMenuWidget = new ModMenuWidget(125, 75) {
                 @Override
                 protected void onCloseButton() {
                     onClose();

@@ -3,11 +3,12 @@ package aiven.zomboidhealthsystem.health.moodles;
 import aiven.zomboidhealthsystem.Config;
 import aiven.zomboidhealthsystem.ModDamageTypes;
 import aiven.zomboidhealthsystem.health.Health;
-import aiven.zomboidhealthsystem.utility.Util;
 
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffects;
 
-public final class Thirst extends SimpleMoodle {
+public final class Thirst extends ImportantMoodle {
 
     public Thirst(Health health) {
         super(health);
@@ -19,8 +20,18 @@ public final class Thirst extends SimpleMoodle {
     }
 
     @Override
-    public void update() {
-        this.addAmount(1.0F / 10000.0F * getMultiplier() * Config.getInstance().thirst_multiplier * Health.UPDATE_FREQUENCY);
+    public float maxValue() {
+        return 3.1F;
+    }
+
+    @Override
+    public boolean canPlayerLive() {
+        return getValue() != maxValue();
+    }
+
+    @Override
+    protected void _update() {
+        this.addValue(1.0F / 10000.0F * getMultiplier() * Config.getInstance().thirst_multiplier * Health.UPDATE_FREQUENCY);
 
         this.getHealth().getExhaustion().setMultiplier(this, 1.0F);
 
@@ -42,10 +53,6 @@ public final class Thirst extends SimpleMoodle {
 
                     if (value >= 2.8F) {
                         this.getHealth().addMobEffect(MobEffects.BLINDNESS, 0, 15 * 20);
-
-                        if (value >= 3.1F) {
-                            this.getHealth().die(Util.getDamageSource(ModDamageTypes.THIRST, getPlayer().level()));
-                        }
                     }
                 }
             }
@@ -57,9 +64,14 @@ public final class Thirst extends SimpleMoodle {
         this.setValue(this.getValue() + 0.35F / 8000 * sumTicks);
     }
 
+    @Override
+    protected ResourceKey<DamageType> getDamageType() {
+        return ModDamageTypes.THIRST;
+    }
+
     public void drink(float amount, boolean clean) {
         if (clean) {
-            this.addAmount(-amount);
+            this.addValue(-amount);
         }
         this.getHealth().getTemperature().cool(0.5F);
     }

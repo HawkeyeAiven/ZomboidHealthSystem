@@ -28,9 +28,10 @@ public final class ZomboidHealthSystem implements ModInitializer {
 
 		//TODO
 		// - Плохое самочувствие при низком PlayerHp
-		// - Не пишется, от чего игрок умер, и не только. Короче DamageSource bug
 		// - BodyWidget улучшить
 		// - Чтобы заходя в инвентарь можно было читать мудлы
+		// - Не пишется, от чего игрок умер, и не только. Короче DamageSource bug
+		// - Золотые яблоки дают доп хп
 
 		log.info(NAME + " initialized!");
 	}

@@ -41,22 +41,6 @@ public class MoodlesWidget extends AbstractMovableWidget {
             return;
         }
 
-        if(health.isBleeding() && Config.getInstance().show_bleeding_icon) {
-            context.blit(
-                    ZomboidHealthSystem.getResourceLocation("textures/moodle/moodle_bkg_bad_2.png"),
-                    this.getX(), this.getY() + getHeight(), 0,0, SIZE, SIZE, SIZE, SIZE
-            );
-
-            context.blit(
-                    ZomboidHealthSystem.getResourceLocation("textures/moodle/moodle_icon_bleeding.png"),
-                    this.getX(), this.getY() + getHeight(), 0,0, SIZE, SIZE, SIZE, SIZE
-            );
-
-            this.height += SIZE;
-
-            this.iconNames.add(Component.translatable("zomboid-health-system.moodle.bleeding").getString());
-        }
-
         for(Moodle moodle : health.getSortMoodleArray()) {
             if(moodle.showIcon()) {
                 context.blit(

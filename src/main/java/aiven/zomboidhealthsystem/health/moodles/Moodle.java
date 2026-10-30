@@ -20,8 +20,6 @@ public abstract class Moodle {
 
     public abstract String getId();
 
-    public abstract void update();
-
     public abstract int getAmplifier();
 
     public abstract void sleep(int sumTicks);
@@ -29,6 +27,8 @@ public abstract class Moodle {
     public abstract String getNbt();
 
     public abstract void readNbt(String value);
+
+    public abstract void update();
 
     public boolean showIcon(){
         return this.getAmplifier() != 0 && getMoodleIconTexture() != null && getBackgroundTexture() != null;
@@ -53,15 +53,15 @@ public abstract class Moodle {
         return Component.translatable(ZomboidHealthSystem.ID + ".moodle." + getId()).getString() + " " + getAmplifier();
     }
 
-    public final Health getHealth() {
+    protected final Health getHealth() {
         return health;
     }
 
-    public final Player getPlayer() {
+    protected final Player getPlayer() {
         return getHealth().getPlayer();
     }
 
-    public final Level getLevel() {
+    protected final Level getLevel() {
         return getPlayer().level();
     }
 

@@ -77,7 +77,6 @@ public abstract class BodyPart {
         if (Util.random(getBleedingChance(amount, source))) {
             this.setBleedingValue((this.getMaxHp() - this.getHp()) / 1.85F);
         }
-
         return Math.max(0, d);
     }
 
@@ -116,9 +115,7 @@ public abstract class BodyPart {
             }
         }
         if (!this.isBandaged() || !this.bandageItem.isStopBleeding()) {
-            this.getHealth().damagePlayerHp(
-                    Util.getDamageSource(ModDamageTypes.BLEEDING, getPlayer().level()),
-                    (this.getBleedingValue() / 30) * Health.UPDATE_FREQUENCY);
+            this.health.getBlood().addValue(-this.getBleedingValue() / 30 * Health.UPDATE_FREQUENCY);
         }
     }
 
@@ -161,6 +158,19 @@ public abstract class BodyPart {
         }
     }
 
+    public void disInfect() {
+        if (Util.random(0.33F)) {
+            hasInfection = false;
+        }
+    }
+
+    public void sleep(int ticks) {
+        this.heal(0.75F / 8000F * ticks);
+        if (this.isBandaged()) {
+            this.setBleedingValue(this.getBleedingValue() - (1.0F / 8000 * ticks));
+        }
+    }
+
     public AbstractBandageItem getBandageItem() {
         return bandageItem;
     }
@@ -191,19 +201,6 @@ public abstract class BodyPart {
 
     public boolean hasInfection() {
         return hasInfection;
-    }
-
-    public void disInfect() {
-        if (Util.random(0.33F)) {
-            hasInfection = false;
-        }
-    }
-
-    public void sleep(int ticks) {
-        this.heal(0.75F / 8000F * ticks);
-        if (this.isBandaged()) {
-            this.setBleedingValue(this.getBleedingValue() - (1.0F / 8000 * ticks));
-        }
     }
 
     public Health getHealth() {

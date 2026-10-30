@@ -4,6 +4,7 @@ import aiven.zomboidhealthsystem.gui.RenderHelper;
 import aiven.zomboidhealthsystem.health.Health;
 import aiven.zomboidhealthsystem.utility.ClientUtil;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
@@ -19,8 +20,10 @@ public class BodyWidget extends AbstractMovableWidget {
 
     @Override
     protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float tickDelta) {
-        for(BodyPart bodyPart : BodyPart.values()) {
-            bodyPart.renderPart(context, tickDelta, getX(), getY());
+        if(!Minecraft.getInstance().player.isCreative() && !Minecraft.getInstance().player.isSpectator()) {
+            for (BodyPart bodyPart : BodyPart.values()) {
+                bodyPart.renderPart(context, tickDelta, getX(), getY());
+            }
         }
     }
 

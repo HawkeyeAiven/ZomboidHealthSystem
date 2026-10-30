@@ -6,7 +6,9 @@ import aiven.zomboidhealthsystem.utility.Util;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -18,7 +20,7 @@ import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.node.JsonNodeFactory;
 import tools.jackson.databind.node.ObjectNode;
 
-public final class Temperature extends SimpleMoodle {
+public final class Temperature extends ImportantMoodle {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     public static final float MIN_COMFORTABLE_TEMPERATURE = Config.getInstance().min_comfortable_temp;
@@ -48,8 +50,18 @@ public final class Temperature extends SimpleMoodle {
     }
 
     @Override
-    protected float minValue() {
-        return Float.MIN_VALUE;
+    public boolean canPlayerLive() {
+        return getValue() != minValue() && getValue() != maxValue();
+    }
+
+    @Override
+    public float minValue() {
+        return MIN_TEMPERATURE_BODY;
+    }
+
+    @Override
+    public float maxValue() {
+        return MAX_TEMPERATURE_BODY;
     }
 
     @Override
@@ -58,7 +70,7 @@ public final class Temperature extends SimpleMoodle {
     }
 
     @Override
-    public void update() {
+    public void _update() {
         float deltaTemp = Math.abs(this.getValue() - AVERAGE_TEMPERATURE_BODY);
         boolean isOverWorld = isOverWorld();
         if(Config.getInstance().temperature) {
@@ -130,18 +142,21 @@ public final class Temperature extends SimpleMoodle {
                     }
                 }
             }
-
-            if (this.value < MIN_TEMPERATURE_BODY) {
-                this.getHealth().die(Util.getDamageSource(ModDamageTypes.HYPOTHERMIA, getPlayer().level()));
-            }
-            if (this.value > MAX_TEMPERATURE_BODY) {
-                this.getHealth().die(Util.getDamageSource(ModDamageTypes.HYPERTHERMIA, getPlayer().level()));
-            }
         }
 
         heat = 0;
         heatFromCampfire = 0;
         heatFromFurnace = 0;
+    }
+
+    @Override
+    protected void die() {
+        if (this.value <= MIN_TEMPERATURE_BODY) {
+            this.getHealth().kill(Util.getDamageSource(ModDamageTypes.HYPOTHERMIA, getPlayer().level()));
+        }
+        if (this.value >= MAX_TEMPERATURE_BODY) {
+            this.getHealth().kill(Util.getDamageSource(ModDamageTypes.HYPERTHERMIA, getPlayer().level()));
+        }
     }
 
     @Override
@@ -156,6 +171,11 @@ public final class Temperature extends SimpleMoodle {
             isFeelingHot = false;
             isFeelingCold = false;
         }
+    }
+
+    @Override
+    protected ResourceKey<DamageType> getDamageType() {
+        return null;
     }
 
     @Override

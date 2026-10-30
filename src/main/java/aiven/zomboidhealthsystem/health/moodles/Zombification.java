@@ -5,11 +5,13 @@ import aiven.zomboidhealthsystem.ModDamageTypes;
 import aiven.zomboidhealthsystem.health.Health;
 import aiven.zomboidhealthsystem.utility.Util;
 
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.phys.Vec3;
 
-public final class Zombification extends SimpleMoodle {
+public final class Zombification extends ImportantMoodle {
 
     public Zombification(Health health) {
         super(health);
@@ -21,9 +23,19 @@ public final class Zombification extends SimpleMoodle {
     }
 
     @Override
-    public void update() {
+    public float maxValue() {
+        return 4.2F;
+    }
+
+    @Override
+    public boolean canPlayerLive() {
+        return getValue() != maxValue();
+    }
+
+    @Override
+    public void _update() {
         if(this.getValue() >= 1) {
-            this.addAmount(1.0F / (4 * 60 * 20) * Health.UPDATE_FREQUENCY);
+            this.addValue(1.0F / (4 * 60 * 20) * Health.UPDATE_FREQUENCY);
             if(this.getValue() >= 1.25F) {
                 getHealth().getExhaustion().setMultiplier(this, getValue());
                 getHealth().getHunger().setMultiplier(this, getValue() * 2.50F);
@@ -37,15 +49,7 @@ public final class Zombification extends SimpleMoodle {
                 if(this.getValue() >= 2.0F) {
                     Wet wet = getHealth().getWet();
                     if(wet.getValue() <= 2.1F) {
-                        wet.addAmount(1.0F / (30 * 20) * Health.UPDATE_FREQUENCY);
-                    }
-                    if(getValue() >= 4.2F) {
-                        Zombie zombieEntity = new Zombie(getPlayer().level());
-                        Vec3 pos = getPlayer().position();
-                        zombieEntity.moveTo(pos.x, pos.y, pos.z);
-                        zombieEntity.setCustomName(getPlayer().getName());
-                        getPlayer().level().addFreshEntity(zombieEntity);
-                        getHealth().die(Util.getDamageSource(ModDamageTypes.ZOMBIFICATION, getPlayer().level()));
+                        wet.addValue(1.0F / (30 * 20) * Health.UPDATE_FREQUENCY);
                     }
                 }
             }
@@ -53,8 +57,23 @@ public final class Zombification extends SimpleMoodle {
     }
 
     @Override
+    protected void die() {
+        Zombie zombieEntity = new Zombie(getPlayer().level());
+        Vec3 pos = getPlayer().position();
+        zombieEntity.moveTo(pos.x, pos.y, pos.z);
+        zombieEntity.setCustomName(getPlayer().getName());
+        getPlayer().level().addFreshEntity(zombieEntity);
+        getHealth().kill(Util.getDamageSource(getDamageType(), getPlayer().level()));
+    }
+
+    @Override
     public void sleep(int sumTicks) {
 
+    }
+
+    @Override
+    protected ResourceKey<DamageType> getDamageType() {
+        return ModDamageTypes.ZOMBIFICATION;
     }
 
     public void onAttackByZombie(float damage) {

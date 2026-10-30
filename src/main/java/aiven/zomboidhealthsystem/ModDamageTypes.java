@@ -17,13 +17,14 @@ public final class ModDamageTypes {
     public static final ResourceKey<DamageType> THIRST = register("thirst");
     public static final ResourceKey<DamageType> HYPOTHERMIA = register("hypothermia");
     public static final ResourceKey<DamageType> HYPERTHERMIA = register("hyperthermia");
-    public static final ResourceKey<DamageType> SEVERE_DAMAGE = register("severe_damage");
     public static final ResourceKey<DamageType> HUNGER = register("hunger");
     public static final ResourceKey<DamageType> ZOMBIFICATION = register("zombification");
 
-    private static ResourceKey<DamageType> register(String id){
+    private static ResourceKey<DamageType> register(String id) {
         return ResourceKey.create(Registries.DAMAGE_TYPE, ZomboidHealthSystem.getResourceLocation(id));
     }
 
-    public static void initialize(){}
+    public static void initialize() {
+
+    }
 }

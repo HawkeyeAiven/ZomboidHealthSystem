@@ -104,9 +104,9 @@ public class ModMenuWidget extends ModContainer {
             context.blit(
                     ZomboidHealthSystem.getResourceLocation("textures/gui/line.png"),
                     66,
-                    119 - (int) (ClientUtil.getHealth().getPlayerHp() * 0.7F),
+                    119 - (int) (health.getBlood().getValue() * 0.7F),
                     0, 0, 5,
-                    (int) (ClientUtil.getHealth().getPlayerHp() * 0.7F), 7, 90
+                    (int) (health.getBlood().getValue() * 0.7F), 7, 90
             );
         } else if(infoTabButton.visible) {
 

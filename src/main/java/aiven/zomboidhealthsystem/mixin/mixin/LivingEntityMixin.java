@@ -1,8 +1,10 @@
 package aiven.zomboidhealthsystem.mixin.mixin;
 
+import aiven.zomboidhealthsystem.health.Health;
 import aiven.zomboidhealthsystem.mixin.access.PlayerAccess;
 import aiven.zomboidhealthsystem.health.moodles.Hunger;
 
+import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.CombatTracker;
@@ -29,9 +31,6 @@ public abstract class LivingEntityMixin extends EntityMixin {
     public abstract void setHealth(float f);
 
     @Shadow
-    public abstract float getHealth();
-
-    @Shadow
     protected abstract float getDamageAfterArmorAbsorb(DamageSource damageSource, float f);
 
     @Shadow
@@ -39,6 +38,10 @@ public abstract class LivingEntityMixin extends EntityMixin {
 
     @Shadow
     public abstract CombatTracker getCombatTracker();
+
+    @Shadow
+    @Final
+    private static EntityDataAccessor<Float> DATA_HEALTH_ID;
 
     /**
      * @author Aiven
@@ -72,6 +75,47 @@ public abstract class LivingEntityMixin extends EntityMixin {
         }
 
         return itemStack;
+    }
+
+    /**
+     * @author Aiven
+     * @reason К сожалению, вместо того, чтобы использовать метод isAlive(), майнкрафт часто обращается к этому методу.
+     */
+    @Overwrite
+    public float getHealth() {
+        if(toLivingEntity() instanceof PlayerAccess playerAccess) {
+            Health health = playerAccess.zomboid_health_system$getModHealth();
+            if(!health.isAlive()) {
+                return 0.0F;
+            }
+        }
+        return this.entityData.get(DATA_HEALTH_ID);
+    }
+
+    /**
+     * @author Aiven
+     * @reason Перенаправление на {@link Health#isAlive()}
+     */
+    @Overwrite
+    public boolean isDeadOrDying() {
+        if(toLivingEntity() instanceof PlayerAccess playerAccess) {
+            return !playerAccess.zomboid_health_system$getModHealth().isAlive() || getHealth() == 0;
+        } else {
+            return this.getHealth() <= 0.0F;
+        }
+    }
+
+    /**
+     * @author Aiven
+     * @reason Перенаправление на {@link Health#isAlive()}
+     */
+    @Overwrite
+    public boolean isAlive() {
+        if(toLivingEntity() instanceof PlayerAccess playerAccess) {
+            return playerAccess.zomboid_health_system$getModHealth().isAlive() && getHealth() != 0;
+        } else {
+            return !this.isRemoved() && this.getHealth() > 0.0F;
+        }
     }
 
     @Unique

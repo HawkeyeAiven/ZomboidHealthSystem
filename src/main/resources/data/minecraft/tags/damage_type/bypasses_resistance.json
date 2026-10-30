@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "zomboid-health-system:bleeding",
+    "zomboid-health-system:cold",
+    "zomboid-health-system:drowsiness",
+    "zomboid-health-system:thirst",
+    "zomboid-health-system:hypothermia",
+    "zomboid-health-system:hyperthermia",
+    "zomboid-health-system:hunger",
+    "zomboid-health-system:zombification"
+  ]
+}

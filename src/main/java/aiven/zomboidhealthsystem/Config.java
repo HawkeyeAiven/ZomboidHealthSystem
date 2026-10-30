@@ -27,7 +27,6 @@ public final class Config {
     public boolean time_hud = true;
     public boolean health_hud = true;
     public boolean moodles_hud = true;
-    public boolean show_bleeding_icon = true;
     public boolean show_injured_icon = true;
 
     public float temperature_multiplier = 1.0F;
