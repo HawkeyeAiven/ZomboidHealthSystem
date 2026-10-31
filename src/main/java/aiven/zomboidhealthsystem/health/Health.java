@@ -1,7 +1,6 @@
 package aiven.zomboidhealthsystem.health;
 
 import aiven.zomboidhealthsystem.Config;
-
 import aiven.zomboidhealthsystem.ModDamageTypes;
 import aiven.zomboidhealthsystem.health.bodyparts.*;
 import aiven.zomboidhealthsystem.health.moodles.*;
@@ -59,8 +58,8 @@ public final class Health {
 
     public static final int BANDAGE_HEAL_TIME = Config.getInstance().heal_time;
     public static final int BANDAGE_BECOMES_DIRTY_AFTER = 2 * 60 * 20;
-    public static final int UPDATE_FREQUENCY = Config.getInstance().update_frequency;
-    public static final int MAX_SLOWNESS_AMPLIFIER = 4 - 1;
+    public static final int MAX_SLOWNESS_AMPLIFIER = 7;
+    private static final int UPDATE_FREQUENCY = Config.getInstance().update_frequency;
 
     private final Player player;
 
@@ -77,6 +76,7 @@ public final class Health {
     private final Drowsiness drowsiness;
     private final Thirst thirst;
     private final Exhaustion exhaustion;
+    private final Temperature temperature;
     private final Cold cold;
     private final Wet wet;
     private final Hunger hunger;
@@ -85,7 +85,6 @@ public final class Health {
     private final Zombification zombification;
 
     private final Moodle[] moodles;
-    private final Temperature temperature;
 
     private int i = 0;
 
@@ -134,18 +133,40 @@ public final class Health {
 
     public void tick() {
         if (i++ >= UPDATE_FREQUENCY - 1) {
-            update();
+            update(UPDATE_FREQUENCY);
             i = 0;
         }
     }
 
-    private void update() {
+    private void update(float tickDelta) {
         if (player != null && isAlive() && !player.isCreative() && !player.isSpectator() && !player.level().isClientSide()) {
             for (BodyPart part : bodyParts) {
-                part.update();
+                part.update(tickDelta);
             }
 
-            applyEffects();
+            {
+                AtomicReference<Float> weaknessAmplifier = new AtomicReference<>(0.0F);
+                AtomicReference<Float> slownessAmplifier = new AtomicReference<>(0.0F);
+                AtomicReference<Float> fatigueAmplifier = new AtomicReference<>(0.0F);
+
+                for (BodyPart part : bodyParts) {
+                    part.addEffectAmplifiers(slownessAmplifier, fatigueAmplifier, weaknessAmplifier);
+                }
+
+                if (slownessAmplifier.get() > MAX_SLOWNESS_AMPLIFIER) {
+                    slownessAmplifier.set((float) MAX_SLOWNESS_AMPLIFIER);
+                }
+
+                if(slownessAmplifier.get() >= 1) {
+                    addMobEffect(MobEffects.MOVEMENT_SLOWDOWN, slownessAmplifier.get().intValue() - 1, 15 * 20);
+                }
+                if(fatigueAmplifier.get() >= 1) {
+                    addMobEffect(MobEffects.DIG_SLOWDOWN, fatigueAmplifier.get().intValue() - 1, 15 * 20);
+                }
+                if(weaknessAmplifier.get() >= 1) {
+                    addMobEffect(MobEffects.WEAKNESS, weaknessAmplifier.get().intValue() - 1, 15 * 20);
+                }
+            }
 
             if (this.getPlayer().hasEffect(MobEffects.REGENERATION)) {
                 int amplifier = this.getPlayer().getEffect(MobEffects.REGENERATION).getAmplifier();
@@ -153,45 +174,15 @@ public final class Health {
             }
 
             if(!this.getPlayer().hasEffect(MobEffects.ABSORPTION)) {
-                for(BodyPart bodyPart : bodyParts) {
-                    bodyPart.setAdditionalHp(0);
-                }
+                setAdditionalHp(0);
             }
 
             for(Moodle moodle : this.moodles) {
                 if(!isAlive()) {
                     return;
                 }
-                moodle.update();
+                moodle.update(tickDelta);
             }
-        }
-    }
-
-    private void applyEffects() {
-        if (player != null && isAlive() && !player.isCreative() && !player.isSpectator() && !player.level().isClientSide()) {
-            AtomicReference<Float> weaknessAmplifier = new AtomicReference<>(0.0F);
-            AtomicReference<Float> slownessAmplifier = new AtomicReference<>(0.0F);
-            AtomicReference<Float> fatigueAmplifier = new AtomicReference<>(0.0F);
-
-            for (BodyPart part : bodyParts) {
-                part.addEffectAmplifiers(slownessAmplifier, fatigueAmplifier, weaknessAmplifier);
-            }
-
-            if (slownessAmplifier.get() > MAX_SLOWNESS_AMPLIFIER) {
-                slownessAmplifier.set((float) MAX_SLOWNESS_AMPLIFIER);
-            }
-
-            if(slownessAmplifier.get() >= 1) {
-                addMobEffect(MobEffects.MOVEMENT_SLOWDOWN, slownessAmplifier.get().intValue() - 1, 15 * 20);
-            }
-            if(fatigueAmplifier.get() >= 1) {
-                addMobEffect(MobEffects.DIG_SLOWDOWN, fatigueAmplifier.get().intValue() - 1, 15 * 20);
-            }
-            if(weaknessAmplifier.get() >= 1) {
-                addMobEffect(MobEffects.WEAKNESS, weaknessAmplifier.get().intValue() - 1, 15 * 20);
-            }
-
-            this.getPain().applyEffects();
         }
     }
 
@@ -201,17 +192,17 @@ public final class Health {
                 return;
             }
 
-            if(amount > getMaxHpSum() + getAdditionalHpSum()) {
-                for(BodyPart bodyPart : bodyParts) {
-                    bodyPart.setHp(0);
-                    bodyPart.setAdditionalHp(0);
-                }
-                return;
-            }
-
             amount = amount * Config.getInstance().damage_multiplier;
 
             if (amount <= 0) {
+                return;
+            }
+
+            if(amount > getMaxHpSum() + getAdditionalHpSum()) {
+                for (BodyPart bodyPart : bodyParts) {
+                    bodyPart.setHp(0);
+                    bodyPart.setAdditionalHp(0);
+                }
                 return;
             }
 
@@ -223,44 +214,47 @@ public final class Health {
 
                 blood.addValue(-amount * 5);
 
-            } else if (isPointDamage(source)) {
-                float d = randomHit().damage(amount, source);
-                if(d != 0) {
-                    actuallyHurt(source, d);
-                }
-
-            } else if (isFootDamage(source)) {
-
-                BodyPart[] orderDamageBodyParts = new BodyPart[]{
-                        head,
-                        leftArm, rightArm,
-                        body,
-                        leftLeg, rightLeg,
-                        leftFoot, rightFoot
-                };
-
-                float d = amount / 2.0F;
-
-                for (int i = 7; i != 0; i--) {
-                    if (d < 0.2F) break;
-                    int random = new Random().nextInt(0, 2);
-                    BodyPart part = orderDamageBodyParts[i - random];
-                    d = part.damage(d, source);
-                }
-
-            } else if (isItDamageToEntireBody(source)) {
-
-                for (BodyPart part : bodyParts) {
-                    part.damage(amount / getNotNullHpBodyPartCount(), source);
-                }
-
             } else {
-                do {
-                    amount = damageRandom(source, amount);
-                } while ((amount != 0) && isAlive());
+                if (isPointDamage(source)) {
 
+                    float d;
+                    do {
+                        d = randomHit().damage(amount, source);
+                    } while (d != 0 && isAlive());
+
+                } else if (isFootDamage(source)) {
+
+                    BodyPart[] orderDamageBodyParts = new BodyPart[]{
+                            head,
+                            leftArm, rightArm,
+                            body,
+                            leftLeg, rightLeg,
+                            leftFoot, rightFoot
+                    };
+
+                    float d = amount / 2.0F;
+
+                    for (int i = 7; i != 0; i--) {
+                        if (d < 0.2F) break;
+                        int random = new Random().nextInt(0, 2);
+                        BodyPart part = orderDamageBodyParts[i - random];
+                        d = part.damage(d, source);
+                    }
+
+                } else if (isItDamageToEntireBody(source)) {
+
+                    for (BodyPart part : bodyParts) {
+                        part.damage(amount / getNotNullHpBodyPartCount(), source);
+                    }
+
+                } else {
+                    do {
+                        amount = damageRandom(source, amount);
+                    } while ((amount != 0) && isAlive());
+
+                }
             }
-            applyEffects();
+            update(0);
         }
     }
 
@@ -307,8 +301,11 @@ public final class Health {
         return false;
     }
 
+    public boolean isDeadOrDying() {
+        return !isAlive();
+    }
+
     public boolean isAlive() {
-        // Хотелось бы так, но из-за этого слишком много багов, поэтому проще в мудлах убивать игрока через kill();
 //        for(Moodle moodle : moodles) {
 //            if(moodle instanceof ImportantMoodle importantMoodle) {
 //                if (!importantMoodle.canPlayerLive()) {
@@ -324,6 +321,12 @@ public final class Health {
             }
         }
         return true;
+    }
+
+    public void setAdditionalHp(float value) {
+        for(BodyPart bodyPart : bodyParts) {
+            bodyPart.setAdditionalHp(value / bodyParts.length);
+        }
     }
 
     public void sleep(int ticks) {
@@ -383,7 +386,7 @@ public final class Health {
         return getHpSum() / getMaxHpSum();
     }
 
-    public void kill(DamageSource source) {
+    public void die(DamageSource source) {
         this.player.hurt(source, Float.MAX_VALUE);
     }
 
@@ -598,7 +601,14 @@ public final class Health {
                 DamageTypes.INDIRECT_MAGIC,
                 DamageTypes.MAGIC,
                 DamageTypes.ON_FIRE,
-                ModDamageTypes.BLEEDING
+                ModDamageTypes.BLEEDING,
+                ModDamageTypes.COLD,
+                ModDamageTypes.DROWSINESS,
+                ModDamageTypes.THIRST,
+                ModDamageTypes.HYPOTHERMIA,
+                ModDamageTypes.HYPERTHERMIA,
+                ModDamageTypes.HUNGER,
+                ModDamageTypes.ZOMBIFICATION
         }) {
             if(source.is(key)) {
                 return true;
@@ -641,9 +651,5 @@ public final class Health {
             if (source.is(t)) return true;
         }
         return false;
-    }
-
-    public static boolean once(int time) {
-        return new Random().nextInt(0, time / UPDATE_FREQUENCY) == 0;
     }
 }

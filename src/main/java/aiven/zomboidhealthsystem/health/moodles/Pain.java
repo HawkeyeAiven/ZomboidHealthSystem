@@ -24,29 +24,36 @@ public final class Pain extends Moodle {
     }
 
     @Override
-    public void update() {
+    public void update(float tickDelta) {
         Player player = this.getHealth().getPlayer();
 
-        if(painkillerEffect) {
-            if(painkillerAmount < painkillerMaxAmount) {
-                painkillerAmount += 1.0F / (60 * 20) * Health.UPDATE_FREQUENCY;
-            } else if(painkillerAmount != 0){
-                painkillerEffect = false;
-            }
-        } else {
-            if(painkillerAmount > 0) {
-                final float speed = 1.0F / (600 * 20) * Health.UPDATE_FREQUENCY;
-                painkillerAmount -= speed;
-                painkillerMaxAmount -= speed;
+        if(tickDelta != 0) {
+            if (painkillerEffect) {
+                if (painkillerAmount < painkillerMaxAmount) {
+                    painkillerAmount += 1.0F / (60 * 20) * tickDelta;
+                } else if (painkillerAmount != 0) {
+                    painkillerEffect = false;
+                }
             } else {
-                painkillerAmount = 0;
-                painkillerMaxAmount = 0;
+                if (painkillerAmount > 0) {
+                    final float speed = 1.0F / (600 * 20) * tickDelta;
+                    painkillerAmount -= speed;
+                    painkillerMaxAmount -= speed;
+                } else {
+                    painkillerAmount = 0;
+                    painkillerMaxAmount = 0;
+                }
             }
         }
 
-        if(player.isSleeping() && Config.getInstance().pain_keeps_awake && this.getPain() >= 1 && getHealth().getDrowsiness().getAmplifier() < 2){
-            player.stopSleeping();
-            player.displayClientMessage(Component.translatable("zomboid-health-system.message.pain_not_sleep"),true);
+            if (player.isSleeping() && Config.getInstance().pain_keeps_awake && this.getPain() >= 1 && getHealth().getDrowsiness().getAmplifier() < 2) {
+                player.stopSleeping();
+                player.displayClientMessage(Component.translatable("zomboid-health-system.message.pain_not_sleep"), true);
+            }
+
+
+        if (this.getPain() >= 8) {
+            health.addMobEffect(MobEffects.BLINDNESS, 0, 5 * 20);
         }
     }
 
@@ -93,12 +100,6 @@ public final class Pain extends Moodle {
             this.painkillerAmount = objectNode.get("painkiller_amount").asFloat();
             this.painkillerMaxAmount = objectNode.get("painkiller_max_amount").asFloat();
             this.painkillerEffect = objectNode.get("painkiller_effect").asBoolean();
-        }
-    }
-
-    public void applyEffects() {
-        if (this.getPain() >= 8) {
-            health.addMobEffect(MobEffects.BLINDNESS, 0, 5 * 20);
         }
     }
 

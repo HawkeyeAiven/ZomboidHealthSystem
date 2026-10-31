@@ -3,6 +3,7 @@ package aiven.zomboidhealthsystem.health.moodles;
 import aiven.zomboidhealthsystem.Config;
 import aiven.zomboidhealthsystem.ModDamageTypes;
 import aiven.zomboidhealthsystem.health.Health;
+import aiven.zomboidhealthsystem.utility.Util;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -39,31 +40,33 @@ public final class Hunger extends ImportantMoodle {
     }
 
     @Override
-    protected void _update() {
-        this.addValue(1.0F / 10000 * getMultiplier() * (this.getValue() < 0 ? 2.25F : 1.0F) * Config.getInstance().hunger_multiplier * Health.UPDATE_FREQUENCY);
+    protected void _update(float tickDelta) {
+        if(tickDelta != 0) {
+            this.addValue(1.0F / 10000 * getMultiplier() * (this.getValue() < 0 ? 2.25F : 1.0F) * Config.getInstance().hunger_multiplier * tickDelta);
 
-        if(value >= 1.0F) {
-            this.getHealth().getExhaustion().setMultiplier(this, (getValue() / 3) + 1);
-            if(value >= 2.5F) {
-                if(once(5 * 60 * 20)) {
-                    getHealth().addMobEffect(MobEffects.CONFUSION, 0, 10 * 20);
-                }
-                if(value >= 4.0F) {
-                    getHealth().addMobEffect(MobEffects.MOVEMENT_SLOWDOWN, (int)(value / 3) - 1, 15 * 20);
-                    if(value >= 6.0F) {
-                        getHealth().addMobEffect(MobEffects.DIG_SLOWDOWN,(int) (value / 4) - 1, 15 * 20);
-                        if(once(5 * 60 * 20)) {
-                            getHealth().addMobEffect(MobEffects.CONFUSION, 0, 10 * 20);
-                        }
-                        if(once(5 * 60 * 20)) {
-                            getHealth().addMobEffect(MobEffects.DARKNESS, 0, 5 * 20);
-                        }
-                        if(value >= 8.4F) {
-                            if(once(3 * 60 * 20)) {
-                                getHealth().addMobEffect(MobEffects.CONFUSION, 0, 15 * 20);
+            if (value >= 2.0F) {
+                this.getHealth().getExhaustion().setMultiplier(this, 1 + ((value - 2.0F) / 4));
+                if (value >= 3.0F) {
+                    if (Util.random(1.0F / (5 * 60 * 20))) {
+                        getHealth().addMobEffect(MobEffects.CONFUSION, 0, 10 * 20);
+                    }
+                    if (value >= 4.0F) {
+                        getHealth().addMobEffect(MobEffects.MOVEMENT_SLOWDOWN, (int) (value / 3) - 1, 15 * 20);
+                        if (value >= 6.0F) {
+                            getHealth().addMobEffect(MobEffects.DIG_SLOWDOWN, (int) (value / 4) - 1, 15 * 20);
+                            if (Util.random(1.0F / (5 * 60 * 20))) {
+                                getHealth().addMobEffect(MobEffects.CONFUSION, 0, 10 * 20);
                             }
-                            if(once(3 * 60 * 20)) {
-                                getHealth().addMobEffect(MobEffects.DARKNESS, 0, 10 * 20);
+                            if (Util.random(1.0F / (5 * 60 * 20))) {
+                                getHealth().addMobEffect(MobEffects.DARKNESS, 0, 5 * 20);
+                            }
+                            if (value >= 8.4F) {
+                                if (Util.random(1.0F / (3 * 60 * 20))) {
+                                    getHealth().addMobEffect(MobEffects.CONFUSION, 0, 15 * 20);
+                                }
+                                if (Util.random(1.0F / (3 * 60 * 20))) {
+                                    getHealth().addMobEffect(MobEffects.DARKNESS, 0, 10 * 20);
+                                }
                             }
                         }
                     }

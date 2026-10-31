@@ -1,5 +1,6 @@
 package aiven.zomboidhealthsystem;
 
+import aiven.zomboidhealthsystem.gui.BodyWidgetType;
 import net.minecraft.client.Minecraft;
 
 import org.slf4j.Logger;
@@ -43,7 +44,7 @@ public final class Config {
     public float cold_chance = 1.0F / (9 * 60 * 20);
     public float average_bleeding_chance = 0.25F;
     public float zombification_chance = 0.25F;
-    public float exhaustion_per_jump = 0.033F;
+    public float exhaustion_per_jump = 0.020F;
 
     public float min_comfortable_temp = 10.0F;
     public float max_comfortable_temp = 30.0F;
@@ -74,6 +75,8 @@ public final class Config {
 
     public int time_hud_xpos = 6;
     public int time_hud_ypos = 6;
+
+    public BodyWidgetType bodyWidgetType = BodyWidgetType.ZOMBOID;
 
     public static void initialize() {
         if(file.exists()) {

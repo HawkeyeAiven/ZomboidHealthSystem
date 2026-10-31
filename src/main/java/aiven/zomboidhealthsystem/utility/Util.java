@@ -9,7 +9,6 @@ import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -17,8 +16,10 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Random;
+import java.util.function.Predicate;
 
 public final class Util {
 
@@ -75,15 +76,16 @@ public final class Util {
         return block.defaultBlockState().isAir();
     }
 
-    public static float getDistance(Level level, Block block, BlockPos center, int radius) {
+    public static float getMinDistance(Level level, BlockPos center, int radius, Predicate<BlockState> filter) {
         float distance = -1;
         for(int x = -radius; x <= radius; x++){
             for(int y = -radius; y <= radius; y++){
                 for(int z = -radius; z <= radius; z++){
                     BlockPos pos = new BlockPos(x + center.getX(),y + center.getY(),z + center.getZ());
-                    if(level.getBlockState(pos).getBlock().equals(block)) {
+                    BlockState blockState = level.getBlockState(pos);
+                    if(filter.test(blockState)) {
                         float dis = (float) center.getCenter().distanceTo(pos.getCenter());
-                        if(dis <= radius) {
+                        if (dis <= radius) {
                             if (distance != -1) {
                                 distance = Math.min(dis, distance);
                             } else {

@@ -1,7 +1,6 @@
 package aiven.zomboidhealthsystem.health.bodyparts;
 
 import aiven.zomboidhealthsystem.Config;
-import aiven.zomboidhealthsystem.ModDamageTypes;
 import aiven.zomboidhealthsystem.item.AbstractBandageItem;
 import aiven.zomboidhealthsystem.health.Health;
 import aiven.zomboidhealthsystem.utility.Util;
@@ -59,12 +58,12 @@ public abstract class BodyPart {
 
     public float damage(float amount, DamageSource source) {
         if (getAdditionalHp() > 0) {
-            float d = amount - additionalHp;
-            setAdditionalHp(Math.max(0, additionalHp - amount));
-            amount = d;
+            float g = amount;
+            amount = amount - this.additionalHp;
+            setAdditionalHp(Math.max(this.additionalHp - amount, 0));
 
             if(amount <= 0) {
-                this.player.awardStat(Stats.DAMAGE_ABSORBED, Math.round(-amount * 10.0F));
+                this.player.awardStat(Stats.DAMAGE_ABSORBED, Math.round(g * 10.0F));
             }
         }
 
@@ -74,48 +73,50 @@ public abstract class BodyPart {
 
         float d = amount - this.hp;
         this.hp = Math.max(this.hp - amount, 0);
-        if (Util.random(getBleedingChance(amount, source))) {
+        if (Util.random(getBleedingChance(hp + amount, hp, source))) {
             this.setBleedingValue((this.getMaxHp() - this.getHp()) / 1.85F);
         }
         return Math.max(0, d);
     }
 
-    public void update() {
-        if (getHp() >= getMaxHp()) {
-            setBleedingValue(0);
-        }
-
-        if (this.isBandaged()) {
-            this.heal(
-                    bandageItem.getHealAmount()
-                            / Health.BANDAGE_HEAL_TIME
-                            / (this.hasInfection() ? 3 : 1)
-                            * (this.getHealth().getHunger().getValue() < 0 ? 1.25F : 1.0F)
-                            / (float) Math.sqrt(Math.max(getHealth().getHunger().getValue(), 1))
-                            * Health.UPDATE_FREQUENCY
-            );
-
-            this.bandageTime += Health.UPDATE_FREQUENCY;
-
-            if (bandageItem.isDirty() && isBleeding()) {
-                if (Util.random(Config.getInstance().infection_chance * Health.UPDATE_FREQUENCY)) {
-                    this.hasInfection = true;
-                }
+    public void update(float tickDelta) {
+        if(tickDelta != 0) {
+            if (getHp() >= getMaxHp()) {
+                setBleedingValue(0);
             }
 
-            if (bandageItem.isStopBleeding()) {
-                if (this.isBleeding()) {
-                    this.setBleedingValue(this.getBleedingValue() - (0.00015F * Health.UPDATE_FREQUENCY));
+            if (this.isBandaged()) {
+                this.heal(
+                        bandageItem.getHealAmount()
+                                / Health.BANDAGE_HEAL_TIME
+                                / (this.hasInfection() ? 3 : 1)
+                                * (this.getHealth().getHunger().getValue() < 0 ? 1.25F : 1.0F)
+                                / (float) Math.sqrt(Math.max(getHealth().getHunger().getValue(), 1))
+                                * tickDelta
+                );
 
-                    if (this.getBandageTime() > Health.BANDAGE_BECOMES_DIRTY_AFTER / (this.getBleedingValue() + 0.5F)) {
+                this.bandageTime += tickDelta;
 
-                        this.bandageItem = this.bandageItem.getDirtyBandageItem();
+                if (bandageItem.isDirty() && isBleeding()) {
+                    if (Util.random(Config.getInstance().infection_chance * tickDelta)) {
+                        this.hasInfection = true;
+                    }
+                }
+
+                if (bandageItem.isStopBleeding()) {
+                    if (this.isBleeding()) {
+                        this.setBleedingValue(this.getBleedingValue() - (0.00015F * tickDelta));
+
+                        if (this.getBandageTime() > Health.BANDAGE_BECOMES_DIRTY_AFTER / (this.getBleedingValue() + 0.5F)) {
+
+                            this.bandageItem = this.bandageItem.getDirtyBandageItem();
+                        }
                     }
                 }
             }
-        }
-        if (!this.isBandaged() || !this.bandageItem.isStopBleeding()) {
-            this.health.getBlood().addValue(-this.getBleedingValue() / 30 * Health.UPDATE_FREQUENCY);
+            if (!this.isBandaged() || !this.bandageItem.isStopBleeding()) {
+                this.health.getBlood().addValue(-this.getBleedingValue() / 30 * tickDelta);
+            }
         }
     }
 
@@ -135,15 +136,17 @@ public abstract class BodyPart {
         }
     }
 
-    protected float getBleedingChance(float damage, DamageSource source) {
+    protected float getBleedingChance(float oldHp, float newHp, DamageSource source) {
         Objects.requireNonNull(source, "source == null");
 
-        if (this.getHp() <= 1) {
+        float damage = oldHp - newHp;
+
+        if (newHp <= 1) {
             return 1.0F;
         }
 
         float chance = Config.getInstance().average_bleeding_chance * damage;
-        chance *= Math.max(1, (this.getMaxHp() - this.getHp()) * 0.875F);
+        chance *= Math.max(1, (this.getMaxHp() - newHp) * 0.875F);
 
         if ((source.is(DamageTypes.FALL) || source.is(DamageTypes.HOT_FLOOR)) && !getHealth().getPlayer().getPose().equals(Pose.SWIMMING)) {
             return chance / 2.25F;
@@ -151,8 +154,6 @@ public abstract class BodyPart {
             return chance * 1.05F;
         } else if (Health.isItDamageToEntireBody(source)) {
             return chance / 2.0F;
-        } else if (source.is(DamageTypes.DROWN)) {
-            return 0;
         } else {
             return chance;
         }

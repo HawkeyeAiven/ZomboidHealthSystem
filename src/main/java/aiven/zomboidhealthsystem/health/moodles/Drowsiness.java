@@ -4,6 +4,7 @@ import aiven.zomboidhealthsystem.Config;
 import aiven.zomboidhealthsystem.ModDamageTypes;
 import aiven.zomboidhealthsystem.ZomboidHealthSystem;
 import aiven.zomboidhealthsystem.health.Health;
+import aiven.zomboidhealthsystem.utility.Util;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -45,47 +46,49 @@ public final class Drowsiness extends ImportantMoodle {
     }
 
     @Override
-    protected void _update() {
-        addTicks(1.0F * 1.58F * getMultiplier() * Config.getInstance().drowsiness_multiplier * Health.UPDATE_FREQUENCY);
+    protected void _update(float tickDelta) {
+        if(tickDelta != 0) {
+            addTicks(1.0F * 1.58F * getMultiplier() * Config.getInstance().drowsiness_multiplier * tickDelta);
 
-        if(caffeine_effect) {
-            if(caffeine_value < max_caffeine_value) {
-                caffeine_value += 1.0F / (60 * 20) * Health.UPDATE_FREQUENCY;
-            } else if(max_caffeine_value != 0){
-                caffeine_effect = false;
-            }
-        } else {
-            if(caffeine_value > max_caffeine_value * -0.75F) {
-                caffeine_value -= 1.0F / (drowsinessTime / 4.0F) * Health.UPDATE_FREQUENCY;
-            }
-        }
-
-        if(sleeping_pills_effect) {
-            if(sleeping_pills_value < max_sleeping_pills_value) {
-                sleeping_pills_value += 1.0F / (60 * 20) * Config.getInstance().sleeping_pills_multiplier * Health.UPDATE_FREQUENCY;
-            } else if(max_sleeping_pills_value != 0) {
-                sleeping_pills_effect = false;
-            }
-        } else {
-            if(sleeping_pills_value > 0) {
-                sleeping_pills_value -= 1.0F / (5 * 60 * 20) * Health.UPDATE_FREQUENCY;
+            if (caffeine_effect) {
+                if (caffeine_value < max_caffeine_value) {
+                    caffeine_value += 1.0F / (60 * 20) * tickDelta;
+                } else if (max_caffeine_value != 0) {
+                    caffeine_effect = false;
+                }
             } else {
-                sleeping_pills_value = 0;
-                max_sleeping_pills_value = 0;
-                sleeping_pills_effect = true;
-            }
-        }
-
-        this.getHealth().getExhaustion().setMultiplier(this, ((float) getAmplifier() / 2) + 1);
-
-        if (this.getAmplifier() >= 1) {
-            if (once(5 * 60 * 20 / this.getAmplifier())) {
-                this.getHealth().addMobEffect(MobEffects.BLINDNESS, 0, 5 * 20);
+                if (caffeine_value > max_caffeine_value * -0.75F) {
+                    caffeine_value -= 1.0F / (drowsinessTime / 4.0F) * tickDelta;
+                }
             }
 
-            if (this.getAmplifier() >= 2) {
-                if (this.getAmplifier() >= 3) {
-                    this.getHealth().addMobEffect(MobEffects.DIG_SLOWDOWN, (this.getAmplifier() / 2) - 1, 15 * 20);
+            if (sleeping_pills_effect) {
+                if (sleeping_pills_value < max_sleeping_pills_value) {
+                    sleeping_pills_value += 1.0F / (60 * 20) * Config.getInstance().sleeping_pills_multiplier * tickDelta;
+                } else if (max_sleeping_pills_value != 0) {
+                    sleeping_pills_effect = false;
+                }
+            } else {
+                if (sleeping_pills_value > 0) {
+                    sleeping_pills_value -= 1.0F / (5 * 60 * 20) * tickDelta;
+                } else {
+                    sleeping_pills_value = 0;
+                    max_sleeping_pills_value = 0;
+                    sleeping_pills_effect = true;
+                }
+            }
+
+            this.getHealth().getExhaustion().setMultiplier(this, ((float) getAmplifier() / 2) + 1);
+
+            if (this.getAmplifier() >= 1) {
+                if (Util.random(1.0F / ((float) (5 * 60 * 20) / this.getAmplifier()))) {
+                    this.getHealth().addMobEffect(MobEffects.BLINDNESS, 0, 5 * 20);
+                }
+
+                if (this.getAmplifier() >= 2) {
+                    if (this.getAmplifier() >= 3) {
+                        this.getHealth().addMobEffect(MobEffects.DIG_SLOWDOWN, (this.getAmplifier() / 2) - 1, 15 * 20);
+                    }
                 }
             }
         }
@@ -175,10 +178,6 @@ public final class Drowsiness extends ImportantMoodle {
     public void addSleepingPills(float amount) {
         this.max_sleeping_pills_value += amount;
         this.sleeping_pills_effect = true;
-    }
-
-    public boolean hasCaffeine() {
-        return caffeine_value != 0 && max_caffeine_value != 0;
     }
 
     public void addTicks(float amount) {

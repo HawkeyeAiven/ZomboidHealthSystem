@@ -33,23 +33,25 @@ public final class Zombification extends ImportantMoodle {
     }
 
     @Override
-    public void _update() {
-        if(this.getValue() >= 1) {
-            this.addValue(1.0F / (4 * 60 * 20) * Health.UPDATE_FREQUENCY);
-            if(this.getValue() >= 1.25F) {
-                getHealth().getExhaustion().setMultiplier(this, getValue());
-                getHealth().getHunger().setMultiplier(this, getValue() * 2.50F);
-                getHealth().getThirst().setMultiplier(this, getValue() * 1.75F);
-                if(once((int) (3 * 60 * 20 / getValue()))) {
-                    getHealth().addMobEffect(MobEffects.CONFUSION, 0, 10 * 20);
-                }
-                if(once((int) (3 * 60 * 20 / getValue()))) {
-                    getHealth().addMobEffect(MobEffects.BLINDNESS, 0, 10 * 20);
-                }
-                if(this.getValue() >= 2.0F) {
-                    Wet wet = getHealth().getWet();
-                    if(wet.getValue() <= 2.1F) {
-                        wet.addValue(1.0F / (30 * 20) * Health.UPDATE_FREQUENCY);
+    public void _update(float tickDelta) {
+        if(tickDelta != 0) {
+            if (this.getValue() >= 1) {
+                this.addValue(1.0F / (4 * 60 * 20) * tickDelta);
+                if (this.getValue() >= 1.25F) {
+                    getHealth().getExhaustion().setMultiplier(this, getValue());
+                    getHealth().getHunger().setMultiplier(this, getValue() * 2.50F);
+                    getHealth().getThirst().setMultiplier(this, getValue() * 1.75F);
+                    if (Util.random(1.0F / (3 * 60 * 20 / getValue()))) {
+                        getHealth().addMobEffect(MobEffects.CONFUSION, 0, 10 * 20);
+                    }
+                    if (Util.random(1.0F / (3 * 60 * 20 / getValue()))) {
+                        getHealth().addMobEffect(MobEffects.BLINDNESS, 0, 10 * 20);
+                    }
+                    if (this.getValue() >= 2.0F) {
+                        Wet wet = getHealth().getWet();
+                        if (wet.getValue() <= 2.1F) {
+                            wet.addValue(1.0F / (30 * 20) * tickDelta);
+                        }
                     }
                 }
             }
@@ -63,7 +65,7 @@ public final class Zombification extends ImportantMoodle {
         zombieEntity.moveTo(pos.x, pos.y, pos.z);
         zombieEntity.setCustomName(getPlayer().getName());
         getPlayer().level().addFreshEntity(zombieEntity);
-        getHealth().kill(Util.getDamageSource(getDamageType(), getPlayer().level()));
+        getHealth().die(Util.getDamageSource(getDamageType(), getPlayer().level()));
     }
 
     @Override

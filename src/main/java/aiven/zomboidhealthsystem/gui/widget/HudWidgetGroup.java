@@ -1,6 +1,7 @@
 package aiven.zomboidhealthsystem.gui.widget;
 
 import aiven.zomboidhealthsystem.Config;
+import aiven.zomboidhealthsystem.gui.BodyWidgetType;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -10,7 +11,7 @@ public class HudWidgetGroup extends ModWidgetGroup {
 
     private final TimeWidget timeWidget;
     private final MoodlesWidget moodlesWidget;
-    private final BodyWidget bodyWidget;
+    private final AbstractBodyWidget bodyWidget;
 
     public HudWidgetGroup(Minecraft minecraft) {
         this.minecraft = minecraft;
@@ -19,7 +20,11 @@ public class HudWidgetGroup extends ModWidgetGroup {
 
         this.timeWidget = new TimeWidget(config.time_hud_xpos, config.time_hud_ypos, minecraft);
         this.moodlesWidget = new MoodlesWidget(0, config.moodles_hud_ypos);
-        this.bodyWidget = new BodyWidget(config.health_hud_xpos, config.health_hud_ypos);
+        if(BodyWidgetType.ZOMBOID.equals(Config.getInstance().bodyWidgetType)) {
+            this.bodyWidget = new ZomboidBodyWidget(config.health_hud_xpos, config.health_hud_ypos);
+        } else {
+            this.bodyWidget = new SimpleBodyWidget(config.health_hud_xpos, config.health_hud_ypos);
+        }
 
         if(config.time_hud) {
             addChildren(timeWidget);
@@ -50,7 +55,7 @@ public class HudWidgetGroup extends ModWidgetGroup {
         return moodlesWidget;
     }
 
-    public BodyWidget getBodyWidget() {
+    public AbstractBodyWidget getBodyWidget() {
         return bodyWidget;
     }
 }

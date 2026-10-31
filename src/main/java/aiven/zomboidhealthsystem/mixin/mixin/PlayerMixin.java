@@ -82,7 +82,6 @@ public abstract class PlayerMixin extends LivingEntityMixin implements PlayerAcc
         if (!this.isInvulnerableTo(damageSource)) {
             damage = this.getDamageAfterArmorAbsorb(damageSource, damage);
             damage = this.getDamageAfterMagicAbsorb(damageSource, damage);
-            damage = Math.max(damage - this.getAbsorptionAmount(), 0.0F);
 
             if (damage != 0.0F) {
                 this.getCombatTracker().recordDamage(damageSource, damage);

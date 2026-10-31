@@ -9,6 +9,9 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.CombatTracker;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodProperties;
@@ -17,6 +20,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 
 import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = LivingEntity.class, priority = 10000)
 public abstract class LivingEntityMixin extends EntityMixin {
@@ -94,12 +100,12 @@ public abstract class LivingEntityMixin extends EntityMixin {
 
     /**
      * @author Aiven
-     * @reason Перенаправление на {@link Health#isAlive()}
+     * @reason Перенаправление на {@link Health#isDeadOrDying()} )}
      */
     @Overwrite
     public boolean isDeadOrDying() {
         if(toLivingEntity() instanceof PlayerAccess playerAccess) {
-            return !playerAccess.zomboid_health_system$getModHealth().isAlive() || getHealth() == 0;
+            return playerAccess.zomboid_health_system$getModHealth().isDeadOrDying() || getHealth() == 0;
         } else {
             return this.getHealth() <= 0.0F;
         }
@@ -115,6 +121,21 @@ public abstract class LivingEntityMixin extends EntityMixin {
             return playerAccess.zomboid_health_system$getModHealth().isAlive() && getHealth() != 0;
         } else {
             return !this.isRemoved() && this.getHealth() > 0.0F;
+        }
+    }
+
+    @Inject(at = @At("RETURN"), method = "addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z")
+    private void addEffect(MobEffectInstance mobEffectInstance, Entity entity, CallbackInfoReturnable<Boolean> cir) {
+        if (!level().isClientSide()) {
+            if (toLivingEntity() instanceof PlayerAccess playerAccess) {
+                if (mobEffectInstance.getEffect().equals(MobEffects.ABSORPTION)) {
+                    Health health = playerAccess.zomboid_health_system$getModHealth();
+                    int addHp = (mobEffectInstance.getAmplifier() + 1) * 4;
+                    if(health.getAdditionalHpSum() < addHp) {
+                        health.setAdditionalHp(addHp);
+                    }
+                }
+            }
         }
     }
 

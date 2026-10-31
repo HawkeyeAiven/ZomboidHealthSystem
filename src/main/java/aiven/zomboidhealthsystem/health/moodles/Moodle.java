@@ -28,7 +28,7 @@ public abstract class Moodle {
 
     public abstract void readNbt(String value);
 
-    public abstract void update();
+    public abstract void update(float tickDelta);
 
     public boolean showIcon(){
         return this.getAmplifier() != 0 && getMoodleIconTexture() != null && getBackgroundTexture() != null;
@@ -79,9 +79,5 @@ public abstract class Moodle {
 
     protected final boolean isOverWorld() {
         return getPlayer().level().equals(getPlayer().getServer().overworld());
-    }
-
-    protected static boolean once(int time){
-        return Health.once(time);
     }
 }

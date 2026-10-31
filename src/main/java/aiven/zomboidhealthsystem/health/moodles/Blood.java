@@ -36,13 +36,15 @@ public final class Blood extends ImportantMoodle {
     }
 
     @Override
-    protected void _update() {
-        if (this.getPlayer().hasEffect(MobEffects.REGENERATION)) {
-            int amplifier = this.getPlayer().getEffect(MobEffects.REGENERATION).getAmplifier();
-            this.addValue(((float) amplifier + 1) / 100.0F * Health.UPDATE_FREQUENCY);
-        }
-        if(health.getHunger().getValue() < 2) {
-            addValue(0.003F * (health.getHunger().getValue() < 0 ? 1.25F : 1.0F) * Health.UPDATE_FREQUENCY);
+    protected void _update(float tickDelta) {
+        if(tickDelta != 0) {
+            if (this.getPlayer().hasEffect(MobEffects.REGENERATION)) {
+                int amplifier = this.getPlayer().getEffect(MobEffects.REGENERATION).getAmplifier();
+                this.addValue(((float) amplifier + 1) / 100.0F * tickDelta);
+            }
+            if (health.getHunger().getValue() < 2) {
+                addValue(0.003F * (health.getHunger().getValue() < 0 ? 1.25F : 1.0F) * tickDelta);
+            }
         }
     }
 

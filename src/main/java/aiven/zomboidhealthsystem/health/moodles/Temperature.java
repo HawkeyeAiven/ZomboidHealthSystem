@@ -14,6 +14,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.AbstractFurnaceBlock;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 
 import tools.jackson.databind.ObjectMapper;
@@ -35,8 +37,9 @@ public final class Temperature extends ImportantMoodle {
     private boolean isFeelingHot = false;
 
     private float heat = 0;
-    private float heatFromCampfire = 0;
-    private float heatFromFurnace = 0;
+
+    private float heatFromBlocks = -1;
+    private float heatFromBlocksTickDelta = 0;
 
 
     public Temperature(Health health) {
@@ -70,92 +73,101 @@ public final class Temperature extends ImportantMoodle {
     }
 
     @Override
-    public void _update() {
-        float deltaTemp = Math.abs(this.getValue() - AVERAGE_TEMPERATURE_BODY);
-        boolean isOverWorld = isOverWorld();
-        if(Config.getInstance().temperature) {
-            Thirst thirst = getHealth().getThirst();
-            Hunger hunger = getHealth().getHunger();
-
-            thirst.setMultiplier(this, 1.0F);
-            hunger.setMultiplier(this, 1.0F);
-            this.getHealth().getExhaustion().setMultiplier(this, 1.0F);
-
-            float temperature = getPerceivedTemperature();
-            float minComfortableTemp = getMinComfortableTemperature();
-            float maxComfortableTemp = getMaxComfortableTemperature();
-
-            if (temperature < minComfortableTemp && isOverWorld) {
-                this.value -= (((minComfortableTemp - temperature) / 2)
-                        / 10000
-                        * Math.max(1, (hunger.getValue() / 2.5F) + 1)
-                        * Config.getInstance().temperature_multiplier
-                        * Health.UPDATE_FREQUENCY
-                );
-                isFeelingCold = true;
-                isFeelingHot = false;
-            } else if (temperature > maxComfortableTemp && isOverWorld) {
-                this.value += (((temperature - maxComfortableTemp) / 2)
-                        / 10000
-                        * Math.max(1, thirst.getValue())
-                        * Config.getInstance().temperature_multiplier
-                        * Health.UPDATE_FREQUENCY
-                );
-                isFeelingHot = true;
-                isFeelingCold = false;
-            } else {
-                isFeelingHot = false;
-                isFeelingCold = false;
-                if (this.value < AVERAGE_TEMPERATURE_BODY - 0.1F) {
-                    this.value += 0.003F
-                            * Config.getInstance().temperature_multiplier
-                            * Health.UPDATE_FREQUENCY;
-                    hunger.setMultiplier(this, 1.33F);
-                } else if (this.value > AVERAGE_TEMPERATURE_BODY + 0.1F) {
-                    this.value -= 0.003F
-                            / ((thirst.getValue() + 1.0F) * 1.5F)
-                            * Config.getInstance().temperature_multiplier
-                            * Health.UPDATE_FREQUENCY;
-                    thirst.setMultiplier(this, 1.33F);
+    public void _update(float tickDelta) {
+        if(tickDelta != 0) {
+            float deltaTemp = Math.abs(this.getValue() - AVERAGE_TEMPERATURE_BODY);
+            boolean isOverWorld = isOverWorld();
+            if (Config.getInstance().temperature) {
+                if (heatFromBlocks == -1) {
+                    heatFromBlocks = getHeatFromHeatSources();
+                } else {
+                    heatFromBlocksTickDelta += tickDelta;
+                    if (heatFromBlocksTickDelta >= 20) {
+                        heatFromBlocksTickDelta = 0;
+                        heatFromBlocks = getHeatFromHeatSources();
+                    }
                 }
-            }
 
-            if (deltaTemp >= 1.5F) {
-                this.getHealth().getExhaustion().setMultiplier(this, deltaTemp / 1.5F);
-                if (deltaTemp >= 3.0F) {
-                    this.getHealth().addMobEffect(MobEffects.MOVEMENT_SLOWDOWN, (int) deltaTemp / 2 - 1, 15 * 20);
-                    this.getHealth().addMobEffect(MobEffects.DIG_SLOWDOWN, (int) deltaTemp / 2 - 1, 15 * 20);
-                    this.getHealth().addMobEffect(MobEffects.WEAKNESS, (int) deltaTemp / 2 - 1, 15 * 20);
-                    if (once(2 * 60 * 20)) {
-                        this.getHealth().addMobEffect(MobEffects.CONFUSION, 0, 10 * 20);
+                Thirst thirst = getHealth().getThirst();
+                Hunger hunger = getHealth().getHunger();
+
+                thirst.setMultiplier(this, 1.0F);
+                hunger.setMultiplier(this, 1.0F);
+                this.getHealth().getExhaustion().setMultiplier(this, 1.0F);
+
+                float temperature = getPerceivedTemperature();
+                float minComfortableTemp = getMinComfortableTemperature();
+                float maxComfortableTemp = getMaxComfortableTemperature();
+
+                if (temperature < minComfortableTemp && isOverWorld) {
+                    this.value -= (((minComfortableTemp - temperature) / 2)
+                            / 10000
+                            * Math.max(1, (hunger.getValue() / 2.5F) + 1)
+                            * Config.getInstance().temperature_multiplier
+                            * tickDelta
+                    );
+                    isFeelingCold = true;
+                    isFeelingHot = false;
+                } else if (temperature > maxComfortableTemp && isOverWorld) {
+                    this.value += (((temperature - maxComfortableTemp) / 2)
+                            / 10000
+                            * Math.max(1, thirst.getValue())
+                            * Config.getInstance().temperature_multiplier
+                            * tickDelta
+                    );
+                    isFeelingHot = true;
+                    isFeelingCold = false;
+                } else {
+                    isFeelingHot = false;
+                    isFeelingCold = false;
+                    if (this.value < AVERAGE_TEMPERATURE_BODY - 0.1F) {
+                        this.value += 0.003F
+                                * Config.getInstance().temperature_multiplier
+                                * tickDelta;
+                        hunger.setMultiplier(this, 1.33F);
+                    } else if (this.value > AVERAGE_TEMPERATURE_BODY + 0.1F) {
+                        this.value -= 0.003F
+                                / ((thirst.getValue() + 1.0F) * 1.5F)
+                                * Config.getInstance().temperature_multiplier
+                                * tickDelta;
+                        thirst.setMultiplier(this, 1.33F);
                     }
-                    if (once(2 * 60 * 20)) {
-                        this.getHealth().addMobEffect(MobEffects.DARKNESS, 0, 5 * 20);
-                    }
-                    if (deltaTemp >= 4.5F) {
-                        if (once(60 * 20)) {
+                }
+
+                if (deltaTemp >= 1.5F) {
+                    this.getHealth().getExhaustion().setMultiplier(this, deltaTemp / 1.5F);
+                    if (deltaTemp >= 3.0F) {
+                        this.getHealth().addMobEffect(MobEffects.MOVEMENT_SLOWDOWN, (int) deltaTemp / 2 - 1, 15 * 20);
+                        this.getHealth().addMobEffect(MobEffects.DIG_SLOWDOWN, (int) deltaTemp / 2 - 1, 15 * 20);
+                        this.getHealth().addMobEffect(MobEffects.WEAKNESS, (int) deltaTemp / 2 - 1, 15 * 20);
+                        if (Util.random(1.0F / (2 * 60 * 20))) {
                             this.getHealth().addMobEffect(MobEffects.CONFUSION, 0, 10 * 20);
                         }
-                        if (once(60 * 20)) {
+                        if (Util.random(1.0F / (2 * 60 * 20))) {
                             this.getHealth().addMobEffect(MobEffects.DARKNESS, 0, 5 * 20);
+                        }
+                        if (deltaTemp >= 4.5F) {
+                            if (Util.random(1.0F / (60 * 20))) {
+                                this.getHealth().addMobEffect(MobEffects.CONFUSION, 0, 10 * 20);
+                            }
+                            if (Util.random(1.0F / (60 * 20))) {
+                                this.getHealth().addMobEffect(MobEffects.DARKNESS, 0, 5 * 20);
+                            }
                         }
                     }
                 }
             }
+            heat = 0;
         }
-
-        heat = 0;
-        heatFromCampfire = 0;
-        heatFromFurnace = 0;
     }
 
     @Override
     protected void die() {
         if (this.value <= MIN_TEMPERATURE_BODY) {
-            this.getHealth().kill(Util.getDamageSource(ModDamageTypes.HYPOTHERMIA, getPlayer().level()));
+            this.getHealth().die(Util.getDamageSource(ModDamageTypes.HYPOTHERMIA, getPlayer().level()));
         }
         if (this.value >= MAX_TEMPERATURE_BODY) {
-            this.getHealth().kill(Util.getDamageSource(ModDamageTypes.HYPERTHERMIA, getPlayer().level()));
+            this.getHealth().die(Util.getDamageSource(ModDamageTypes.HYPERTHERMIA, getPlayer().level()));
         }
     }
 
@@ -220,7 +232,7 @@ public final class Temperature extends ImportantMoodle {
     }
 
     public float getPerceivedTemperature() {
-        return getTemperatureAtUserPos() + getHeat() + getHeatFromHeatSources() + getHeatFromArmor();
+        return getTemperatureAtUserPos() + getHeat() + heatFromBlocks + getHeatFromArmor();
     }
 
     public float getTemperatureAtUserPos() {
@@ -243,7 +255,29 @@ public final class Temperature extends ImportantMoodle {
     }
 
     public float getHeatFromHeatSources() {
-        return getHeatFromCampfire() + getHeatFromFurnace() + getHeatFromLava();
+        float distance = Util.getMinDistance(getLevel(), getPlayer().blockPosition(), 5, blockState -> {
+            for(Block block : new Block[]{
+                    Blocks.LAVA,
+                    Blocks.CAMPFIRE,
+                    Blocks.SOUL_CAMPFIRE,
+                    Blocks.FIRE,
+                    Blocks.SOUL_FIRE
+            }) {
+                if(blockState.getBlock().equals(block)) {
+                    return true;
+                }
+            }
+            if(blockState.getBlock() instanceof AbstractFurnaceBlock furnace) {
+                if(blockState.getValue(AbstractFurnaceBlock.LIT)) {
+                    return true;
+                }
+            }
+            return false;
+        });
+        if(distance == -1 || distance >= 5) {
+            return 0;
+        }
+        return Config.getInstance().max_heat_from_block - (distance * Config.getInstance().max_heat_from_block / 5);
     }
 
     private float getMinComfortableTemperature() {
@@ -277,22 +311,6 @@ public final class Temperature extends ImportantMoodle {
         this.heat = heat;
     }
 
-    public void setHeatFromCampfire(float heatFromCampfire) {
-        this.heatFromCampfire = heatFromCampfire;
-    }
-
-    public void setHeatFromFurnace(float heatFromFurnace) {
-        this.heatFromFurnace = heatFromFurnace;
-    }
-
-    public float getHeatFromCampfire() {
-        return heatFromCampfire;
-    }
-
-    public float getHeatFromFurnace() {
-        return heatFromFurnace;
-    }
-
     public void setTemperature(float temperature) {
         this.value = temperature;
     }
@@ -303,14 +321,6 @@ public final class Temperature extends ImportantMoodle {
 
     public float getHeat() {
         return heat;
-    }
-
-    public float getHeatFromLava() {
-        float distance = Util.getDistance(getLevel(), Blocks.LAVA, getPlayer().blockPosition(), 5);
-        if(distance == -1 || distance >= 5) {
-            return 0;
-        }
-        return Config.getInstance().max_heat_from_block - (distance * Config.getInstance().max_heat_from_block / 5);
     }
 
     public boolean isFeelingCold() {

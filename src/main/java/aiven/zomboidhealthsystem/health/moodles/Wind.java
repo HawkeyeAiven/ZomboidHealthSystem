@@ -20,10 +20,11 @@ public final class Wind extends SimpleMoodle {
     }
 
     @Override
-    public void update() {
-        amount = getWind();
-
-        getHealth().getTemperature().addHeat(-amount * (getHealth().getWet().getValue() / 2 + 1));
+    public void update(float tickDelta) {
+        if(tickDelta != 0) {
+            amount = getWind();
+            getHealth().getTemperature().addHeat(-amount * (getHealth().getWet().getValue() / 2 + 1));
+        }
     }
 
     @Override

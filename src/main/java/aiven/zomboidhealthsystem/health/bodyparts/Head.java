@@ -1,6 +1,7 @@
 package aiven.zomboidhealthsystem.health.bodyparts;
 
 import aiven.zomboidhealthsystem.health.Health;
+import aiven.zomboidhealthsystem.utility.Util;
 
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
@@ -27,10 +28,10 @@ public final class Head extends ImportartBodyPart {
     }
 
     @Override
-    public void update() {
-        super.update();
+    public void update(float tickDelta) {
+        super.update(tickDelta);
         if (this.getMaxHp() / 2 >= this.getHp()) {
-            if(Health.once(3 * 60 * 20)){
+            if(Util.random(tickDelta / (3 * 60 * 20))){
                 getHealth().addMobEffect(MobEffects.BLINDNESS, 10 * 20, 0);
             }
         }

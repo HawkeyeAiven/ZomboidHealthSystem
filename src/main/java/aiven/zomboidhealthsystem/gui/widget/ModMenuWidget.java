@@ -1,6 +1,8 @@
 package aiven.zomboidhealthsystem.gui.widget;
 
+import aiven.zomboidhealthsystem.Config;
 import aiven.zomboidhealthsystem.ZomboidHealthSystem;
+import aiven.zomboidhealthsystem.gui.BodyWidgetType;
 import aiven.zomboidhealthsystem.health.Health;
 import aiven.zomboidhealthsystem.utility.ClientUtil;
 import aiven.zomboidhealthsystem.utility.ModTime;
@@ -67,12 +69,21 @@ public class ModMenuWidget extends ModContainer {
         addChildren(healthTabButton);
         addChildren(infoTabButton);
 
-        this.healthTabGroup.addChildren(new BodyWidget(14, 50) {
-            @Override
-            protected boolean isValidClickButton(int i) {
-                return false;
-            }
-        });
+        if(BodyWidgetType.ZOMBOID.equals(Config.getInstance().bodyWidgetType)) {
+            this.healthTabGroup.addChildren(new ZomboidBodyWidget(16, 50) {
+                @Override
+                protected boolean isValidClickButton(int i) {
+                    return false;
+                }
+            });
+        } else {
+            this.healthTabGroup.addChildren(new SimpleBodyWidget(14, 50) {
+                @Override
+                protected boolean isValidClickButton(int i) {
+                    return false;
+                }
+            });
+        }
         {
             int x1 = 75;
             int y1 = 60;

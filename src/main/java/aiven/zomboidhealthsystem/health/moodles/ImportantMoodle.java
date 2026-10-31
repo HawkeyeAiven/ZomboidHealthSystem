@@ -13,19 +13,19 @@ public abstract class ImportantMoodle extends SimpleMoodle {
 
     public abstract boolean canPlayerLive();
 
-    protected abstract void _update();
+    protected abstract void _update(float tickDelta);
 
     protected abstract ResourceKey<DamageType> getDamageType();
 
     @Override
-    public final void update() {
+    public final void update(float tickDelta) {
         if(!canPlayerLive()) {
             die();
         }
-        _update();
+        _update(tickDelta);
     }
 
     protected void die() {
-        health.kill(Util.getDamageSource(getDamageType(), getPlayer().level()));
+        health.die(Util.getDamageSource(getDamageType(), getPlayer().level()));
     }
 }
