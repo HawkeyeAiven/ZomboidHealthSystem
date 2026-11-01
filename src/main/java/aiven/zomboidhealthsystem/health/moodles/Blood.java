@@ -3,6 +3,7 @@ package aiven.zomboidhealthsystem.health.moodles;
 import aiven.zomboidhealthsystem.ModDamageTypes;
 import aiven.zomboidhealthsystem.ZomboidHealthSystem;
 import aiven.zomboidhealthsystem.health.Health;
+import aiven.zomboidhealthsystem.utility.Util;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -44,6 +45,17 @@ public final class Blood extends ImportantMoodle {
             }
             if (health.getHunger().getValue() < 2) {
                 addValue(0.003F * (health.getHunger().getValue() < 0 ? 1.25F : 1.0F) * tickDelta);
+            }
+
+            health.getExhaustion().setMultiplier(this, (1.0F + ((100 - value) / 100)));
+            if(value <= 25) {
+                if(Util.random(tickDelta / (30 * 20))) {
+                    health.addMobEffect(MobEffects.CONFUSION, 0, 15 * 20);
+                }
+
+                if(Util.random(tickDelta / (30 * 20))) {
+                    health.addMobEffect(MobEffects.BLINDNESS, 0, 15 * 20);
+                }
             }
         }
     }

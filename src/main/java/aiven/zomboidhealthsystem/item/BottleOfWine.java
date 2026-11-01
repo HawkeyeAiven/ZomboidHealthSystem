@@ -1,8 +1,5 @@
 package aiven.zomboidhealthsystem.item;
 
-import aiven.zomboidhealthsystem.mixin.access.PlayerAccess;
-import aiven.zomboidhealthsystem.health.Health;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.network.chat.Component;
@@ -39,11 +36,6 @@ public class BottleOfWine extends Item {
         if (livingEntity instanceof ServerPlayer serverPlayer) {
             CriteriaTriggers.CONSUME_ITEM.trigger(serverPlayer, itemStack);
             serverPlayer.awardStat(Stats.ITEM_USED.get(this));
-        }
-
-        if(livingEntity instanceof ServerPlayer player) {
-            Health health = ((PlayerAccess) player).zomboid_health_system$getModHealth();
-            health.getDrunkenness().addValue(1.75F);
         }
 
         livingEntity.eat(level, itemStack);

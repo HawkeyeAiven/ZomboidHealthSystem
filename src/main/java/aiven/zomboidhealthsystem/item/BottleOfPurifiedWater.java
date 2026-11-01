@@ -1,7 +1,5 @@
 package aiven.zomboidhealthsystem.item;
 
-import aiven.zomboidhealthsystem.mixin.access.PlayerAccess;
-import aiven.zomboidhealthsystem.health.Health;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -35,9 +33,6 @@ public class BottleOfPurifiedWater extends Item {
         if (livingEntity instanceof ServerPlayer serverPlayer) {
             CriteriaTriggers.CONSUME_ITEM.trigger(serverPlayer, itemStack);
             serverPlayer.awardStat(Stats.ITEM_USED.get(this));
-
-            Health health = ((PlayerAccess) serverPlayer).zomboid_health_system$getModHealth();
-            health.getThirst().drink(1.25F, true);
         }
 
         return new ItemStack(Items.GLASS_BOTTLE);

@@ -26,7 +26,7 @@ public class ModButtonWithDelay extends ModButton {
                 isClicked = false;
                 execute(mouseX, mouseY);
             } else {
-                setMessage(Component.literal(String.valueOf(Util.floor((delay - d) / 20, 10))));
+                setMessage(Component.literal(String.valueOf(Util.floor((delay - d) / 20, 1))));
             }
         } else {
             d = 0;

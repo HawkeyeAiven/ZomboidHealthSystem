@@ -52,8 +52,8 @@
   "zomboid-health-system.tooltip.shows_temp_thermometer": "Displays body temperature and feels-like temperature",
   "zomboid-health-system.tooltip.works_over_time": "Takes effect over time",
   "zomboid-health-system.tooltip.doesnt_stop_bleeding": "Does not stop bleeding",
-  "zomboid-health-system.tooltip.hunger": "Hunger",
-  "zomboid-health-system.tooltip.thirst": "Thirst",
+  "zomboid-health-system.tooltip.hunger": "Hunger: %s",
+  "zomboid-health-system.tooltip.thirst": "Thirst: %s",
   "zomboid-health-system.tooltip.allows_sleep_without_drowsiness": "Allows you to sleep without drowsiness",
   "zomboid-health-system.tooltip.reduces_pain": "Reduces pain",
 

@@ -105,7 +105,7 @@ public final class Hunger extends ImportantMoodle {
 
     public void eatFood(int hunger, float saturationModifier) {
         if(!getLevel().isClientSide) {
-            this.addValue((float) -hunger * getAppetite());
+            this.addValue((float) -hunger * appetite);
             this.health.getBlood().addValue(Config.getInstance().food_heal_amount * hunger);
         }
     }

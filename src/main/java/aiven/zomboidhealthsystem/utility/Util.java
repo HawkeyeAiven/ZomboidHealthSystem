@@ -137,13 +137,9 @@ public final class Util {
         return value;
     }
 
-    public static double floor(double number, int nums){
-        int num = (int) (number * (double) nums);
-        return (double) num / nums;
-    }
-
-    public static float floor(float number, int nums){
-        int num = (int) (number * (float) nums);
-        return (float) num / nums;
+    public static double floor(double number, int numbersAfterComma){
+        double d = Math.pow(10, numbersAfterComma);
+        int num = (int) (number * d);
+        return (double) num / d;
     }
 }

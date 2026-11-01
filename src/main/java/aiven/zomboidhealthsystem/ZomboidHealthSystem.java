@@ -27,8 +27,7 @@ public final class ZomboidHealthSystem implements ModInitializer {
 		ServerNetworking.initialize();
 
 		//TODO
-		// - Плохое самочувствие при низком PlayerHp
-		// - Показывать на предметах значение голода и жажды
+		// - Config в ModMenu сделать надо
 
 		log.info(NAME + " initialized!");
 	}

@@ -79,7 +79,7 @@ public final class Thirst extends ImportantMoodle {
 
     public void drink(float amount, boolean clean) {
         if (clean) {
-            this.addValue(-amount);
+            this.addValue(-amount / 2);
         }
         this.getHealth().getTemperature().cool(0.5F);
     }

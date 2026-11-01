@@ -7,16 +7,20 @@ import aiven.zomboidhealthsystem.mixin.access.PlayerAccess;
 import aiven.zomboidhealthsystem.health.Health;
 import aiven.zomboidhealthsystem.health.moodles.Hunger;
 
+import aiven.zomboidhealthsystem.utility.ItemUtil;
 import com.mojang.authlib.GameProfile;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.MilkBucketItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 
@@ -26,6 +30,7 @@ import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = Player.class, priority = 10000)
 public abstract class PlayerMixin extends LivingEntityMixin implements PlayerAccess {
@@ -71,6 +76,23 @@ public abstract class PlayerMixin extends LivingEntityMixin implements PlayerAcc
     @Inject(at = @At("HEAD"), method = "addAdditionalSaveData")
     public void addData(CompoundTag compoundTag, CallbackInfo ci) {
         compoundTag.putByteArray(healthId, modHealth.getNbt());
+    }
+
+    @Inject(at = @At("HEAD"), method = "eat")
+    public void eat(Level level, ItemStack itemStack, CallbackInfoReturnable<ItemStack> cir) {
+        if(!level.isClientSide()) {
+            if (itemStack.isEdible()) {
+                Health health = zomboid_health_system$getModHealth();
+
+                FoodProperties foodProperties = itemStack.getItem().getFoodProperties();
+                health.getHunger().eatFood(foodProperties.getNutrition(), foodProperties.getSaturationModifier());
+
+                float thirst = ItemUtil.getThirst(itemStack.getItem());
+                if(thirst != -1) {
+                    health.getThirst().drink(thirst, true);
+                }
+            }
+        }
     }
 
     /**
