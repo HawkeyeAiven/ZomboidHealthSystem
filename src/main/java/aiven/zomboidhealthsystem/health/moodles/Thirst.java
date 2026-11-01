@@ -81,6 +81,8 @@ public final class Thirst extends ImportantMoodle {
         if (clean) {
             this.addValue(-amount / 2);
         }
-        this.getHealth().getTemperature().cool(0.5F);
+        if(amount >= 1.0F) {
+            this.getHealth().getTemperature().cool(0.33F);
+        }
     }
 }

@@ -1,6 +1,7 @@
 package aiven.zomboidhealthsystem;
 
 import aiven.zomboidhealthsystem.gui.BodyWidgetType;
+
 import net.minecraft.client.Minecraft;
 
 import org.slf4j.Logger;
@@ -76,7 +77,7 @@ public final class Config {
     public int time_hud_xpos = 6;
     public int time_hud_ypos = 6;
 
-    public BodyWidgetType bodyWidgetType = BodyWidgetType.ZOMBOID;
+    public BodyWidgetType body_widget_type = BodyWidgetType.ZOMBOID;
 
     public static void initialize() {
         if(file.exists()) {

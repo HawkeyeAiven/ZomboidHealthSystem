@@ -54,7 +54,7 @@ public abstract class ItemMixin {
     }
 
 
-    @Inject(at = @At("HEAD"), method = "finishUsingItem")
+    @Inject(at = @At("RETURN"), method = "finishUsingItem")
     private void finishUsingItem(ItemStack itemStack, Level level, LivingEntity livingEntity, CallbackInfoReturnable<ItemStack> cir) {
         float thirst = ItemUtil.getThirst(asItem());
         if(thirst != -1 && !level.isClientSide() && livingEntity instanceof PlayerAccess playerAccess) {

@@ -69,7 +69,7 @@ public class ModMenuWidget extends ModContainer {
         addChildren(healthTabButton);
         addChildren(infoTabButton);
 
-        if(BodyWidgetType.ZOMBOID.equals(Config.getInstance().bodyWidgetType)) {
+        if(BodyWidgetType.ZOMBOID.equals(Config.getInstance().body_widget_type)) {
             this.healthTabGroup.addChildren(new ZomboidBodyWidget(16, 50) {
                 @Override
                 protected boolean isValidClickButton(int i) {

@@ -27,7 +27,7 @@ public final class ZomboidHealthSystem implements ModInitializer {
 		ServerNetworking.initialize();
 
 		//TODO
-		// - Config в ModMenu сделать надо
+		// - Комментарии в config
 
 		log.info(NAME + " initialized!");
 	}

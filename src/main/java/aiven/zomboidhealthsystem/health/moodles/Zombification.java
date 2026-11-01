@@ -39,8 +39,8 @@ public final class Zombification extends ImportantMoodle {
                 this.addValue(1.0F / (4 * 60 * 20) * tickDelta);
                 if (this.getValue() >= 1.25F) {
                     getHealth().getExhaustion().setMultiplier(this, getValue());
-                    getHealth().getHunger().setMultiplier(this, getValue() * 2.50F);
-                    getHealth().getThirst().setMultiplier(this, getValue() * 1.75F);
+                    getHealth().getHunger().setMultiplier(this, getValue());
+                    getHealth().getThirst().setMultiplier(this, getValue());
                     if (Util.random(1.0F / (3 * 60 * 20 / getValue()))) {
                         getHealth().addMobEffect(MobEffects.CONFUSION, 0, 10 * 20);
                     }

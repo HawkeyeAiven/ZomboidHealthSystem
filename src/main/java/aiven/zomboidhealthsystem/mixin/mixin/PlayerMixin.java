@@ -86,11 +86,6 @@ public abstract class PlayerMixin extends LivingEntityMixin implements PlayerAcc
 
                 FoodProperties foodProperties = itemStack.getItem().getFoodProperties();
                 health.getHunger().eatFood(foodProperties.getNutrition(), foodProperties.getSaturationModifier());
-
-                float thirst = ItemUtil.getThirst(itemStack.getItem());
-                if(thirst != -1) {
-                    health.getThirst().drink(thirst, true);
-                }
             }
         }
     }
