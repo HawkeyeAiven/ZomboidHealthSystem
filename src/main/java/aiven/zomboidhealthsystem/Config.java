@@ -2,20 +2,31 @@ package aiven.zomboidhealthsystem;
 
 import aiven.zomboidhealthsystem.gui.BodyWidgetType;
 
+import com.github.HawkeyeAiven.json5.ObjectMapper;
+
+import com.github.HawkeyeAiven.json5.annotations.Comment;
+import de.marhali.json5.Json5;
+
 import net.minecraft.client.Minecraft;
 
 import org.slf4j.Logger;
 
-import tools.jackson.databind.ObjectMapper;
-
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 
 public final class Config {
     private static final File configDirectory = new File(Minecraft.getInstance().gameDirectory, "config");
-    private static final File file = new File(configDirectory, ZomboidHealthSystem.ID_VER + ".json");
+    private static final File file = new File(configDirectory, ZomboidHealthSystem.ID_VER + ".json5");
 
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final Json5 json5 = Json5.builder(builder -> builder
+            .writeComments()
+            .prettyPrinting()
+            .build()
+    );
+
+    private static final ObjectMapper mapper = new ObjectMapper(json5);
     private static final Logger log = ZomboidHealthSystem.log;
 
     private static Config config;
@@ -31,6 +42,7 @@ public final class Config {
     public boolean moodles_hud = true;
     public boolean show_injured_icon = true;
 
+    @Comment("Speed multipliers")
     public float temperature_multiplier = 1.0F;
     public float drowsiness_multiplier = 1.0F;
     public float thirst_multiplier = 1.0F;
@@ -77,12 +89,18 @@ public final class Config {
     public int time_hud_xpos = 6;
     public int time_hud_ypos = 6;
 
-    public BodyWidgetType body_widget_type = BodyWidgetType.ZOMBOID;
+    @Comment("""
+            "ZOMBOID": Shows damage, bleeding and a bandage
+            "SIMPLE": Shows the level of damage and the presence of a bandage\
+            """)
+    public String body_widget_type = BodyWidgetType.ZOMBOID.toString();
 
     public static void initialize() {
         if(file.exists()) {
             try {
-                config = mapper.readValue(file, Config.class);
+                try (FileReader reader = new FileReader(file)) {
+                    config = mapper.parse(reader, Config.class);
+                }
             } catch (Exception e) {
                 log.error("Failed to load config", e);
                 config = new Config();
@@ -108,7 +126,9 @@ public final class Config {
 
     private static void save(Config config) throws IOException {
         try {
-            mapper.writerWithDefaultPrettyPrinter().writeValue(file, config);
+            try (FileWriter writer = new FileWriter(file)) {
+                mapper.serialize(config, writer);
+            }
         } catch (Exception e) {
             throw new IOException(e);
         }

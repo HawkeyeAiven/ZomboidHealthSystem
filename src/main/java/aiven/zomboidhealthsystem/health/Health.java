@@ -6,6 +6,9 @@ import aiven.zomboidhealthsystem.health.bodyparts.*;
 import aiven.zomboidhealthsystem.health.moodles.*;
 import aiven.zomboidhealthsystem.utility.Util;
 
+import de.marhali.json5.Json5;
+import de.marhali.json5.Json5Object;
+import de.marhali.json5.Json5Primitive;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.TagKey;
@@ -18,10 +21,7 @@ import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
 
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.node.JsonNodeFactory;
-import tools.jackson.databind.node.ObjectNode;
-
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,8 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 
 public final class Health {
-    private static final ObjectMapper mapper = new ObjectMapper();
+
+    private static final Json5 mapper = new Json5();
 
     // все числа должны быть четными, сумма == 100
     private static final int
@@ -558,34 +559,38 @@ public final class Health {
     }
 
     public byte[] getNbt() {
-        ObjectNode objectNode = new ObjectNode(JsonNodeFactory.instance);
+        Json5Object object = new Json5Object();
 
         for(Moodle moodle : moodles){
-            String value = moodle.getNbt();
-            if(value != null) {
-                objectNode.put(moodle.getId(), value);
+            String nbt = moodle.getNbt();
+            if(nbt != null) {
+                object.add(moodle.getId(), Json5Primitive.fromString(nbt));
             }
         }
 
         for (BodyPart part : bodyParts) {
             String nbt = part.getNbt();
             if(nbt != null) {
-                objectNode.put(part.getId(), nbt);
+                object.add(part.getId(), Json5Primitive.fromString(nbt));
             }
         }
-        return mapper.writeValueAsBytes(objectNode);
+        try {
+            return mapper.serialize(object).getBytes(StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void readNbt(byte[] nbt) {
-        ObjectNode objectNode = mapper.readTree(nbt).asObject();
+        Json5Object object = mapper.parse(new String(nbt, StandardCharsets.UTF_8)).getAsJson5Object();
 
         for (int i = 0; i < 8; i++) {
             BodyPart bodyPart = this.getBodyParts()[i];
-            bodyPart.readNbt(objectNode.get(bodyPart.getId()) == null ? null : objectNode.get(bodyPart.getId()).asString());
+            bodyPart.readNbt(object.get(bodyPart.getId()) == null ? null : object.get(bodyPart.getId()).getAsString());
         }
 
         for(Moodle moodle : this.moodles){
-            moodle.readNbt(objectNode.get(moodle.getId()) == null ? null : objectNode.get(moodle.getId()).asString());
+            moodle.readNbt(object.get(moodle.getId()) == null ? null : object.get(moodle.getId()).getAsString());
         }
     }
 

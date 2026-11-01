@@ -4,6 +4,9 @@ import aiven.zomboidhealthsystem.*;
 import aiven.zomboidhealthsystem.health.Health;
 import aiven.zomboidhealthsystem.utility.Util;
 
+import de.marhali.json5.Json5;
+import de.marhali.json5.Json5Object;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -18,12 +21,11 @@ import net.minecraft.world.level.block.AbstractFurnaceBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.node.JsonNodeFactory;
-import tools.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+
 
 public final class Temperature extends ImportantMoodle {
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final Json5 mapper = new Json5();
 
     public static final float MIN_COMFORTABLE_TEMPERATURE = Config.getInstance().min_comfortable_temp;
     public static final float MAX_COMFORTABLE_TEMPERATURE = Config.getInstance().max_comfortable_temp;
@@ -174,10 +176,10 @@ public final class Temperature extends ImportantMoodle {
     @Override
     public void readNbt(String value) {
         if(value != null) {
-            ObjectNode objectNode = mapper.readTree(value).asObject();
-            setValue(objectNode.get("value").asFloat());
-            isFeelingCold = objectNode.get("cold").asBoolean();
-            isFeelingHot = objectNode.get("hot").asBoolean();
+            Json5Object object = new Json5Object();
+            setValue(object.get("value").getAsFloat());
+            isFeelingCold = object.get("cold").getAsBoolean();
+            isFeelingHot = object.get("hot").getAsBoolean();
         } else {
             setValue(defaultValue());
             isFeelingHot = false;
@@ -192,11 +194,15 @@ public final class Temperature extends ImportantMoodle {
 
     @Override
     public String getNbt() {
-        ObjectNode objectNode = new ObjectNode(JsonNodeFactory.instance);
-        objectNode.put("value", getValue());
-        objectNode.put("cold", isFeelingCold);
-        objectNode.put("hot", isFeelingHot);
-        return mapper.writeValueAsString(objectNode);
+        Json5Object object = new Json5Object();
+        object.addProperty("value", getValue());
+        object.addProperty("cold", isFeelingCold);
+        object.addProperty("hot", isFeelingHot);
+        try {
+            return mapper.serialize(object);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

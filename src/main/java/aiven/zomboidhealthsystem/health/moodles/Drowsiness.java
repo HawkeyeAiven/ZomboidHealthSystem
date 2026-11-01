@@ -6,17 +6,19 @@ import aiven.zomboidhealthsystem.ZomboidHealthSystem;
 import aiven.zomboidhealthsystem.health.Health;
 import aiven.zomboidhealthsystem.utility.Util;
 
+import de.marhali.json5.Json5;
+import de.marhali.json5.Json5Object;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffects;
 
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.node.JsonNodeFactory;
-import tools.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+
 
 public final class Drowsiness extends ImportantMoodle {
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final Json5 mapper = new Json5();
 
     private int drowsinessTime;
 
@@ -122,17 +124,21 @@ public final class Drowsiness extends ImportantMoodle {
     @Override
     public String getNbt() {
         if(this.getValue() != 0 || this.caffeine_value != 0 || this.max_caffeine_value != 0) {
-            ObjectNode objectNode = new ObjectNode(JsonNodeFactory.instance);
+            Json5Object object = new Json5Object();
 
-            objectNode.put("amount", this.getValue());
-            objectNode.put("caffeine_value", this.caffeine_value);
-            objectNode.put("max_caffeine_value", this.max_caffeine_value);
-            objectNode.put("caffeine_effect", this.caffeine_effect);
-            objectNode.put("sleeping_pills_value", this.sleeping_pills_value);
-            objectNode.put("max_sleeping_pills_value", this.max_sleeping_pills_value);
-            objectNode.put("sleeping_pills_effect", this.sleeping_pills_effect);
+            object.addProperty("amount", this.getValue());
+            object.addProperty("caffeine_value", this.caffeine_value);
+            object.addProperty("max_caffeine_value", this.max_caffeine_value);
+            object.addProperty("caffeine_effect", this.caffeine_effect);
+            object.addProperty("sleeping_pills_value", this.sleeping_pills_value);
+            object.addProperty("max_sleeping_pills_value", this.max_sleeping_pills_value);
+            object.addProperty("sleeping_pills_effect", this.sleeping_pills_effect);
 
-            return mapper.writeValueAsString(objectNode);
+            try {
+                return mapper.serialize(object);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
         return null;
     }
@@ -148,15 +154,14 @@ public final class Drowsiness extends ImportantMoodle {
             this.sleeping_pills_effect = true;
             this.caffeine_effect = true;
         } else {
-            ObjectNode objectNode = mapper.readTree(value).asObject();
-
-            this.value = objectNode.get("amount").asFloat();
-            this.caffeine_value = objectNode.get("caffeine_value").asFloat();
-            this.max_caffeine_value = objectNode.get("max_caffeine_value").asFloat();
-            this.caffeine_effect = objectNode.get("caffeine_effect").asBoolean();
-            this.sleeping_pills_value = objectNode.get("sleeping_pills_value").asFloat();
-            this.max_sleeping_pills_value = objectNode.get("max_sleeping_pills_value").asFloat();
-            this.sleeping_pills_effect = objectNode.get("sleeping_pills_effect").asBoolean();
+            Json5Object object = mapper.parse(value).getAsJson5Object();
+            this.value = object.get("amount").getAsFloat();
+            this.caffeine_value = object.get("caffeine_value").getAsFloat();
+            this.max_caffeine_value = object.get("max_caffeine_value").getAsFloat();
+            this.caffeine_effect = object.get("caffeine_effect").getAsBoolean();
+            this.sleeping_pills_value = object.get("sleeping_pills_value").getAsFloat();
+            this.max_sleeping_pills_value = object.get("max_sleeping_pills_value").getAsFloat();
+            this.sleeping_pills_effect = object.get("sleeping_pills_effect").getAsBoolean();
         }
     }
 

@@ -4,16 +4,17 @@ import aiven.zomboidhealthsystem.Config;
 import aiven.zomboidhealthsystem.health.Health;
 import aiven.zomboidhealthsystem.health.bodyparts.BodyPart;
 
+import de.marhali.json5.Json5;
+import de.marhali.json5.Json5Object;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.node.JsonNodeFactory;
-import tools.jackson.databind.node.ObjectNode;
+import java.io.IOException;
 
 public final class Pain extends Moodle {
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final Json5 mapper = new Json5();
 
     private float painkillerAmount = 0;
     private float painkillerMaxAmount = 0;
@@ -79,11 +80,15 @@ public final class Pain extends Moodle {
     @Override
     public String getNbt() {
         if(painkillerMaxAmount != 0 || painkillerAmount != 0) {
-            ObjectNode objectNode = new ObjectNode(JsonNodeFactory.instance);
-            objectNode.put("painkiller_amount", painkillerAmount);
-            objectNode.put("painkiller_max_amount", painkillerMaxAmount);
-            objectNode.put("painkiller_effect", painkillerEffect);
-            return mapper.writeValueAsString(objectNode);
+            Json5Object object = new Json5Object();
+            object.addProperty("painkiller_amount", painkillerAmount);
+            object.addProperty("painkiller_max_amount", painkillerMaxAmount);
+            object.addProperty("painkiller_effect", painkillerEffect);
+            try {
+                return mapper.serialize(object);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         } else {
             return null;
         }
@@ -96,10 +101,10 @@ public final class Pain extends Moodle {
             this.painkillerMaxAmount = 0;
             this.painkillerEffect = false;
         } else {
-            ObjectNode objectNode = mapper.readTree(value).asObject();
-            this.painkillerAmount = objectNode.get("painkiller_amount").asFloat();
-            this.painkillerMaxAmount = objectNode.get("painkiller_max_amount").asFloat();
-            this.painkillerEffect = objectNode.get("painkiller_effect").asBoolean();
+            Json5Object object = mapper.parse(value).getAsJson5Object();
+            this.painkillerAmount = object.get("painkiller_amount").getAsFloat();
+            this.painkillerMaxAmount = object.get("painkiller_max_amount").getAsFloat();
+            this.painkillerEffect = object.get("painkiller_effect").getAsBoolean();
         }
     }
 

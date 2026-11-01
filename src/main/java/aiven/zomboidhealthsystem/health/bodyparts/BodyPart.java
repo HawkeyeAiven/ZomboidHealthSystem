@@ -5,6 +5,9 @@ import aiven.zomboidhealthsystem.item.AbstractBandageItem;
 import aiven.zomboidhealthsystem.health.Health;
 import aiven.zomboidhealthsystem.utility.Util;
 
+import de.marhali.json5.Json5;
+import de.marhali.json5.Json5Object;
+
 import net.minecraft.stats.Stats;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -14,15 +17,13 @@ import net.minecraft.world.item.Item;
 
 import org.jetbrains.annotations.Nullable;
 
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.node.JsonNodeFactory;
-import tools.jackson.databind.node.ObjectNode;
 
+import java.io.IOException;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class BodyPart {
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final Json5 mapper = new Json5();
 
     protected final Health health;
     protected float hp;
@@ -241,30 +242,34 @@ public abstract class BodyPart {
     }
 
     public String getNbt() {
-        ObjectNode objectNode = new ObjectNode(JsonNodeFactory.instance);
-        objectNode.put("hp", hp);
-        objectNode.put("additionalHp", additionalHp);
-        objectNode.put("bandageItem", bandageItem != null ? Item.getId(bandageItem) : -1);
-        objectNode.put("bandageTime", bandageTime);
-        objectNode.put("bleedingValue", bleedingValue);
-        objectNode.put("hasInfection", hasInfection);
-        return mapper.writeValueAsString(objectNode);
+        Json5Object object = new Json5Object();
+        object.addProperty("hp", hp);
+        object.addProperty("additionalHp", additionalHp);
+        object.addProperty("bandageItem", bandageItem != null ? Item.getId(bandageItem) : -1);
+        object.addProperty("bandageTime", bandageTime);
+        object.addProperty("bleedingValue", bleedingValue);
+        object.addProperty("hasInfection", hasInfection);
+        try {
+            return mapper.serialize(object);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void readNbt(String nbt) {
         if(nbt != null) {
-            ObjectNode objectNode = mapper.readTree(nbt).asObject();
-            this.hp = objectNode.get("hp").asFloat();
-            this.additionalHp = objectNode.get("additionalHp").asFloat();
-            int id = objectNode.get("bandageItem").asInt();
+            Json5Object object = mapper.parse(nbt).getAsJson5Object();
+            this.hp = object.get("hp").getAsFloat();
+            this.additionalHp = object.get("additionalHp").getAsFloat();
+            int id = object.get("bandageItem").getAsInt();
             if (id != -1) {
                 bandageItem = (AbstractBandageItem) Item.byId(id);
             } else {
                 bandageItem = null;
             }
-            this.bandageTime = objectNode.get("bandageTime").asInt();
-            this.bleedingValue = objectNode.get("bleedingValue").asFloat();
-            this.hasInfection = objectNode.get("hasInfection").asBoolean();
+            this.bandageTime = object.get("bandageTime").getAsInt();
+            this.bleedingValue = object.get("bleedingValue").getAsFloat();
+            this.hasInfection = object.get("hasInfection").getAsBoolean();
         } else {
             reset();
         }
