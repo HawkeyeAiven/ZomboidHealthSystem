@@ -5,7 +5,12 @@ plugins {
 
 repositories {
 	mavenCentral()
+	flatDir {
+		dirs 'libs'
+	}
 }
+
+def localLibs = fileTree(dir: "libs", includes: ['*.jar'])
 
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -14,8 +19,8 @@ dependencies {
 
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
-	implementation fileTree(dir: "libs", includes: ['*.jar'])
-	include fileTree(dir: "libs", includes: ['*.jar'])
+	implementation 'local:json5:1.0.0'
+	include 'local:json5:1.0.0'
 }
 
 processResources {
