@@ -7,6 +7,14 @@ public class ModTime {
         this.time = time;
     }
 
+    public int getDays() {
+        return Math.toIntExact((time + 8000) / 24000);
+    }
+
+    public int getDay() {
+        return getDays() + 1;
+    }
+
     public long getTime() {
         return time;
     }

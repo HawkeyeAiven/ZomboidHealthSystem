@@ -37,9 +37,6 @@ public final class Util {
     }
 
     public static boolean isInOpenSpace(Level level, BlockPos pos) {
-        if (level.getBlockState(pos).getBlock().equals(Blocks.CAVE_AIR)) {
-            return false;
-        }
         int count = 0;
         for (int i = 1; i < 10; i++) {
             Block block = level.getBlockState(pos.north(i)).getBlock();
@@ -73,7 +70,7 @@ public final class Util {
     }
 
     private static boolean isAir(Block block) {
-        return block.defaultBlockState().isAir();
+        return block.equals(Blocks.AIR);
     }
 
     public static float getMinDistance(Level level, BlockPos center, int radius, Predicate<BlockState> filter) {

@@ -9,7 +9,6 @@ import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public final class ZomboidHealthSystem implements ModInitializer {
 	public static final String ID = "zomboid-health-system";
 	public static final String NAME = "Zomboid Health System";
@@ -26,10 +25,10 @@ public final class ZomboidHealthSystem implements ModInitializer {
 		ModDamageTypes.initialize();
 		ServerNetworking.initialize();
 
-		//TODO
-		// - Комментарии в config
-
 		log.info(NAME + " initialized!");
+
+		//TODO
+		// - В конфиг комментарии нужны
 	}
 
 	public static ResourceLocation getResourceLocation(String path) {

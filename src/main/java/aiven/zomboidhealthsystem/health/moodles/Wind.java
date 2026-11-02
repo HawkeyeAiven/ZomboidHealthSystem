@@ -8,7 +8,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Pose;
 
 public final class Wind extends SimpleMoodle {
-    private float amount = 0;
+
+    private float delta = 0.0F;
 
     public Wind(Health health) {
         super(health);
@@ -22,14 +23,19 @@ public final class Wind extends SimpleMoodle {
     @Override
     public void update(float tickDelta) {
         if(tickDelta != 0) {
-            amount = getWind();
-            getHealth().getTemperature().addHeat(-amount * (getHealth().getWet().getValue() / 2 + 1));
+            delta += tickDelta;
+
+            if(delta >= 5) {
+                delta = 0;
+                value = getWind();
+            }
+            getHealth().getTemperature().addHeat(-value * (getHealth().getWet().getValue() / 2 + 1));
         }
     }
 
     @Override
     public int getAmplifier() {
-        return Math.max((int) (amount / 5 - 1), 0);
+        return (int) value / 3;
     }
 
     @Override

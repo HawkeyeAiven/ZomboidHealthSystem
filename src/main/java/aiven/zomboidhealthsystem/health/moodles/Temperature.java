@@ -176,7 +176,7 @@ public final class Temperature extends ImportantMoodle {
     @Override
     public void readNbt(String value) {
         if(value != null) {
-            Json5Object object = new Json5Object();
+            Json5Object object = mapper.parse(value).getAsJson5Object();
             setValue(object.get("value").getAsFloat());
             isFeelingCold = object.get("cold").getAsBoolean();
             isFeelingHot = object.get("hot").getAsBoolean();

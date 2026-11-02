@@ -99,6 +99,7 @@ public class ModMenuWidget extends ModContainer {
                 getWidth(), getHeight(), getWidth(), getHeight()
         );
         Health health = ClientUtil.getHealth();
+        ModTime modTime = new ModTime(Minecraft.getInstance().level.getDayTime());
         if(healthTabGroup.visible) { // StringWidget криво рисуется idk почему
             context.drawString(
                     Minecraft.getInstance().font,
@@ -123,13 +124,13 @@ public class ModMenuWidget extends ModContainer {
 
             context.drawString(
                     Minecraft.getInstance().font,
-                    Component.literal("Day: " + (((Minecraft.getInstance().level.getDayTime() + 8000) / 24000) + 1)),
+                    Component.literal("Day: " + modTime.getDay()),
                     10, 25, 0xFFffffff, true
             );
 
             context.drawString(
                     Minecraft.getInstance().font,
-                    Component.literal( "Time: " + new ModTime(Minecraft.getInstance().level.getDayTime())),
+                    Component.literal( "Time: " + modTime),
                     10, 35, 0xFFffffff, true
             );
 

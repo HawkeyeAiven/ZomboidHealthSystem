@@ -48,7 +48,11 @@ public final class Config {
     public Float damage_multiplier = 1.0F;
     public Float sleeping_pills_multiplier = 1.0F;
 
+    public Float wind_update_chance = 1.0F / 4000.0F;
     public Float wind_chance = 0.33F;
+    public Float min_wind = 3.0F;
+    public Float max_wind = 15.0F;
+
     public Float infection_chance = 1.0F / (1.5F * 60 * 20);
     public Float cold_chance = 1.0F / (9 * 60 * 20);
     public Float average_bleeding_chance = 0.25F;

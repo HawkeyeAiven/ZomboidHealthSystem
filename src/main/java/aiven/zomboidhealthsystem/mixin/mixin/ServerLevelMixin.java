@@ -2,10 +2,12 @@ package aiven.zomboidhealthsystem.mixin.mixin;
 
 import aiven.zomboidhealthsystem.Config;
 import aiven.zomboidhealthsystem.mixin.access.PlayerAccess;
+import aiven.zomboidhealthsystem.mixin.access.PrimaryLevelDataAccess;
 import aiven.zomboidhealthsystem.mixin.access.ServerLevelAccess;
 import aiven.zomboidhealthsystem.health.Health;
 import aiven.zomboidhealthsystem.utility.Util;
 
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.SleepStatus;
@@ -42,21 +44,29 @@ public abstract class ServerLevelMixin extends LevelMixin implements ServerLevel
     @Final
     List<ServerPlayer> players;
 
-    @Unique
-    private float wind;
-
+    @Shadow
+    @Final
+    private MinecraftServer server;
     @Unique
     private @Nullable List<ServerPlayer> lastSleepingPlayers = null;
 
     @Unique
     private @Nullable Long lastDayTime = null;
 
-    @Unique
-    private boolean newDay = false;
-
     @Override
     public float zomboid_health_system$getWind() {
-        return wind;
+        if(levelData instanceof PrimaryLevelDataAccess access) {
+            return access.zomboid_health_system$getWind();
+        } else {
+            return 0.0F;
+        }
+    }
+
+    @Unique
+    private void setWind(float wind) {
+        if(levelData instanceof PrimaryLevelDataAccess access) {
+            access.zomboid_health_system$setWind(wind);
+        }
     }
 
     @Inject(at = @At("HEAD"), method = "tick")
@@ -78,23 +88,14 @@ public abstract class ServerLevelMixin extends LevelMixin implements ServerLevel
             lastSleepingPlayers = null;
             lastDayTime = null;
         }
-
-        if(getDayTime() % 24000 < 20) {
-            if(!newDay) {
-                onNewDay();
+        if(server.overworld().equals(this)) {
+            if (Util.random(Config.getInstance().wind_update_chance)) {
+                if (Util.random(Config.getInstance().wind_chance)) {
+                    setWind(new Random().nextFloat(Config.getInstance().min_wind, Config.getInstance().max_wind));
+                } else {
+                    setWind(0.0F);
+                }
             }
-            newDay = true;
-        } else {
-            newDay = false;
-        }
-    }
-
-    @Unique
-    private void onNewDay() {
-        if(Util.random(Config.getInstance().wind_chance)) {
-            wind = new Random().nextFloat(3.0F, 10.0F);
-        } else {
-            wind = 0;
         }
     }
 
