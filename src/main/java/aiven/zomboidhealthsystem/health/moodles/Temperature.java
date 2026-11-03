@@ -4,8 +4,7 @@ import aiven.zomboidhealthsystem.*;
 import aiven.zomboidhealthsystem.health.Health;
 import aiven.zomboidhealthsystem.utility.Util;
 
-import de.marhali.json5.Json5;
-import de.marhali.json5.Json5Object;
+import com.github.HawkeyeAiven.json5.ObjectMapper;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -25,7 +24,7 @@ import java.io.IOException;
 
 
 public final class Temperature extends ImportantMoodle {
-    private static final Json5 mapper = new Json5();
+    private static final ObjectMapper mapper = new ObjectMapper();
 
     public static final float MIN_COMFORTABLE_TEMPERATURE = Config.getInstance().min_comfortable_temp;
     public static final float MAX_COMFORTABLE_TEMPERATURE = Config.getInstance().max_comfortable_temp;
@@ -176,10 +175,10 @@ public final class Temperature extends ImportantMoodle {
     @Override
     public void readNbt(String value) {
         if(value != null) {
-            Json5Object object = mapper.parse(value).getAsJson5Object();
-            setValue(object.get("value").getAsFloat());
-            isFeelingCold = object.get("cold").getAsBoolean();
-            isFeelingHot = object.get("hot").getAsBoolean();
+            Nbt nbt = mapper.read(value, Nbt.class);
+            this.value = nbt.value;
+            this.isFeelingCold = nbt.isFeelingCold;
+            this.isFeelingHot = nbt.isFeelingHot;
         } else {
             setValue(defaultValue());
             isFeelingHot = false;
@@ -194,12 +193,12 @@ public final class Temperature extends ImportantMoodle {
 
     @Override
     public String getNbt() {
-        Json5Object object = new Json5Object();
-        object.addProperty("value", getValue());
-        object.addProperty("cold", isFeelingCold);
-        object.addProperty("hot", isFeelingHot);
+        Nbt nbt = new Nbt();
+        nbt.value = value;
+        nbt.isFeelingCold = isFeelingCold;
+        nbt.isFeelingHot = isFeelingHot;
         try {
-            return mapper.serialize(object);
+            return mapper.write(nbt);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -365,5 +364,11 @@ public final class Temperature extends ImportantMoodle {
             }
         }
         return heat;
+    }
+
+    public static class Nbt {
+        public Float value;
+        public Boolean isFeelingCold = false;
+        public Boolean isFeelingHot = false;
     }
 }

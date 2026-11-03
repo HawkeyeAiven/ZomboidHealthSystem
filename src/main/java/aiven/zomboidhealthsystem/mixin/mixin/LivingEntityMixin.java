@@ -76,6 +76,23 @@ public abstract class LivingEntityMixin extends EntityMixin {
         }
     }
 
+
+    /**
+     * @author Aiven
+     * @reason Перенаправление на {@link Health#healRandom(float)} )}
+     */
+    @Overwrite
+    public void heal(float value) {
+        if(toLivingEntity() instanceof PlayerAccess playerAccess) {
+            playerAccess.zomboid_health_system$getModHealth().healRandom(value);
+        } else {
+            float g = this.getHealth();
+            if (g > 0.0F) {
+                this.setHealth(g + value);
+            }
+        }
+    }
+
     @Inject(at = @At("RETURN"), method = "addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z")
     private void addEffect(MobEffectInstance mobEffectInstance, Entity entity, CallbackInfoReturnable<Boolean> cir) {
         if (!level().isClientSide()) {

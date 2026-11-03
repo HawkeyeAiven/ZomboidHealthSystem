@@ -41,7 +41,7 @@ public class MoodlesWidget extends AbstractMovableWidget {
             return;
         }
 
-        for(Moodle moodle : health.getSortMoodleArray()) {
+        for(Moodle moodle : health.getSortedMoodles()) {
             if(moodle.showIcon()) {
                 context.blit(
                         moodle.getBackgroundTexture(),

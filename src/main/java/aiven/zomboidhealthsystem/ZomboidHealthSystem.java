@@ -1,5 +1,6 @@
 package aiven.zomboidhealthsystem;
 
+import aiven.zomboidhealthsystem.json5.Json5;
 import aiven.zomboidhealthsystem.network.ServerNetworking;
 
 import net.fabricmc.api.ModInitializer;
@@ -19,6 +20,7 @@ public final class ZomboidHealthSystem implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		Json5.initialize();
 		Config.initialize();
 		ModItems.initialize();
 		ModItemGroups.initialize();

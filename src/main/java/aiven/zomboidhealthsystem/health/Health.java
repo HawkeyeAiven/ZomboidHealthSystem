@@ -410,27 +410,10 @@ public final class Health {
         return moodles;
     }
 
-    public Moodle[] getSortMoodleArray() {
+    public List<Moodle> getSortedMoodles() {
         ArrayList<Moodle> moodles = new ArrayList<>(List.of(getMoodles()));
-        Moodle[] list = new Moodle[moodles.size()];
-        int index = 0;
-        int max;
-        Moodle moodle;
-        while (index < list.length) {
-            max = -9999;
-            moodle = null;
-            for (Moodle moodle1 : moodles) {
-                if (moodle1.getAmplifier() > max) {
-                    max = moodle1.getAmplifier();
-                    moodle = moodle1;
-                }
-            }
-            moodles.remove(moodle);
-            list[index] = moodle;
-            index++;
-        }
-
-        return list;
+        moodles.sort((moodle1, moodle2) -> Integer.compare(moodle2.getAmplifier(), moodle1.getAmplifier()));
+        return moodles;
     }
 
     public BodyPart randomHit() {

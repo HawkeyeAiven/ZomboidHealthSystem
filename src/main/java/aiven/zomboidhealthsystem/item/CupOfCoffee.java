@@ -1,5 +1,6 @@
 package aiven.zomboidhealthsystem.item;
 
+import aiven.zomboidhealthsystem.ModItems;
 import aiven.zomboidhealthsystem.mixin.access.PlayerAccess;
 import aiven.zomboidhealthsystem.health.Health;
 
@@ -40,9 +41,7 @@ public class CupOfCoffee extends Item {
             health.getDrowsiness().addCaffeine(1.0F);
         }
 
-        livingEntity.eat(level, itemStack);
-
-        return ItemStack.EMPTY;
+        return ModItems.EMPTY_CUP.getDefaultInstance();
     }
 
     @Override

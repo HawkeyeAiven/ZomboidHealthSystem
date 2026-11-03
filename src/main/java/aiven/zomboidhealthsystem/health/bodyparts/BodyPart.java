@@ -5,15 +5,13 @@ import aiven.zomboidhealthsystem.item.AbstractBandageItem;
 import aiven.zomboidhealthsystem.health.Health;
 import aiven.zomboidhealthsystem.utility.Util;
 
-import de.marhali.json5.Json5;
-import de.marhali.json5.Json5Object;
+import com.github.HawkeyeAiven.json5.ObjectMapper;
 
 import net.minecraft.stats.Stats;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -23,7 +21,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class BodyPart {
-    private static final Json5 mapper = new Json5();
+    private static final ObjectMapper mapper = new ObjectMapper();
 
     protected final Health health;
     protected float hp;
@@ -41,6 +39,10 @@ public abstract class BodyPart {
         this.player = player;
         this.id = id;
     }
+
+    public abstract void addEffectAmplifiers(AtomicReference<Float> slowness, AtomicReference<Float> fatigue, AtomicReference<Float> weakness);
+
+    public abstract float getMaxHp();
 
     public float heal(float amount) {
         if (!this.isFullHp()) {
@@ -73,7 +75,7 @@ public abstract class BodyPart {
         }
 
         float d = amount - this.hp;
-        this.hp = Math.max(this.hp - amount, 0);
+        setHp(this.hp - amount);
         if (Util.random(getBleedingChance(hp + amount, hp, source))) {
             this.setBleedingValue((this.getMaxHp() - this.getHp()) / 1.85F);
         }
@@ -214,7 +216,7 @@ public abstract class BodyPart {
     }
 
     public void setHp(float hp) {
-        this.hp = hp;
+        this.hp = Util.clamp(hp, 0.0F, getMaxHp());
     }
 
     public void setAdditionalHp(float additionalHp) {
@@ -242,34 +244,29 @@ public abstract class BodyPart {
     }
 
     public String getNbt() {
-        Json5Object object = new Json5Object();
-        object.addProperty("hp", hp);
-        object.addProperty("additionalHp", additionalHp);
-        object.addProperty("bandageItem", bandageItem != null ? Item.getId(bandageItem) : -1);
-        object.addProperty("bandageTime", bandageTime);
-        object.addProperty("bleedingValue", bleedingValue);
-        object.addProperty("hasInfection", hasInfection);
+        Nbt nbt = new Nbt();
+        nbt.hp = hp;
+        nbt.additionalHp = additionalHp;
+        nbt.bandageTime = bandageTime;
+        nbt.bandageItem = bandageItem;
+        nbt.bleedingValue = bleedingValue;
+        nbt.hasInfection = hasInfection;
         try {
-            return mapper.serialize(object);
+            return mapper.write(nbt);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void readNbt(String nbt) {
-        if(nbt != null) {
-            Json5Object object = mapper.parse(nbt).getAsJson5Object();
-            this.hp = object.get("hp").getAsFloat();
-            this.additionalHp = object.get("additionalHp").getAsFloat();
-            int id = object.get("bandageItem").getAsInt();
-            if (id != -1) {
-                bandageItem = (AbstractBandageItem) Item.byId(id);
-            } else {
-                bandageItem = null;
-            }
-            this.bandageTime = object.get("bandageTime").getAsInt();
-            this.bleedingValue = object.get("bleedingValue").getAsFloat();
-            this.hasInfection = object.get("hasInfection").getAsBoolean();
+    public void readNbt(String nbtString) {
+        if(nbtString != null) {
+            Nbt nbt = mapper.read(nbtString, Nbt.class);
+            hp = nbt.hp;
+            additionalHp = nbt.additionalHp;
+            bandageTime = nbt.bandageTime;
+            bandageItem = nbt.bandageItem;
+            bleedingValue = nbt.bleedingValue;
+            hasInfection = nbt.hasInfection;
         } else {
             reset();
         }
@@ -284,7 +281,12 @@ public abstract class BodyPart {
         this.bandageTime = 0;
     }
 
-    public abstract void addEffectAmplifiers(AtomicReference<Float> slowness, AtomicReference<Float> fatigue, AtomicReference<Float> weakness);
-
-    public abstract float getMaxHp();
+    public static class Nbt {
+        public Float hp;
+        public Float additionalHp;
+        public Integer bandageTime = 0;
+        public AbstractBandageItem bandageItem;
+        public Float bleedingValue;
+        public Boolean hasInfection;
+    }
 }

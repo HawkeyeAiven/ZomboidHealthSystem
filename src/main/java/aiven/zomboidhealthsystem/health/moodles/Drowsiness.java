@@ -6,8 +6,7 @@ import aiven.zomboidhealthsystem.ZomboidHealthSystem;
 import aiven.zomboidhealthsystem.health.Health;
 import aiven.zomboidhealthsystem.utility.Util;
 
-import de.marhali.json5.Json5;
-import de.marhali.json5.Json5Object;
+import com.github.HawkeyeAiven.json5.ObjectMapper;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -18,14 +17,12 @@ import java.io.IOException;
 
 
 public final class Drowsiness extends ImportantMoodle {
-    private static final Json5 mapper = new Json5();
+    private static final ObjectMapper mapper = new ObjectMapper();
 
     private int drowsinessTime;
-
     private float caffeine_value = 0;
     private float max_caffeine_value = 0;
     private boolean caffeine_effect = true;
-
     private float sleeping_pills_value = 0;
     private float max_sleeping_pills_value = 0;
     private boolean sleeping_pills_effect = true;
@@ -124,18 +121,17 @@ public final class Drowsiness extends ImportantMoodle {
     @Override
     public String getNbt() {
         if(this.getValue() != 0 || this.caffeine_value != 0 || this.max_caffeine_value != 0) {
-            Json5Object object = new Json5Object();
-
-            object.addProperty("amount", this.getValue());
-            object.addProperty("caffeine_value", this.caffeine_value);
-            object.addProperty("max_caffeine_value", this.max_caffeine_value);
-            object.addProperty("caffeine_effect", this.caffeine_effect);
-            object.addProperty("sleeping_pills_value", this.sleeping_pills_value);
-            object.addProperty("max_sleeping_pills_value", this.max_sleeping_pills_value);
-            object.addProperty("sleeping_pills_effect", this.sleeping_pills_effect);
-
+            Nbt nbt = new Nbt();
+            nbt.value = value;
+            nbt.drowsinessTime = drowsinessTime;
+            nbt.caffeine_value = caffeine_value;
+            nbt.max_caffeine_value = max_caffeine_value;
+            nbt.caffeine_effect = caffeine_effect;
+            nbt.sleeping_pills_value = sleeping_pills_value;
+            nbt.max_sleeping_pills_value = max_sleeping_pills_value;
+            nbt.sleeping_pills_effect = sleeping_pills_effect;
             try {
-                return mapper.serialize(object);
+                return mapper.write(nbt);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -154,14 +150,15 @@ public final class Drowsiness extends ImportantMoodle {
             this.sleeping_pills_effect = true;
             this.caffeine_effect = true;
         } else {
-            Json5Object object = mapper.parse(value).getAsJson5Object();
-            this.value = object.get("amount").getAsFloat();
-            this.caffeine_value = object.get("caffeine_value").getAsFloat();
-            this.max_caffeine_value = object.get("max_caffeine_value").getAsFloat();
-            this.caffeine_effect = object.get("caffeine_effect").getAsBoolean();
-            this.sleeping_pills_value = object.get("sleeping_pills_value").getAsFloat();
-            this.max_sleeping_pills_value = object.get("max_sleeping_pills_value").getAsFloat();
-            this.sleeping_pills_effect = object.get("sleeping_pills_effect").getAsBoolean();
+            Nbt nbt = mapper.read(value, Nbt.class);
+            this.value = nbt.value;
+            this.drowsinessTime = nbt.drowsinessTime;
+            this.caffeine_value = nbt.caffeine_value;
+            this.max_caffeine_value = nbt.max_caffeine_value;
+            this.caffeine_effect = nbt.caffeine_effect;
+            this.sleeping_pills_value = nbt.sleeping_pills_value;
+            this.max_sleeping_pills_value = nbt.max_sleeping_pills_value;
+            this.sleeping_pills_effect = nbt.sleeping_pills_effect;
         }
     }
 
@@ -187,5 +184,16 @@ public final class Drowsiness extends ImportantMoodle {
 
     public void addTicks(float amount) {
         addValue(amount / drowsinessTime);
+    }
+
+    public static class Nbt {
+        public Float value;
+        public Integer drowsinessTime;
+        public Float caffeine_value;
+        public Float max_caffeine_value;
+        public Boolean caffeine_effect;
+        public Float sleeping_pills_value;
+        public Float max_sleeping_pills_value;
+        public Boolean sleeping_pills_effect;
     }
 }

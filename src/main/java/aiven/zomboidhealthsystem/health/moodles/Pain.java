@@ -4,8 +4,7 @@ import aiven.zomboidhealthsystem.Config;
 import aiven.zomboidhealthsystem.health.Health;
 import aiven.zomboidhealthsystem.health.bodyparts.BodyPart;
 
-import de.marhali.json5.Json5;
-import de.marhali.json5.Json5Object;
+import com.github.HawkeyeAiven.json5.ObjectMapper;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffects;
@@ -14,7 +13,7 @@ import net.minecraft.world.entity.player.Player;
 import java.io.IOException;
 
 public final class Pain extends Moodle {
-    private static final Json5 mapper = new Json5();
+    private static final ObjectMapper mapper = new ObjectMapper();
 
     private float painkillerAmount = 0;
     private float painkillerMaxAmount = 0;
@@ -26,7 +25,7 @@ public final class Pain extends Moodle {
 
     @Override
     public void update(float tickDelta) {
-        Player player = this.getHealth().getPlayer();
+        Player player = this.health.getPlayer();
 
         if (tickDelta != 0) {
             if (painkillerEffect) {
@@ -80,12 +79,12 @@ public final class Pain extends Moodle {
     @Override
     public String getNbt() {
         if(painkillerMaxAmount != 0 || painkillerAmount != 0) {
-            Json5Object object = new Json5Object();
-            object.addProperty("painkiller_amount", painkillerAmount);
-            object.addProperty("painkiller_max_amount", painkillerMaxAmount);
-            object.addProperty("painkiller_effect", painkillerEffect);
+            Nbt nbt = new Nbt();
+            nbt.painkillerAmount = painkillerAmount;
+            nbt.painkillerMaxAmount = painkillerMaxAmount;
+            nbt.painkillerEffect = painkillerEffect;
             try {
-                return mapper.serialize(object);
+                return mapper.write(nbt);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -101,10 +100,10 @@ public final class Pain extends Moodle {
             this.painkillerMaxAmount = 0;
             this.painkillerEffect = false;
         } else {
-            Json5Object object = mapper.parse(value).getAsJson5Object();
-            this.painkillerAmount = object.get("painkiller_amount").getAsFloat();
-            this.painkillerMaxAmount = object.get("painkiller_max_amount").getAsFloat();
-            this.painkillerEffect = object.get("painkiller_effect").getAsBoolean();
+            Nbt nbt = mapper.read(value, Nbt.class);
+            this.painkillerAmount = nbt.painkillerAmount;
+            this.painkillerMaxAmount = nbt.painkillerMaxAmount;
+            this.painkillerEffect = nbt.painkillerEffect;
         }
     }
 
@@ -114,15 +113,22 @@ public final class Pain extends Moodle {
     }
 
     public float getPain() {
-        float pain = 0;
+        float p = 0;
         for (BodyPart part : this.getHealth().getBodyParts()) {
             float d = (part.getMaxHp() - part.getHp()) / 2.0F * (part.hasInfection() ? 2.0F : 1.0F);
-            if (part.isBandaged())
-                pain += d / 1.25F;
-            else {
-                pain += d;
+            if (part.isBandaged()) {
+                p += d / 1.25F;
+            } else {
+                p += d;
             }
         }
-        return pain / (painkillerAmount + 1) * getMultiplier();
+        float pain = p / (painkillerAmount + 1) * getMultiplier();
+        return Math.max(0, pain);
+    }
+
+    public static class Nbt {
+        public Float painkillerMaxAmount;
+        public Float painkillerAmount;
+        public Boolean painkillerEffect;
     }
 }

@@ -10,8 +10,8 @@ import aiven.zomboidhealthsystem.network.packet.ActionPacket;
 import aiven.zomboidhealthsystem.health.Health;
 import aiven.zomboidhealthsystem.health.bodyparts.BodyPart;
 import aiven.zomboidhealthsystem.utility.ClientUtil;
-
 import aiven.zomboidhealthsystem.utility.Util;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;

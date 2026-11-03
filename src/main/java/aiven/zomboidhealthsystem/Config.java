@@ -103,7 +103,7 @@ public final class Config {
         if (file.exists()) {
             try {
                 try (FileReader reader = new FileReader(file)) {
-                    config = mapper.parse(reader, Config.class);
+                    config = mapper.read(reader, Config.class);
                 }
             } catch (Exception e) {
                 log.error("Failed to load config", e);
@@ -131,7 +131,7 @@ public final class Config {
     private static void save(Config config) throws IOException {
         try {
             try (FileWriter writer = new FileWriter(file)) {
-                mapper.serialize(config, writer);
+                mapper.write(config, writer);
             }
         } catch (Exception e) {
             throw new IOException(e);
