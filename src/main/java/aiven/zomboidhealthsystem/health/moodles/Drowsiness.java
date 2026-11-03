@@ -96,7 +96,7 @@ public final class Drowsiness extends ImportantMoodle {
         }
 
         if(getPlayer().isSleeping()) {
-            if (getAmplifier() < Config.getInstance().min_drowsiness_for_sleep) {
+            if (getAmplifier() < Config.getInstance().min_drowsiness_for_sleep && !health.getDrunkenness().canSleepAnyway()) {
                 getPlayer().stopSleeping();
                 getPlayer().sendSystemMessage(Component.translatable(ZomboidHealthSystem.ID + ".message.dont_want_sleep"));
             }

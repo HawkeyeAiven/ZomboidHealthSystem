@@ -1,5 +1,8 @@
 package aiven.zomboidhealthsystem.item;
 
+import aiven.zomboidhealthsystem.health.Health;
+import aiven.zomboidhealthsystem.mixin.access.PlayerAccess;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.network.chat.Component;
@@ -37,9 +40,11 @@ public class BottleOfWine extends Item {
         if (livingEntity instanceof ServerPlayer serverPlayer) {
             CriteriaTriggers.CONSUME_ITEM.trigger(serverPlayer, itemStack);
             serverPlayer.awardStat(Stats.ITEM_USED.get(this));
-        }
 
-        livingEntity.eat(level, itemStack);
+            PlayerAccess playerAccess = (PlayerAccess) serverPlayer;
+            Health health = playerAccess.zomboid_health_system$getModHealth();
+            health.getDrunkenness().addValue(1.75F);
+        }
 
         return new ItemStack(Items.GLASS_BOTTLE);
     }
@@ -71,6 +76,7 @@ public class BottleOfWine extends Item {
 
     @Override
     public void appendHoverText(ItemStack itemStack, @Nullable Level level, List<Component> list, TooltipFlag tooltipFlag) {
+        super.appendHoverText(itemStack, level, list, tooltipFlag);
         list.add(Component.translatable("zomboid-health-system.tooltip.allows_sleep_without_drowsiness").withStyle(ChatFormatting.GOLD));
         list.add(Component.translatable("zomboid-health-system.tooltip.reduces_pain").withStyle(ChatFormatting.GOLD));
     }

@@ -40,7 +40,7 @@ public class SleepingPills extends Item {
         if(!level.isClientSide()) {
             player.getCooldowns().addCooldown(this, 20);
 
-            itemStack.setDamageValue(itemStack.getDamageValue() - 1);
+            itemStack.setDamageValue(itemStack.getDamageValue() + 1);
 
             if(itemStack.getDamageValue() > itemStack.getMaxDamage()) {
                 itemStack.setCount(itemStack.getCount() - 1);

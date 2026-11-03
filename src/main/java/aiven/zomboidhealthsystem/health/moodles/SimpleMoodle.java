@@ -48,8 +48,8 @@ public abstract class SimpleMoodle extends Moodle {
         this.value = Util.clamp(value, minValue(), maxValue());
     }
 
-    public void addValue(float amount) {
-        setValue(getValue() + amount);
+    public void addValue(float value) {
+        setValue(getValue() + value);
     }
 
     public int getAmplifier() {
