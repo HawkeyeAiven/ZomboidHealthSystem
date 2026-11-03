@@ -60,7 +60,7 @@ Most mechanics are based on **Project Zomboid**, but I've made some adjustments.
 ### Cold
 - Your body temperature decreases.
 
-### Heat
+### Hot
 - Your body temperature increases.
 
 ### Wind
