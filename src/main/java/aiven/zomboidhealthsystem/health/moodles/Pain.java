@@ -28,7 +28,7 @@ public final class Pain extends Moodle {
     public void update(float tickDelta) {
         Player player = this.getHealth().getPlayer();
 
-        if(tickDelta != 0) {
+        if (tickDelta != 0) {
             if (painkillerEffect) {
                 if (painkillerAmount < painkillerMaxAmount) {
                     painkillerAmount += 1.0F / (60 * 20) * tickDelta;
@@ -47,10 +47,10 @@ public final class Pain extends Moodle {
             }
         }
 
-            if (player.isSleeping() && Config.getInstance().pain_keeps_awake && this.getPain() >= 1 && getHealth().getDrowsiness().getAmplifier() < 2) {
-                player.stopSleeping();
-                player.displayClientMessage(Component.translatable("zomboid-health-system.message.pain_not_sleep"), true);
-            }
+        if (player.isSleeping() && Config.getInstance().pain_keeps_awake && this.getPain() >= 1 && getHealth().getDrowsiness().getAmplifier() < 2) {
+            player.stopSleeping();
+            player.displayClientMessage(Component.translatable("zomboid-health-system.message.pain_not_sleep"), true);
+        }
 
 
         if (this.getPain() >= 8) {

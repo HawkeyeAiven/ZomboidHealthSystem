@@ -66,7 +66,7 @@ public final class Config {
 
     public Float cold_chance = 1.0F / (9 * 60 * 20);
 
-    public Float wind_update_chance = 1.0F / 4000.0F;
+    public Float wind_update_chance = 1.0F / 12000.0F;
     public Float wind_chance = 0.33F;
     public Float min_wind = 3.0F;
     public Float max_wind = 15.0F;
@@ -100,7 +100,7 @@ public final class Config {
     public String body_widget_type = BodyWidgetType.ZOMBOID.toString();
 
     public static void initialize() {
-        if(file.exists()) {
+        if (file.exists()) {
             try {
                 try (FileReader reader = new FileReader(file)) {
                     config = mapper.parse(reader, Config.class);
