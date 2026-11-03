@@ -100,7 +100,7 @@ public final class Util {
         int d = 0;
 
         for(ItemStack itemStack : player.getArmorSlots()) {
-            if(!itemStack.getItem().equals(Items.AIR)) {
+            if(!itemStack.isEmpty()) {
                 d += 1;
             }
         }
