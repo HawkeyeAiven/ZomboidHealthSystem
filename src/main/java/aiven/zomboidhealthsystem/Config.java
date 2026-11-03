@@ -32,21 +32,39 @@ public final class Config {
     private static Config config;
 
     public Boolean temperature = true;
-    public Boolean pain_keeps_awake = true;
-    public Boolean time_hud = true;
-    public Boolean health_hud = true;
-    public Boolean moodles_hud = true;
-    public Boolean show_injured_icon = true;
-
-    @Comment("Speed multipliers")
     public Float temperature_multiplier = 1.0F;
+    public Float min_comfortable_temp = 10.0F;
+    public Float max_comfortable_temp = 30.0F;
+    public Float heat_from_wool_helmet = 6.5F;
+    public Float heat_from_wool_chestplate = 8.5F;
+    public Float heat_from_wool_leggings = 7.5F;
+    public Float heat_from_wool_boots = 6.5F;
+    public Float heat_from_leather_helmet = 4.5F;
+    public Float heat_from_leather_chestplate = 6.5F; // Чтобы была карта айдишников и значений
+    public Float heat_from_leather_leggings = 5.0F;
+    public Float heat_from_leather_boots = 4.5F;
+    public Float heat_from_other_armor = 1.0F;
+    public Float max_heat_from_block = 30.0F;
+
     public Float drowsiness_multiplier = 1.0F;
-    public Float thirst_multiplier = 1.0F;
-    public Float exhaustion_multiplier = 1.0F;
-    public Float wet_multiplier = 1.0F;
-    public Float hunger_multiplier = 1.0F;
-    public Float damage_multiplier = 1.0F;
+    public Integer min_drowsiness_for_sleep = 1;
     public Float sleeping_pills_multiplier = 1.0F;
+
+    public Boolean pain_keeps_awake = true;
+
+    public Float thirst_multiplier = 1.0F;
+
+    public Float exhaustion_multiplier = 1.0F;
+    public Float exhaustion_per_jump = 0.020F;
+
+    public Float wet_multiplier = 1.0F;
+
+    public Float hunger_multiplier = 1.0F;
+    public Integer food_heal_amount = 2;
+
+    public Float damage_multiplier = 1.0F;
+
+    public Float cold_chance = 1.0F / (9 * 60 * 20);
 
     public Float wind_update_chance = 1.0F / 4000.0F;
     public Float wind_chance = 0.33F;
@@ -54,32 +72,18 @@ public final class Config {
     public Float max_wind = 15.0F;
 
     public Float infection_chance = 1.0F / (1.5F * 60 * 20);
-    public Float cold_chance = 1.0F / (9 * 60 * 20);
     public Float average_bleeding_chance = 0.25F;
-    public Float zombification_chance = 0.25F;
-    public Float exhaustion_per_jump = 0.020F;
-
-    public Float min_comfortable_temp = 10.0F;
-    public Float max_comfortable_temp = 30.0F;
-
-    public Float heat_from_wool_helmet = 6.5F;
-    public Float heat_from_wool_chestplate = 8.5F;
-    public Float heat_from_wool_leggings = 7.5F;
-    public Float heat_from_wool_boots = 6.5F;
-
-    public Float heat_from_leather_helmet = 4.5F;
-    public Float heat_from_leather_chestplate = 6.5F;
-    public Float heat_from_leather_leggings = 5.0F;
-    public Float heat_from_leather_boots = 4.5F;
-
-    public Float heat_from_other_armor = 1.0F;
-
-    public Float max_heat_from_block = 30.0F;
-
     public Integer heal_time = 40 * 60 * 20;
-    public Integer food_heal_amount = 2;
+
+    public Float zombification_chance = 0.25F;
+
     public Integer update_frequency = 1;
-    public Integer min_drowsiness_for_sleep = 1;
+
+    public Boolean time_hud = true;
+    public Boolean health_hud = true;
+    public Boolean moodles_hud = true;
+    public Boolean show_injured_icon = true;
+
     public Integer moodle_icon_size = 16;
     public Integer moodles_hud_ypos = 90;
 
