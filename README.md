@@ -1,3 +1,5 @@
+CurseForge: https://www.curseforge.com/minecraft/mc-mods/zomboid-health-system
+
 ## EN
 
 Most mechanics are based on **Project Zomboid**, but I've made some adjustments.
