@@ -29,7 +29,7 @@ public final class Wind extends SimpleMoodle {
                 delta = 0;
                 value = getWind();
             }
-            getHealth().getTemperature().addHeat(-value * (getHealth().getWet().getValue() / 2 + 1));
+            getHealth().getTemperature().setHeat(this, -value * (getHealth().getWet().getValue() / 2 + 1));
         }
     }
 

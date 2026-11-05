@@ -15,12 +15,12 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.AbstractFurnaceBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 
 public final class Temperature extends ImportantMoodle {
@@ -34,10 +34,10 @@ public final class Temperature extends ImportantMoodle {
     public static final float MIN_TEMPERATURE_BODY = AVERAGE_TEMPERATURE_BODY - 6;
     public static final float MAX_TEMPERATURE_BODY = AVERAGE_TEMPERATURE_BODY + 6;
 
+    private final HashMap<Moodle, Float> heatMap = new HashMap<>();
+
     private boolean isFeelingCold = false;
     private boolean isFeelingHot = false;
-
-    private float heat = 0;
 
     private float heatFromBlocks = -1;
     private float heatFromBlocksTickDelta = 0;
@@ -78,7 +78,7 @@ public final class Temperature extends ImportantMoodle {
         if(tickDelta != 0) {
             float deltaTemp = Math.abs(this.getValue() - AVERAGE_TEMPERATURE_BODY);
             boolean isOverWorld = isOverWorld();
-            if (Config.getInstance().temperature) {
+            if (Config.getInstance().temperature_enabled) {
                 if (heatFromBlocks == -1) {
                     heatFromBlocks = getHeatFromHeatSources();
                 } else {
@@ -104,7 +104,7 @@ public final class Temperature extends ImportantMoodle {
                     this.value -= (((minComfortableTemp - temperature) / 2)
                             / 10000
                             * Math.max(1, (hunger.getValue() / 2.5F) + 1)
-                            * Config.getInstance().temperature_multiplier
+                            * Config.getInstance().body_temperature_speed_multiplier
                             * tickDelta
                     );
                     isFeelingCold = true;
@@ -113,7 +113,7 @@ public final class Temperature extends ImportantMoodle {
                     this.value += (((temperature - maxComfortableTemp) / 2)
                             / 10000
                             * Math.max(1, thirst.getValue())
-                            * Config.getInstance().temperature_multiplier
+                            * Config.getInstance().body_temperature_speed_multiplier
                             * tickDelta
                     );
                     isFeelingHot = true;
@@ -123,13 +123,13 @@ public final class Temperature extends ImportantMoodle {
                     isFeelingCold = false;
                     if (this.value < AVERAGE_TEMPERATURE_BODY - 0.1F) {
                         this.value += 0.003F
-                                * Config.getInstance().temperature_multiplier
+                                * Config.getInstance().body_temperature_speed_multiplier
                                 * tickDelta;
                         hunger.setMultiplier(this, 1.33F);
                     } else if (this.value > AVERAGE_TEMPERATURE_BODY + 0.1F) {
                         this.value -= 0.003F
                                 / ((thirst.getValue() + 1.0F) * 1.5F)
-                                * Config.getInstance().temperature_multiplier
+                                * Config.getInstance().body_temperature_speed_multiplier
                                 * tickDelta;
                         thirst.setMultiplier(this, 1.33F);
                     }
@@ -158,7 +158,10 @@ public final class Temperature extends ImportantMoodle {
                     }
                 }
             }
-            heat = 0;
+
+            if(!Config.getInstance().temperature_enabled) {
+                setValue(defaultValue());
+            }
         }
     }
 
@@ -312,20 +315,23 @@ public final class Temperature extends ImportantMoodle {
         }
     }
 
-    public void setHeat(float heat) {
-        this.heat = heat;
+    public void setHeat(Moodle moodle, Float heat) {
+        this.heatMap.put(moodle, heat);
+    }
+
+    public float getHeat() {
+        float sum = 0;
+        for(Moodle key : heatMap.keySet()) {
+            Float f = heatMap.get(key);
+            if(f != 0) {
+                sum += f;
+            }
+        }
+        return sum;
     }
 
     public void setTemperature(float temperature) {
         this.value = temperature;
-    }
-
-    public void addHeat(float heat) {
-        this.setHeat(getHeat() + heat);
-    }
-
-    public float getHeat() {
-        return heat;
     }
 
     public boolean isFeelingCold() {
@@ -340,30 +346,22 @@ public final class Temperature extends ImportantMoodle {
         Player player = this.getHealth().getPlayer();
         float heat = 0;
         for(ItemStack stack : player.getArmorSlots()){
-            Item item = stack.getItem();
-            if(!item.equals(Items.AIR)){
-                if(item.equals(Items.LEATHER_HELMET)){
-                    heat += Config.getInstance().heat_from_leather_helmet;
-                } else if(item.equals(Items.LEATHER_CHESTPLATE)){
-                    heat += Config.getInstance().heat_from_leather_chestplate;
-                } else if(item.equals(Items.LEATHER_LEGGINGS)){
-                    heat += Config.getInstance().heat_from_leather_leggings;
-                } else if(item.equals(Items.LEATHER_BOOTS)){
-                    heat += Config.getInstance().heat_from_leather_boots;
-                } else if(item.equals(ModItems.WOOL_HELMET)){
-                    heat += Config.getInstance().heat_from_wool_helmet;
-                } else if(item.equals(ModItems.WOOL_CHESTPLATE)){
-                    heat += Config.getInstance().heat_from_wool_chestplate;
-                } else if(item.equals(ModItems.WOOL_LEGGINGS)){
-                    heat += Config.getInstance().heat_from_wool_leggings;
-                } else if(item.equals(ModItems.WOOL_BOOTS)){
-                    heat += Config.getInstance().heat_from_wool_boots;
-                } else {
-                    heat += Config.getInstance().heat_from_other_armor;
-                }
+            if(!stack.isEmpty()){
+                Item item = stack.getItem();
+                heat += getHeatFromArmor(item);
             }
         }
         return heat;
+    }
+
+    public static float getHeatFromArmor(Item item) {
+        String id = Util.getStringId(item);
+        Float value = Config.getInstance().heat_values.get(id);
+        if(value != null) {
+            return value;
+        } else {
+            return Config.getInstance().heat_from_other_armor;
+        }
     }
 
     public static class Nbt {

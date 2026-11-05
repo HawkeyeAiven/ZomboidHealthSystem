@@ -43,7 +43,7 @@ public abstract class AbstractBandageItem extends Item {
 
     public abstract AbstractBandageItem getDirtyBandageItem();
 
-    public abstract float getHealAmount();
+    public abstract float getHealMultiplier();
 
     public abstract boolean isStopBleeding();
 

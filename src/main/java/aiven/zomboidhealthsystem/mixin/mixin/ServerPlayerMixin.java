@@ -2,7 +2,7 @@ package aiven.zomboidhealthsystem.mixin.mixin;
 
 import aiven.zomboidhealthsystem.Config;
 import aiven.zomboidhealthsystem.network.ServerNetworking;
-import aiven.zomboidhealthsystem.network.packet.ModHealthPacket;
+import aiven.zomboidhealthsystem.network.packet.HealthPacket;
 
 import net.minecraft.server.level.ServerPlayer;
 
@@ -21,7 +21,7 @@ public abstract class ServerPlayerMixin extends PlayerMixin {
     @Inject(at = @At("HEAD"), method = "doTick")
     public void doTick(CallbackInfo ci) {
         if(i++ >= Config.getInstance().update_frequency - 1) {
-            ServerNetworking.send(toServerPlayer(), new ModHealthPacket(zomboid_health_system$getModHealth()));
+            ServerNetworking.send(toServerPlayer(), new HealthPacket(zomboid_health_system$getModHealth()));
         }
     }
 

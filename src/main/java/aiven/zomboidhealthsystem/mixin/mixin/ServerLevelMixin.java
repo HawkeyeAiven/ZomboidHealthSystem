@@ -88,19 +88,23 @@ public abstract class ServerLevelMixin extends LevelMixin implements ServerLevel
             lastSleepingPlayers = null;
             lastDayTime = null;
         }
-        if(server.overworld().equals(this)) {
-            if (Util.random(Config.getInstance().wind_update_chance)) {
-                if (Util.random(Config.getInstance().wind_chance)) {
-                    setWind(new Random().nextFloat(Config.getInstance().min_wind, Config.getInstance().max_wind));
-                } else {
-                    setWind(0.0F);
-                }
+        updateWind(1);
+    }
+
+    @Unique
+    private void updateWind(int tickDelta) {
+        if (Util.random(Config.getInstance().wind_update_chance * tickDelta)) {
+            if (Util.random(Config.getInstance().wind_chance)) {
+                setWind(new Random().nextFloat(Config.getInstance().min_wind, Config.getInstance().max_wind));
+            } else {
+                setWind(0.0F);
             }
         }
     }
 
     @Unique
     private void onSleep(List<ServerPlayer> players, long time) {
+        updateWind(Math.toIntExact(time));
         for(ServerPlayer player : players) {
             Health health = ((PlayerAccess) player).zomboid_health_system$getModHealth();
             health.sleep(Math.toIntExact(time));

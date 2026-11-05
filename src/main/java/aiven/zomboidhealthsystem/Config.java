@@ -1,6 +1,7 @@
 package aiven.zomboidhealthsystem;
 
 import aiven.zomboidhealthsystem.gui.BodyWidgetType;
+import aiven.zomboidhealthsystem.utility.Util;
 
 import com.github.HawkeyeAiven.json5.ObjectMapper;
 import com.github.HawkeyeAiven.json5.annotations.Comment;
@@ -8,6 +9,7 @@ import com.github.HawkeyeAiven.json5.annotations.Comment;
 import de.marhali.json5.Json5;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.item.Items;
 
 import org.slf4j.Logger;
 
@@ -15,6 +17,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 
 public final class Config {
     private static final File configDirectory = new File(Minecraft.getInstance().gameDirectory, "config");
@@ -31,40 +34,64 @@ public final class Config {
 
     private static Config config;
 
-    public Boolean temperature = true;
-    public Float temperature_multiplier = 1.0F;
+    public Boolean temperature_enabled = true;
+    @Comment("The rate at which body temperature increases or decreases.")
+    public Float body_temperature_speed_multiplier = 1.0F;
     public Float min_comfortable_temp = 10.0F;
     public Float max_comfortable_temp = 30.0F;
-    public Float heat_from_wool_helmet = 6.5F;
-    public Float heat_from_wool_chestplate = 8.5F;
-    public Float heat_from_wool_leggings = 7.5F;
-    public Float heat_from_wool_boots = 6.5F;
-    public Float heat_from_leather_helmet = 4.5F;
-    public Float heat_from_leather_chestplate = 6.5F; // Чтобы была карта айдишников и значений
-    public Float heat_from_leather_leggings = 5.0F;
-    public Float heat_from_leather_boots = 4.5F;
-    public Float heat_from_other_armor = 1.0F;
     public Float max_heat_from_block = 30.0F;
+    public LinkedHashMap<String, Float> heat_values = new LinkedHashMap<>();
+    {
+        heat_values.put(Util.getStringId(ModItems.WOOL_HELMET), 6.5F);
+        heat_values.put(Util.getStringId(ModItems.WOOL_CHESTPLATE), 8.5F);
+        heat_values.put(Util.getStringId(ModItems.WOOL_LEGGINGS), 7.5F);
+        heat_values.put(Util.getStringId(ModItems.WOOL_BOOTS), 6.5F);
+        heat_values.put(Util.getStringId(Items.LEATHER_HELMET), 4.5F);
+        heat_values.put(Util.getStringId(Items.LEATHER_CHESTPLATE), 6.5F);
+        heat_values.put(Util.getStringId(Items.LEATHER_LEGGINGS), 5.0F);
+        heat_values.put(Util.getStringId(Items.LEATHER_BOOTS), 4.5F);
+    }
+    public Float heat_from_other_armor = 1.0F;
 
-    public Float drowsiness_multiplier = 1.0F;
+    @Comment("The rate at which drowsiness increases. A value of \"0\" disables it.")
+    public Float drowsiness_speed_multiplier = 1.0F;
     public Integer min_drowsiness_for_sleep = 1;
-    public Float sleeping_pills_multiplier = 1.0F;
+    public Float sleeping_pills_speed_multiplier = 1.0F;
 
+    @Comment("Pain prevents you from falling asleep")
     public Boolean pain_keeps_awake = true;
 
-    public Float thirst_multiplier = 1.0F;
+    @Comment("The rate at which thirst increases. A value of \"0\" disables it.")
+    public Float thirst_speed_multiplier = 1.0F;
+    public LinkedHashMap<String, Float> thirst_values = new LinkedHashMap<>();
+    {
+        thirst_values.put(Util.getStringId(Items.APPLE), 0.2F);
+        thirst_values.put(Util.getStringId(Items.MUSHROOM_STEW), 0.4F);
+        thirst_values.put(Util.getStringId(Items.MELON_SLICE), 0.4F);
+        thirst_values.put(Util.getStringId(Items.BEETROOT_SOUP), 0.4F);
+        thirst_values.put(Util.getStringId(Items.SWEET_BERRIES), 0.05F);
+        thirst_values.put(Util.getStringId(Items.GLOW_BERRIES), 0.05F);
+        thirst_values.put(Util.getStringId(Items.RABBIT_STEW), 0.35F);
+        thirst_values.put(Util.getStringId(Items.MILK_BUCKET), 2.0F);
+        thirst_values.put(Util.getStringId(ModItems.BOTTLE_OF_PURIFIED_WATER), 1.25F);
+        thirst_values.put(Util.getStringId(ModItems.CUP_OF_COFFEE), 0.75F);
+        thirst_values.put(Util.getStringId(ModItems.BOTTLE_OF_WINE), 1.25F);
+    }
 
-    public Float exhaustion_multiplier = 1.0F;
+    @Comment("The rate at which you become tired or recover. A value of \"0\" disables it.")
+    public Float exhaustion_speed_multiplier = 1.0F;
     public Float exhaustion_per_jump = 0.020F;
 
-    public Float wet_multiplier = 1.0F;
+    @Comment("The rate at which wetness increases. A value of \"0\" disables it.")
+    public Float wetness_speed_multiplier = 1.0F;
 
-    public Float hunger_multiplier = 1.0F;
+    @Comment("The rate at which hunger increases. A value of \"0\" disables it.")
+    public Float hunger_speed_multiplier = 1.0F;
     public Integer food_heal_amount = 2;
 
     public Float damage_multiplier = 1.0F;
 
-    public Float cold_chance = 1.0F / (9 * 60 * 20);
+    public Float common_cold_chance = 1.0F / (9 * 60 * 20);
 
     public Float wind_update_chance = 1.0F / 12000.0F;
     public Float wind_chance = 0.33F;
@@ -73,7 +100,7 @@ public final class Config {
 
     public Float infection_chance = 1.0F / (1.5F * 60 * 20);
     public Float average_bleeding_chance = 0.25F;
-    public Integer heal_time = 40 * 60 * 20;
+    public Float heal_value = 1.0F / (40 * 60 * 20);
 
     public Float zombification_chance = 0.25F;
 

@@ -77,7 +77,6 @@ public abstract class PlayerMixin extends LivingEntityMixin implements PlayerAcc
         if(!level.isClientSide()) {
             if (itemStack.isEdible()) {
                 Health health = zomboid_health_system$getModHealth();
-
                 FoodProperties foodProperties = itemStack.getItem().getFoodProperties();
                 health.getHunger().eatFood(foodProperties.getNutrition(), foodProperties.getSaturationModifier());
             }

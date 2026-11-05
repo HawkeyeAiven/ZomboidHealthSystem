@@ -9,14 +9,14 @@ import net.fabricmc.fabric.api.networking.v1.PacketType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 
-public final class ModHealthPacket implements FabricPacket {
+public final class HealthPacket implements FabricPacket {
     private final byte[] bytes;
 
-    public ModHealthPacket(Health health) {
+    public HealthPacket(Health health) {
         this.bytes = health.getNbt();
     }
 
-    public ModHealthPacket(byte[] bytes) {
+    public HealthPacket(byte[] bytes) {
         this.bytes = bytes;
     }
 
@@ -36,11 +36,11 @@ public final class ModHealthPacket implements FabricPacket {
         return ServerPacketTypes.healthPacketType;
     }
 
-    public static ModHealthPacket create(FriendlyByteBuf nbt) {
+    public static HealthPacket create(FriendlyByteBuf nbt) {
         try {
             CompoundTag compoundTag = nbt.readNbt();
             byte[] bytes = compoundTag.getByteArray("health");
-            return new ModHealthPacket(bytes);
+            return new HealthPacket(bytes);
         } catch (Exception e) {
             return null;
         }

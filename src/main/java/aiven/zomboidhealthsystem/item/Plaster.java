@@ -18,7 +18,7 @@ public class Plaster extends AbstractBandageItem {
     }
 
     @Override
-    public float getHealAmount() {
+    public float getHealMultiplier() {
         return 1;
     }
 

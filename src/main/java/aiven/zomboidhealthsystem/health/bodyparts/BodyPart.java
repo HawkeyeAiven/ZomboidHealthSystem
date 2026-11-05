@@ -90,8 +90,8 @@ public abstract class BodyPart {
 
             if (this.isBandaged()) {
                 this.heal(
-                        bandageItem.getHealAmount()
-                                / Health.BANDAGE_HEAL_TIME
+                        Config.getInstance().heal_value
+                                * bandageItem.getHealMultiplier()
                                 / (this.hasInfection() ? 3 : 1)
                                 * (this.getHealth().getHunger().getValue() < 0 ? 1.25F : 1.0F)
                                 / (float) Math.sqrt(Math.max(getHealth().getHunger().getValue(), 1))

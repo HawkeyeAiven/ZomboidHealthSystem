@@ -46,8 +46,8 @@ public final class Drowsiness extends ImportantMoodle {
 
     @Override
     protected void _update(float tickDelta) {
-        if(tickDelta != 0) {
-            addTicks(1.0F * 1.58F * getMultiplier() * Config.getInstance().drowsiness_multiplier * tickDelta);
+        if(tickDelta != 0 && Config.getInstance().drowsiness_speed_multiplier != 0) {
+            addTicks(1.0F * 1.58F * getMultiplier() * Config.getInstance().drowsiness_speed_multiplier * tickDelta);
 
             if (caffeine_effect) {
                 if (caffeine_value < max_caffeine_value) {
@@ -63,7 +63,7 @@ public final class Drowsiness extends ImportantMoodle {
 
             if (sleeping_pills_effect) {
                 if (sleeping_pills_value < max_sleeping_pills_value) {
-                    sleeping_pills_value += 1.0F / (60 * 20) * Config.getInstance().sleeping_pills_multiplier * tickDelta;
+                    sleeping_pills_value += 1.0F / (60 * 20) * Config.getInstance().sleeping_pills_speed_multiplier * tickDelta;
                 } else if (max_sleeping_pills_value != 0) {
                     sleeping_pills_effect = false;
                 }
@@ -90,13 +90,17 @@ public final class Drowsiness extends ImportantMoodle {
                     }
                 }
             }
+
+            if(getPlayer().isSleeping()) {
+                if (getAmplifier() < Config.getInstance().min_drowsiness_for_sleep && !health.getDrunkenness().canSleepAnyway()) {
+                    getPlayer().stopSleeping();
+                    getPlayer().sendSystemMessage(Component.translatable(ZomboidHealthSystem.ID + ".message.dont_want_sleep"));
+                }
+            }
         }
 
-        if(getPlayer().isSleeping()) {
-            if (getAmplifier() < Config.getInstance().min_drowsiness_for_sleep && !health.getDrunkenness().canSleepAnyway()) {
-                getPlayer().stopSleeping();
-                getPlayer().sendSystemMessage(Component.translatable(ZomboidHealthSystem.ID + ".message.dont_want_sleep"));
-            }
+        if(Config.getInstance().drowsiness_speed_multiplier == 0) {
+            setValue(defaultValue());
         }
     }
 
@@ -110,7 +114,7 @@ public final class Drowsiness extends ImportantMoodle {
             this.max_sleeping_pills_value = 0;
             this.sleeping_pills_effect = true;
         }
-        this.value = Math.max(0, value - (float) sumTicks / 8000.0F);
+        setValue(value - (float) sumTicks / 8000.0F);
     }
 
     @Override

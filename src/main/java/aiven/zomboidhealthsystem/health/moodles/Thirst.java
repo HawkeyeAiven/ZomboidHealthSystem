@@ -32,8 +32,8 @@ public final class Thirst extends ImportantMoodle {
 
     @Override
     protected void _update(float tickDelta) {
-        if(tickDelta != 0) {
-            this.addValue(1.0F / 10000.0F * getMultiplier() * Config.getInstance().thirst_multiplier * tickDelta);
+        if(tickDelta != 0 && Config.getInstance().thirst_speed_multiplier > 0) {
+            this.addValue(1.0F / 10000.0F * getMultiplier() * Config.getInstance().thirst_speed_multiplier * tickDelta);
 
             this.getHealth().getExhaustion().setMultiplier(this, 1.0F);
 
@@ -65,11 +65,15 @@ public final class Thirst extends ImportantMoodle {
                 this.getHealth().addMobEffect(MobEffects.BLINDNESS, 0, 15 * 20);
             }
         }
+
+        if(Config.getInstance().thirst_speed_multiplier == 0) {
+            setValue(defaultValue());
+        }
     }
 
     @Override
     public void sleep(int sumTicks) {
-        this.setValue(this.getValue() + 0.35F / 8000 * sumTicks);
+        this.setValue(this.getValue() + (0.35F / 8000) * sumTicks * Config.getInstance().thirst_speed_multiplier);
     }
 
     @Override

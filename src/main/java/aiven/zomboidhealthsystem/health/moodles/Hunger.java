@@ -41,8 +41,8 @@ public final class Hunger extends ImportantMoodle {
 
     @Override
     protected void _update(float tickDelta) {
-        if(tickDelta != 0) {
-            this.addValue(1.0F / 10000 * getMultiplier() * (this.getValue() < 0 ? 2.25F : 1.0F) * Config.getInstance().hunger_multiplier * tickDelta);
+        if(tickDelta != 0 && Config.getInstance().hunger_speed_multiplier != 0) {
+            this.addValue(1.0F / 10000 * getMultiplier() * (this.getValue() < 0 ? 2.25F : 1.0F) * Config.getInstance().hunger_speed_multiplier * tickDelta);
 
             if (value >= 2.0F) {
                 this.getHealth().getExhaustion().setMultiplier(this, 1 + ((value - 2.0F) / 4));
@@ -73,6 +73,10 @@ public final class Hunger extends ImportantMoodle {
                 }
             }
         }
+
+        if(Config.getInstance().hunger_speed_multiplier == 0) {
+            setValue(defaultValue());
+        }
     }
 
     @Override
@@ -86,7 +90,7 @@ public final class Hunger extends ImportantMoodle {
 
     @Override
     public void sleep(int sumTicks) {
-        this.addValue(0.5F / 8000 * sumTicks * (getValue() < 0 ? 2.25F : 1.0F));
+        this.addValue(0.5F / 8000 * sumTicks * (getValue() < 0 ? 2.25F : 1.0F) * Config.getInstance().hunger_speed_multiplier);
     }
 
     @Override

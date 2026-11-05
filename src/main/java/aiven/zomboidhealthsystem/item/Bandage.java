@@ -10,7 +10,7 @@ public class Bandage extends AbstractBandageItem {
     }
 
     @Override
-    public float getHealAmount() {
+    public float getHealMultiplier() {
         return 4;
     }
 

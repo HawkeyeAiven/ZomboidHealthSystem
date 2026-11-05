@@ -54,6 +54,7 @@
   "zomboid-health-system.tooltip.doesnt_stop_bleeding": "Does not stop bleeding",
   "zomboid-health-system.tooltip.hunger": "Hunger: %s",
   "zomboid-health-system.tooltip.thirst": "Thirst: %s",
+  "zomboid-health-system.tooltip.heat": "Heat: %s",
   "zomboid-health-system.tooltip.allows_sleep_without_drowsiness": "Allows you to sleep without drowsiness",
   "zomboid-health-system.tooltip.reduces_pain": "Reduces pain",
 

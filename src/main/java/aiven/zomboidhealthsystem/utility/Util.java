@@ -1,8 +1,10 @@
 package aiven.zomboidhealthsystem.utility;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
@@ -25,6 +27,14 @@ public final class Util {
 
     private Util() {
 
+    }
+
+    public static ResourceLocation getId(Item item) {
+        return BuiltInRegistries.ITEM.getKey(item);
+    }
+
+    public static String getStringId(Item item) {
+        return getId(item).toString();
     }
 
     public static boolean contains(Container container, Item item) {

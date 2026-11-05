@@ -35,9 +35,9 @@ public class Thermometer extends Item {
             float temperature = (float) Util.floor(health.getTemperature().getValue(), 1);
             float perceived = (float) Util.floor(health.getTemperature().getPerceivedTemperature(), 1);
 
-            player.sendSystemMessage(Component.literal("""
+            player.displayClientMessage(Component.literal("""
                     body t: %s°C, perceived t: %s°C\
-                    """.formatted(temperature, perceived)));
+                    """.formatted(temperature, perceived)), true);
         }
         return InteractionResultHolder.success(player.getItemInHand(interactionHand));
     }

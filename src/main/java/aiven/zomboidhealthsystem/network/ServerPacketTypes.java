@@ -1,7 +1,7 @@
 package aiven.zomboidhealthsystem.network;
 
 import aiven.zomboidhealthsystem.ZomboidHealthSystem;
-import aiven.zomboidhealthsystem.network.packet.ModHealthPacket;
+import aiven.zomboidhealthsystem.network.packet.HealthPacket;
 
 import net.fabricmc.fabric.api.networking.v1.FabricPacket;
 import net.fabricmc.fabric.api.networking.v1.PacketType;
@@ -15,7 +15,7 @@ public final class ServerPacketTypes {
 
     }
 
-    public static final PacketType<ModHealthPacket> healthPacketType = create("health", ModHealthPacket::create);
+    public static final PacketType<HealthPacket> healthPacketType = create("health", HealthPacket::create);
 
     private static <T extends FabricPacket> PacketType<T> create(String id, Function<FriendlyByteBuf, T> constructor) {
         return PacketType.create(ZomboidHealthSystem.getResourceLocation(id), constructor);

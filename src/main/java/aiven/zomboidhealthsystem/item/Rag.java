@@ -10,7 +10,7 @@ public class Rag extends AbstractBandageItem {
     }
 
     @Override
-    public float getHealAmount() {
+    public float getHealMultiplier() {
         return 2.5f;
     }
 

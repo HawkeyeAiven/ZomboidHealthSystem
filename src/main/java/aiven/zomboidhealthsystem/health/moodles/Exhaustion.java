@@ -19,15 +19,15 @@ public final class Exhaustion extends SimpleMoodle {
 
     @Override
     public void update(float tickDelta) {
-        if(tickDelta != 0) {
+        if(tickDelta != 0 && Config.getInstance().exhaustion_speed_multiplier != 0) {
             getHealth().getThirst().setMultiplier(this, getValue() / 1.75F + 1.0F);
             getHealth().getHunger().setMultiplier(this, getValue() / 2.0F + 1.0F);
             getHealth().getDrowsiness().setMultiplier(this, getValue() + 1.0F);
 
             if (this.getPlayer().isSprinting()) {
-                this.addValue(1.0F / 1100 * getMultiplier() * Config.getInstance().exhaustion_multiplier * tickDelta);
+                this.addValue(1.0F / 1100 * getMultiplier() * Config.getInstance().exhaustion_speed_multiplier * tickDelta);
             } else {
-                this.addValue(-1.0F / 1100 * (isFasterRest() ? 1.25F : 1.0F) * Config.getInstance().exhaustion_multiplier * tickDelta);
+                this.addValue(-1.0F / 1100 * (isFasterRest() ? 1.25F : 1.0F) * Config.getInstance().exhaustion_speed_multiplier * tickDelta);
             }
 
             if (value >= 1.5F) {
@@ -36,7 +36,11 @@ public final class Exhaustion extends SimpleMoodle {
             }
 
             Temperature temperature = getHealth().getTemperature();
-            temperature.addHeat(getValue() * 3);
+            temperature.setHeat(this, getValue() * 3);
+        }
+
+        if(Config.getInstance().exhaustion_speed_multiplier == 0) {
+            setValue(defaultValue());
         }
     }
 
@@ -46,7 +50,7 @@ public final class Exhaustion extends SimpleMoodle {
     }
 
     public void onJump() {
-        this.addValue(Config.getInstance().exhaustion_per_jump * this.getMultiplier() * Config.getInstance().exhaustion_multiplier);
+        this.addValue(Config.getInstance().exhaustion_per_jump * this.getMultiplier() * Config.getInstance().exhaustion_speed_multiplier);
     }
 
     private boolean isFasterRest() {

@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 public final class ZomboidHealthSystem implements ModInitializer {
 	public static final String ID = "zomboid-health-system";
 	public static final String NAME = "Zomboid Health System";
-	public static final String VERSION = "2.0.0";
+	public static final String VERSION = "2.0.1";
 	public static final String ID_VER = ID + "-" + VERSION;
 
 	public static final Logger log = LoggerFactory.getLogger(NAME);
@@ -29,8 +29,8 @@ public final class ZomboidHealthSystem implements ModInitializer {
 
 		log.info(NAME + " initialized!");
 
-		//TODO
-		// - В конфиг комментарии нужны
+		//TODO идеи
+		// - Показывать время только когда часы есть в инвентаре
 	}
 
 	public static ResourceLocation getResourceLocation(String path) {

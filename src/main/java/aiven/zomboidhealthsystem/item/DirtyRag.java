@@ -9,7 +9,7 @@ public class DirtyRag extends AbstractBandageItem {
     }
 
     @Override
-    public float getHealAmount() {
+    public float getHealMultiplier() {
         return 1.25f;
     }
 

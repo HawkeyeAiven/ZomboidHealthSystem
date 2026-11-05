@@ -57,7 +57,6 @@ public final class Health {
             MAX_LEG_HP = 4,
             MAX_FOOT_HP = 4;
 
-    public static final int BANDAGE_HEAL_TIME = Config.getInstance().heal_time;
     public static final int BANDAGE_BECOMES_DIRTY_AFTER = 2 * 60 * 20;
     public static final int MAX_SLOWNESS_AMPLIFIER = 7;
     private static final int UPDATE_FREQUENCY = Config.getInstance().update_frequency;

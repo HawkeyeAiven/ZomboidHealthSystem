@@ -36,7 +36,7 @@ public final class Cold extends ImportantMoodle {
             float amplifier = (Temperature.AVERAGE_TEMPERATURE_BODY - getHealth().getTemperature().getValue()) / 1.5F;
 
             if (amplifier >= 1.0F) {
-                if (Util.random(Config.getInstance().cold_chance * tickDelta * amplifier * getMultiplier())) {
+                if (Util.random(Config.getInstance().common_cold_chance * tickDelta * amplifier * getMultiplier())) {
                     this.addValue(1.0F);
                 }
             }
