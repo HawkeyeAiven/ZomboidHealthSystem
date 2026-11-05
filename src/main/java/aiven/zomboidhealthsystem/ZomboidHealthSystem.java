@@ -31,6 +31,9 @@ public final class ZomboidHealthSystem implements ModInitializer {
 
 		//TODO идеи
 		// - Показывать время только когда часы есть в инвентаре
+
+		//TODO
+		// - Время в разных форматах
 	}
 
 	public static ResourceLocation getResourceLocation(String path) {
