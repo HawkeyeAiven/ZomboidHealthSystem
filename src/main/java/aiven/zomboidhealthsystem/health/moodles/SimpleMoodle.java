@@ -3,6 +3,8 @@ package aiven.zomboidhealthsystem.health.moodles;
 import aiven.zomboidhealthsystem.health.Health;
 import aiven.zomboidhealthsystem.utility.Util;
 
+import java.io.*;
+
 public abstract class SimpleMoodle extends Moodle {
     protected float value = defaultValue();
 
@@ -23,20 +25,32 @@ public abstract class SimpleMoodle extends Moodle {
     }
 
     @Override
-    public String getNbt(){
-        if (value == 0) {
+    public byte[] getNbt(){
+        if (this.value == defaultValue()) {
             return null;
         } else {
-            return String.valueOf(getValue());
+            try {
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                DataOutputStream out = new DataOutputStream(byteArrayOutputStream);
+                out.writeFloat(this.value);
+                return byteArrayOutputStream.toByteArray();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
     @Override
-    public void readNbt(String value) {
-        if(value != null) {
-            this.setValue(Float.parseFloat(value));
-        } else {
-            this.setValue(defaultValue());
+    public void readNbt(byte[] value) {
+        try {
+            if (value != null) {
+                DataInputStream in = new DataInputStream(new ByteArrayInputStream(value));
+                this.setValue(in.readFloat());
+            } else {
+                this.setValue(defaultValue());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

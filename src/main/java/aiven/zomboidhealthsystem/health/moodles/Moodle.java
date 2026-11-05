@@ -24,9 +24,9 @@ public abstract class Moodle {
 
     public abstract void sleep(int sumTicks);
 
-    public abstract String getNbt();
+    public abstract byte[] getNbt();
 
-    public abstract void readNbt(String value);
+    public abstract void readNbt(byte[] value);
 
     public abstract void update(float tickDelta);
 

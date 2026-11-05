@@ -4,8 +4,6 @@ import aiven.zomboidhealthsystem.*;
 import aiven.zomboidhealthsystem.health.Health;
 import aiven.zomboidhealthsystem.utility.Util;
 
-import com.github.HawkeyeAiven.json5.ObjectMapper;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -19,13 +17,11 @@ import net.minecraft.world.level.block.AbstractFurnaceBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 
 
 public final class Temperature extends ImportantMoodle {
-    private static final ObjectMapper mapper = new ObjectMapper();
-
     public static final float MIN_COMFORTABLE_TEMPERATURE = Config.getInstance().min_comfortable_temp;
     public static final float MAX_COMFORTABLE_TEMPERATURE = Config.getInstance().max_comfortable_temp;
 
@@ -176,35 +172,40 @@ public final class Temperature extends ImportantMoodle {
     }
 
     @Override
-    public void readNbt(String value) {
-        if(value != null) {
-            Nbt nbt = mapper.read(value, Nbt.class);
-            this.value = nbt.value;
-            this.isFeelingCold = nbt.isFeelingCold;
-            this.isFeelingHot = nbt.isFeelingHot;
-        } else {
-            setValue(defaultValue());
-            isFeelingHot = false;
-            isFeelingCold = false;
+    public void readNbt(byte[] value) {
+        try {
+            if (value != null) {
+                DataInputStream in = new DataInputStream(new ByteArrayInputStream(value));
+                this.value = in.readFloat();
+                this.isFeelingCold = in.readBoolean();
+                this.isFeelingHot = in.readBoolean();
+            } else {
+                setValue(defaultValue());
+                this.isFeelingHot = false;
+                this.isFeelingCold = false;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public byte[] getNbt() {
+        try {
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            DataOutputStream out = new DataOutputStream(byteArrayOutputStream);
+            out.writeFloat(this.value);
+            out.writeBoolean(this.isFeelingCold);
+            out.writeBoolean(this.isFeelingHot);
+            return byteArrayOutputStream.toByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Override
     protected ResourceKey<DamageType> getDamageType() {
         return null;
-    }
-
-    @Override
-    public String getNbt() {
-        Nbt nbt = new Nbt();
-        nbt.value = value;
-        nbt.isFeelingCold = isFeelingCold;
-        nbt.isFeelingHot = isFeelingHot;
-        try {
-            return mapper.write(nbt);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Override
@@ -362,11 +363,5 @@ public final class Temperature extends ImportantMoodle {
         } else {
             return Config.getInstance().heat_from_other_armor;
         }
-    }
-
-    public static class Nbt {
-        public Float value;
-        public Boolean isFeelingCold = false;
-        public Boolean isFeelingHot = false;
     }
 }

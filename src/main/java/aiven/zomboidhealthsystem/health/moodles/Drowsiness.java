@@ -6,20 +6,20 @@ import aiven.zomboidhealthsystem.ZomboidHealthSystem;
 import aiven.zomboidhealthsystem.health.Health;
 import aiven.zomboidhealthsystem.utility.Util;
 
-import com.github.HawkeyeAiven.json5.ObjectMapper;
-
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffects;
 
-import java.io.IOException;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 
 
 public final class Drowsiness extends ImportantMoodle {
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final int dayLength = 24000;
 
-    private int drowsinessTime;
     private float caffeine_value = 0;
     private float max_caffeine_value = 0;
     private boolean caffeine_effect = true;
@@ -29,9 +29,6 @@ public final class Drowsiness extends ImportantMoodle {
 
     public Drowsiness(Health health) {
         super(health);
-        if(getPlayer() != null && !getPlayer().level().isClientSide()) {
-            drowsinessTime = 24000;
-        }
     }
 
     @Override
@@ -57,7 +54,7 @@ public final class Drowsiness extends ImportantMoodle {
                 }
             } else {
                 if (caffeine_value > max_caffeine_value * -0.75F) {
-                    caffeine_value -= 1.0F / (drowsinessTime / 4.0F) * tickDelta;
+                    caffeine_value -= 1.0F / (dayLength / 4.0F) * tickDelta;
                 }
             }
 
@@ -123,46 +120,48 @@ public final class Drowsiness extends ImportantMoodle {
     }
 
     @Override
-    public String getNbt() {
-        if(this.getValue() != 0 || this.caffeine_value != 0 || this.max_caffeine_value != 0) {
-            Nbt nbt = new Nbt();
-            nbt.value = value;
-            nbt.drowsinessTime = drowsinessTime;
-            nbt.caffeine_value = caffeine_value;
-            nbt.max_caffeine_value = max_caffeine_value;
-            nbt.caffeine_effect = caffeine_effect;
-            nbt.sleeping_pills_value = sleeping_pills_value;
-            nbt.max_sleeping_pills_value = max_sleeping_pills_value;
-            nbt.sleeping_pills_effect = sleeping_pills_effect;
-            try {
-                return mapper.write(nbt);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+    public byte[] getNbt() {
+        try {
+            if (this.getValue() != 0 || this.caffeine_value != 0 || this.max_caffeine_value != 0) {
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                DataOutputStream out = new DataOutputStream(byteArrayOutputStream);
+                out.writeFloat(value);
+                out.writeFloat(caffeine_value);
+                out.writeFloat(max_caffeine_value);
+                out.writeBoolean(caffeine_effect);
+                out.writeFloat(sleeping_pills_value);
+                out.writeFloat(max_sleeping_pills_value);
+                out.writeBoolean(sleeping_pills_effect);
             }
+            return null;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return null;
     }
 
     @Override
-    public void readNbt(String value) {
-        if(value == null) {
-            this.caffeine_value = 0;
-            this.max_caffeine_value = 0;
-            this.sleeping_pills_value = 0;
-            this.max_sleeping_pills_value = 0;
-            this.value = 0;
-            this.sleeping_pills_effect = true;
-            this.caffeine_effect = true;
-        } else {
-            Nbt nbt = mapper.read(value, Nbt.class);
-            this.value = nbt.value;
-            this.drowsinessTime = nbt.drowsinessTime;
-            this.caffeine_value = nbt.caffeine_value;
-            this.max_caffeine_value = nbt.max_caffeine_value;
-            this.caffeine_effect = nbt.caffeine_effect;
-            this.sleeping_pills_value = nbt.sleeping_pills_value;
-            this.max_sleeping_pills_value = nbt.max_sleeping_pills_value;
-            this.sleeping_pills_effect = nbt.sleeping_pills_effect;
+    public void readNbt(byte[] value) {
+        try {
+            if (value == null) {
+                this.value = 0;
+                this.caffeine_value = 0;
+                this.max_caffeine_value = 0;
+                this.sleeping_pills_value = 0;
+                this.max_sleeping_pills_value = 0;
+                this.sleeping_pills_effect = true;
+                this.caffeine_effect = true;
+            } else {
+                DataInputStream in = new DataInputStream(new ByteArrayInputStream(value));
+                this.value = in.readFloat();
+                this.caffeine_value = in.readFloat();
+                this.max_caffeine_value = in.readFloat();
+                this.caffeine_effect = in.readBoolean();
+                this.sleeping_pills_value = in.readFloat();
+                this.max_sleeping_pills_value = in.readFloat();
+                this.sleeping_pills_effect = in.readBoolean();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -187,17 +186,6 @@ public final class Drowsiness extends ImportantMoodle {
     }
 
     public void addTicks(float amount) {
-        addValue(amount / drowsinessTime);
-    }
-
-    public static class Nbt {
-        public Float value;
-        public Integer drowsinessTime;
-        public Float caffeine_value;
-        public Float max_caffeine_value;
-        public Boolean caffeine_effect;
-        public Float sleeping_pills_value;
-        public Float max_sleeping_pills_value;
-        public Boolean sleeping_pills_effect;
+        addValue(amount / dayLength);
     }
 }

@@ -7,8 +7,10 @@ import aiven.zomboidhealthsystem.health.moodles.*;
 import aiven.zomboidhealthsystem.utility.Util;
 
 import de.marhali.json5.Json5;
+import de.marhali.json5.Json5Element;
 import de.marhali.json5.Json5Object;
 import de.marhali.json5.Json5Primitive;
+
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.TagKey;
@@ -24,6 +26,7 @@ import net.minecraft.world.entity.player.Player;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
@@ -544,9 +547,9 @@ public final class Health {
         Json5Object object = new Json5Object();
 
         for (Moodle moodle : moodles) {
-            String nbt = moodle.getNbt();
+            byte[] nbt = moodle.getNbt();
             if (nbt != null) {
-                object.add(moodle.getId(), Json5Primitive.fromString(nbt));
+                object.add(moodle.getId(), Json5Primitive.fromString(Base64.getEncoder().encodeToString(nbt)));
             }
         }
 
@@ -572,7 +575,13 @@ public final class Health {
         }
 
         for (Moodle moodle : this.moodles) {
-            moodle.readNbt(object.get(moodle.getId()) == null ? null : object.get(moodle.getId()).getAsString());
+            Json5Element element = object.get(moodle.getId());
+            if(element != null && !element.isJson5Null()) {
+                String value = element.getAsString();
+                moodle.readNbt(Base64.getDecoder().decode(value));
+            } else {
+                moodle.readNbt(null);
+            }
         }
     }
 

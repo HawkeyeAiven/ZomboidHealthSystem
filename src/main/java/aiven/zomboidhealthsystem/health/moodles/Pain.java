@@ -4,17 +4,13 @@ import aiven.zomboidhealthsystem.Config;
 import aiven.zomboidhealthsystem.health.Health;
 import aiven.zomboidhealthsystem.health.bodyparts.BodyPart;
 
-import com.github.HawkeyeAiven.json5.ObjectMapper;
-
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 
-import java.io.IOException;
+import java.io.*;
 
 public final class Pain extends Moodle {
-    private static final ObjectMapper mapper = new ObjectMapper();
-
     private float painkillerAmount = 0;
     private float painkillerMaxAmount = 0;
     private boolean painkillerEffect = true;
@@ -77,15 +73,16 @@ public final class Pain extends Moodle {
     }
 
     @Override
-    public String getNbt() {
+    public byte[] getNbt() {
         if(painkillerMaxAmount != 0 || painkillerAmount != 0) {
-            Nbt nbt = new Nbt();
-            nbt.painkillerAmount = painkillerAmount;
-            nbt.painkillerMaxAmount = painkillerMaxAmount;
-            nbt.painkillerEffect = painkillerEffect;
             try {
-                return mapper.write(nbt);
-            } catch (IOException e) {
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                DataOutputStream out = new DataOutputStream(byteArrayOutputStream);
+                out.writeFloat(this.painkillerAmount);
+                out.writeFloat(this.painkillerMaxAmount);
+                out.writeBoolean(this.painkillerEffect);
+                return byteArrayOutputStream.toByteArray();
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         } else {
@@ -94,16 +91,20 @@ public final class Pain extends Moodle {
     }
 
     @Override
-    public void readNbt(String value) {
+    public void readNbt(byte[] value) {
         if(value == null) {
             this.painkillerAmount = 0;
             this.painkillerMaxAmount = 0;
             this.painkillerEffect = false;
         } else {
-            Nbt nbt = mapper.read(value, Nbt.class);
-            this.painkillerAmount = nbt.painkillerAmount;
-            this.painkillerMaxAmount = nbt.painkillerMaxAmount;
-            this.painkillerEffect = nbt.painkillerEffect;
+            try {
+                DataInputStream in = new DataInputStream(new ByteArrayInputStream(value));
+                this.painkillerAmount = in.readFloat();
+                this.painkillerMaxAmount = in.readFloat();
+                this.painkillerEffect = in.readBoolean();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

@@ -8,7 +8,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Pose;
 
 public final class Wind extends SimpleMoodle {
-
     private float delta = 0.0F;
 
     public Wind(Health health) {
