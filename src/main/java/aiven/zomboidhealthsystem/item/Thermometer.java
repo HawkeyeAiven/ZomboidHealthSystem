@@ -5,8 +5,6 @@ import aiven.zomboidhealthsystem.mixin.access.PlayerAccess;
 import aiven.zomboidhealthsystem.health.Health;
 import aiven.zomboidhealthsystem.utility.Util;
 
-import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -25,7 +23,7 @@ import java.util.List;
 public class Thermometer extends Item {
 
     public Thermometer() {
-        super(new FabricItemSettings().maxCount(1));
+        super(new Item.Properties().stacksTo(1));
     }
 
     @Override

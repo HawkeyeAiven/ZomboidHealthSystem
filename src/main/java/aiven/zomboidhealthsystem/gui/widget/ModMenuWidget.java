@@ -106,7 +106,7 @@ public class ModMenuWidget extends ModContainer {
         if(healthTabGroup.visible) { // StringWidget криво рисуется idk почему
             context.drawString(
                     Minecraft.getInstance().font,
-                    Component.translatable("zomboid-health-system.health.hud.body_status"),
+                    Component.translatable(ZomboidHealthSystem.ID + ".health.hud.body_status"),
                     78, 25,
                     0xFFf9f0f0
             );

@@ -1,6 +1,7 @@
 package aiven.zomboidhealthsystem.health.moodles;
 
 import aiven.zomboidhealthsystem.Config;
+import aiven.zomboidhealthsystem.ZomboidHealthSystem;
 import aiven.zomboidhealthsystem.health.Health;
 import aiven.zomboidhealthsystem.health.bodyparts.BodyPart;
 
@@ -44,7 +45,7 @@ public final class Pain extends Moodle {
 
         if (player.isSleeping() && Config.getInstance().pain_keeps_awake && this.getPain() >= 1 && getHealth().getDrowsiness().getAmplifier() < 2) {
             player.stopSleeping();
-            player.displayClientMessage(Component.translatable("zomboid-health-system.message.pain_not_sleep"), true);
+            player.displayClientMessage(Component.translatable(ZomboidHealthSystem.ID + ".message.pain_not_sleep"), true);
         }
 
 

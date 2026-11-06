@@ -1,5 +1,6 @@
 package aiven.zomboidhealthsystem.item;
 
+import aiven.zomboidhealthsystem.ZomboidHealthSystem;
 import aiven.zomboidhealthsystem.mixin.access.PlayerAccess;
 import aiven.zomboidhealthsystem.health.Health;
 
@@ -53,7 +54,7 @@ public class Painkillers extends Item {
 
     @Override
     public void appendHoverText(ItemStack itemStack, @Nullable Level level, List<Component> list, TooltipFlag tooltipFlag) {
-        list.add(Component.translatable("zomboid-health-system.tooltip.reduces_pain_by_50").withStyle(ChatFormatting.GOLD));
-        list.add(Component.translatable("zomboid-health-system.tooltip.works_over_time").withStyle(ChatFormatting.GOLD));
+        list.add(Component.translatable(ZomboidHealthSystem.ID + ".tooltip.reduces_pain_by_50").withStyle(ChatFormatting.GOLD));
+        list.add(Component.translatable(ZomboidHealthSystem.ID + ".tooltip.works_over_time").withStyle(ChatFormatting.GOLD));
     }
 }

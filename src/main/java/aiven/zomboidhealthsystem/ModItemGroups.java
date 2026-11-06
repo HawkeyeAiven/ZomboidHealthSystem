@@ -1,11 +1,11 @@
 package aiven.zomboidhealthsystem;
 
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 
@@ -15,7 +15,7 @@ public final class ModItemGroups {
 
     }
 
-    public static CreativeModeTab MAIN_GROUP = register(ModItems.BANDAGE,ZomboidHealthSystem.NAME, ZomboidHealthSystem.ID,
+    public static final CreativeModeTab MAIN_GROUP = register(ModItems.BANDAGE,ZomboidHealthSystem.NAME, ZomboidHealthSystem.ID,
             ModItems.BANDAGE,
             ModItems.RAG,
             ModItems.ALCOHOL_WIPE,
@@ -34,7 +34,7 @@ public final class ModItemGroups {
     );
 
     public static CreativeModeTab register(Item icon, String name, String id, Item...items) {
-        ResourceKey<CreativeModeTab> key = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), new ResourceLocation(ZomboidHealthSystem.ID, id));
+        ResourceKey<CreativeModeTab> key = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(),  ZomboidHealthSystem.getResourceLocation(id));
         CreativeModeTab creativeModeTab = CreativeModeTab.builder(CreativeModeTab.Row.TOP, 0)
                 .icon(icon::getDefaultInstance)
                 .title(Component.literal(name))

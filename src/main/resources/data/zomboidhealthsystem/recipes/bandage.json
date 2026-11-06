@@ -1,0 +1,20 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "##",
+        "WW",
+        "##"
+    ],
+    "key": {
+        "#": {
+            "item": "minecraft:string"
+        },
+        "W": {
+            "item": "minecraft:white_wool"
+        }
+    },
+    "result": {
+        "item": "zomboidhealthsystem:bandage",
+        "count": 2
+    }
+}

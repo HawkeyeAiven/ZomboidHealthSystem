@@ -276,7 +276,7 @@ public final class Temperature extends ImportantMoodle {
                     return true;
                 }
             }
-            if(blockState.getBlock() instanceof AbstractFurnaceBlock furnace) {
+            if(blockState.getBlock() instanceof AbstractFurnaceBlock) {
                 if(blockState.getValue(AbstractFurnaceBlock.LIT)) {
                     return true;
                 }

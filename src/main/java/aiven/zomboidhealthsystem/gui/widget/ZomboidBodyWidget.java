@@ -7,7 +7,23 @@ import aiven.zomboidhealthsystem.utility.Util;
 
 import net.minecraft.client.gui.GuiGraphics;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ZomboidBodyWidget extends AbstractBodyWidget {
+
+    private final List<BodyPart> bodyParts = new ArrayList<>();
+    {
+        bodyParts.add(new BodyPart(6, 0, 16, 16, Health.HEAD_ID));
+        bodyParts.add(new BodyPart(6, 15, 16, 30, Health.BODY_ID));
+        bodyParts.add(new BodyPart(0, 15, 7, 30, Health.LEFT_ARM_ID));
+        bodyParts.add(new BodyPart(21, 15, 7, 30, Health.RIGHT_ARM_ID));
+        bodyParts.add(new BodyPart(6, 44, 8, 22, Health.LEFT_LEG_ID));
+        bodyParts.add(new BodyPart(13, 44, 8, 22, Health.RIGHT_LEG_ID));
+        bodyParts.add(new BodyPart(6, 65, 8, 8, Health.LEFT_FOOT_ID));
+        bodyParts.add(new BodyPart(13, 65, 8, 8, Health.RIGHT_FOOT_ID));
+    }
+
     public ZomboidBodyWidget(int x, int y) {
         super(x, y, 28, 73);
     }
@@ -16,30 +32,20 @@ public class ZomboidBodyWidget extends AbstractBodyWidget {
     protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float tickDelta) {
         Health health = ClientUtil.getHealth();
         if(health != null) {
-            for (BodyPart bodyPart : BodyPart.values()) {
+            for (BodyPart bodyPart : bodyParts) {
                 bodyPart.renderPart(context, tickDelta, health.getBodyPart(bodyPart.id), getX(), getY());
             }
         }
     }
 
-    private enum BodyPart {
-        HEAD(6, 0, 16, 16, Health.HEAD_ID),
-        BODY(6, 15, 16, 30, Health.BODY_ID),
-        LEFT_ARM(0, 15, 7, 30, Health.LEFT_ARM_ID),
-        RIGHT_ARM(21, 15, 7, 30, Health.RIGHT_ARM_ID),
-        LEFT_LEG(6, 44, 8, 22, Health.LEFT_LEG_ID),
-        RIGHT_LEG(13, 44, 8, 22, Health.RIGHT_LEG_ID),
-        LEFT_FOOT(6, 65, 8, 8, Health.LEFT_FOOT_ID),
-        RIGHT_FOOT(13, 65, 8, 8, Health.RIGHT_FOOT_ID),
-        ;
-
+    private static class BodyPart {
         private final int x, y, width, height;
         private final String id;
 
         private float d = 0;
         private boolean bl = true;
 
-        BodyPart(int x, int y, int width, int height, String id) {
+        public BodyPart(int x, int y, int width, int height, String id) {
             this.x = x;
             this.y = y;
             this.width = width;

@@ -1,5 +1,6 @@
 package aiven.zomboidhealthsystem.item;
 
+import aiven.zomboidhealthsystem.ZomboidHealthSystem;
 import aiven.zomboidhealthsystem.health.Health;
 import aiven.zomboidhealthsystem.mixin.access.PlayerAccess;
 
@@ -77,7 +78,7 @@ public class BottleOfWine extends Item {
     @Override
     public void appendHoverText(ItemStack itemStack, @Nullable Level level, List<Component> list, TooltipFlag tooltipFlag) {
         super.appendHoverText(itemStack, level, list, tooltipFlag);
-        list.add(Component.translatable("zomboid-health-system.tooltip.allows_sleep_without_drowsiness").withStyle(ChatFormatting.GOLD));
-        list.add(Component.translatable("zomboid-health-system.tooltip.reduces_pain").withStyle(ChatFormatting.GOLD));
+        list.add(Component.translatable(ZomboidHealthSystem.ID + ".tooltip.allows_sleep_without_drowsiness").withStyle(ChatFormatting.GOLD));
+        list.add(Component.translatable(ZomboidHealthSystem.ID + ".tooltip.reduces_pain").withStyle(ChatFormatting.GOLD));
     }
 }

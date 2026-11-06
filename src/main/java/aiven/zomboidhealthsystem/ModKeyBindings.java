@@ -14,10 +14,10 @@ import org.lwjgl.glfw.GLFW;
 public final class ModKeyBindings {
 
     public static final KeyMapping HEALTH = KeyBindingHelper.registerKeyBinding(new KeyMapping(
-            "key.zomboid-health-system.overlay",
+            "key." + ZomboidHealthSystem.ID + ".overlay",
             InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_H,
-            "key.kategory.zomboid-health-system.zomboid"
+            "key.kategory." + ZomboidHealthSystem.ID + ".zomboid"
     ));
 
     private ModKeyBindings() {

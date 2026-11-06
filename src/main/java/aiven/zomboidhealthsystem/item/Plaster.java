@@ -1,6 +1,7 @@
 package aiven.zomboidhealthsystem.item;
 
 
+import aiven.zomboidhealthsystem.ZomboidHealthSystem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -40,6 +41,6 @@ public class Plaster extends AbstractBandageItem {
 
     @Override
     public void appendHoverText(ItemStack itemStack, @Nullable Level level, List<Component> list, TooltipFlag tooltipFlag) {
-        list.add(Component.translatable("zomboid-health-system.tooltip.doesnt_stop_bleeding").withStyle(ChatFormatting.GOLD));
+        list.add(Component.translatable(ZomboidHealthSystem.ID + ".tooltip.doesnt_stop_bleeding").withStyle(ChatFormatting.GOLD));
     }
 }

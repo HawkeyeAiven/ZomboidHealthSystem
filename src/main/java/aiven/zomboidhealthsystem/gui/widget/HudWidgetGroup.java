@@ -6,6 +6,8 @@ import aiven.zomboidhealthsystem.gui.BodyWidgetType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 
+import java.util.Objects;
+
 public class HudWidgetGroup extends ModWidgetGroup {
     private final Minecraft minecraft;
 
@@ -16,7 +18,7 @@ public class HudWidgetGroup extends ModWidgetGroup {
     public HudWidgetGroup(Minecraft minecraft) {
         this.minecraft = minecraft;
 
-        Config config = Config.getInstance();
+        Config config = Objects.requireNonNull(Config.getInstance(), "Config == null");
 
         this.timeWidget = new TimeWidget(config.time_hud_xpos, config.time_hud_ypos, minecraft);
         this.moodlesWidget = new MoodlesWidget(0, config.moodles_hud_ypos);

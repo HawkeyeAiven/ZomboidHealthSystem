@@ -65,13 +65,13 @@ public class MoodlesWidget extends AbstractMovableWidget {
                         ZomboidHealthSystem.getResourceLocation("textures/moodle/moodle_icon_hot_weather.png"),
                         this.getX(), this.getY() + getHeight(), 0,0, SIZE, SIZE, SIZE, SIZE
                 );
-                this.iconNames.add(Component.translatable("zomboid-health-system.moodle.hot_weather").getString());
+                this.iconNames.add(Component.translatable(ZomboidHealthSystem.ID + ".moodle.hot_weather").getString());
             } else {
                 context.blit(
                         ZomboidHealthSystem.getResourceLocation("textures/moodle/moodle_icon_cold_weather.png"),
                         this.getX(), this.getY() + getHeight(), 0,0, SIZE, SIZE, SIZE, SIZE
                 );
-                this.iconNames.add(Component.translatable("zomboid-health-system.moodle.cold_weather").getString());
+                this.iconNames.add(Component.translatable(ZomboidHealthSystem.ID + ".moodle.cold_weather").getString());
             }
             this.height += SIZE;
         }
@@ -95,7 +95,7 @@ public class MoodlesWidget extends AbstractMovableWidget {
 
                 height += SIZE;
 
-                this.iconNames.add(Component.translatable("zomboid-health-system.moodle.injured").getString());
+                this.iconNames.add(Component.translatable(ZomboidHealthSystem.ID + ".moodle.injured").getString());
             }
         }
         if(isMouseOver(mouseX, mouseY)) {

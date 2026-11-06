@@ -2,6 +2,7 @@ package aiven.zomboidhealthsystem.health.moodles;
 
 import aiven.zomboidhealthsystem.Config;
 import aiven.zomboidhealthsystem.ModDamageTypes;
+import aiven.zomboidhealthsystem.ZomboidHealthSystem;
 import aiven.zomboidhealthsystem.health.Health;
 import aiven.zomboidhealthsystem.utility.Util;
 
@@ -103,7 +104,7 @@ public final class Hunger extends ImportantMoodle {
         if(getValue() > 0) {
             return super.getMoodleIconText();
         } else {
-            return Component.translatable("zomboid-health-system.moodle.saturation").getString() + " " + (-getAmplifier());
+            return Component.translatable(ZomboidHealthSystem.ID + ".moodle.saturation").getString() + " " + (-getAmplifier());
         }
     }
 

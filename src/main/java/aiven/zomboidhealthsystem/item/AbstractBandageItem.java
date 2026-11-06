@@ -1,6 +1,6 @@
 package aiven.zomboidhealthsystem.item;
 
-import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
+import aiven.zomboidhealthsystem.ZomboidHealthSystem;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -22,23 +22,14 @@ import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractBandageItem extends Item {
-    private static final Logger log = LoggerFactory.getLogger(AbstractBandageItem.class);
-
     public static final int BANDAGE_COOLDOWN_TIME = 4 * 20;
     public static final int UNBANDAGE_COOLDOWN_TIME = 3 * 20;
 
-    private static final ArrayList<AbstractBandageItem> bandageItems = new ArrayList<>();
-
     public AbstractBandageItem() {
-        super(new FabricItemSettings().maxCount(8));
-        bandageItems.add(this);
+        super(new Item.Properties().stacksTo(8));
     }
 
     public abstract AbstractBandageItem getDirtyBandageItem();
@@ -88,11 +79,7 @@ public abstract class AbstractBandageItem extends Item {
     @Override
     public void appendHoverText(ItemStack itemStack, @Nullable Level level, List<Component> list, TooltipFlag tooltipFlag) {
         if(isDirty()) {
-            list.add(Component.translatable("zomboid-health-system.tooltip.right_click_on_water").withStyle(ChatFormatting.GOLD));
+            list.add(Component.translatable(ZomboidHealthSystem.ID + ".tooltip.right_click_on_water").withStyle(ChatFormatting.GOLD));
         }
-    }
-
-    public static List<AbstractBandageItem> getBandageItems() {
-        return List.copyOf(bandageItems);
     }
 }

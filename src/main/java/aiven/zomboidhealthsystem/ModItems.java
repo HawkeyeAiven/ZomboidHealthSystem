@@ -15,65 +15,25 @@ public final class ModItems {
 
     }
 
-    public static Item BANDAGE = register(new Bandage(), "bandage");
-    public static Item DIRTY_BANDAGE = register(new DirtyAbstractBandage(), "dirty_bandage");
+    public static Item BANDAGE = register("bandage", new Bandage());
+    public static Item DIRTY_BANDAGE = register("dirty_bandage", new DirtyAbstractBandage());
+    public static Item RAG = register("rag", new Rag());
+    public static Item DIRTY_RAG = register("dirty_rag", new DirtyRag());
+    public static Item ALCOHOL_WIPE = register("alcohol_wipe", new AlcoholWipe());
+    public static Item PLASTER = register("plaster", new Plaster());
+    public static Item CUP_OF_COFFEE = register("cup_of_coffee", new CupOfCoffee());
+    public static Item BOTTLE_OF_PURIFIED_WATER = register("bottle_of_purified_water", new BottleOfPurifiedWater());
+    public static Item BOTTLE_OF_WINE = register("bottle_of_wine", new BottleOfWine());
+    public static Item EMPTY_CUP = register("empty_cup", new EmptyCupItem());
+    public static Item PAINKILLERS = register("painkillers", new Painkillers());
+    public static Item SLEEPING_PILLS = register("sleeping_pills", new SleepingPills());
+    public static Item THERMOMETER = register("thermometer", new Thermometer());
+    public static Item WOOL_HELMET = register("wool_helmet", new ArmorItem(woolArmorMaterial, ArmorItem.Type.HELMET, new Item.Properties()));
+    public static Item WOOL_CHESTPLATE = register("wool_chestplate", new ArmorItem(woolArmorMaterial, ArmorItem.Type.CHESTPLATE, new Item.Properties()));
+    public static Item WOOL_LEGGINGS = register("wool_leggings", new ArmorItem(woolArmorMaterial, ArmorItem.Type.LEGGINGS, new Item.Properties()));
+    public static Item WOOL_BOOTS = register("wool_boots", new ArmorItem(woolArmorMaterial, ArmorItem.Type.BOOTS, new Item.Properties()));
 
-    public static Item RAG = register(new Rag(), "rag");
-    public static Item DIRTY_RAG = register(new DirtyRag(), "dirty_rag");
-
-    public static Item ALCOHOL_WIPE = register(new AlcoholWipe(), "alcohol_wipe");
-
-    public static Item PLASTER = register(new Plaster(), "plaster");
-
-    public static Item CUP_OF_COFFEE = register(new CupOfCoffee(), "cup_of_coffee");
-    public static Item BOTTLE_OF_PURIFIED_WATER = register(new BottleOfPurifiedWater(), "bottle_of_purified_water");
-    public static Item BOTTLE_OF_WINE = register(new BottleOfWine(), "bottle_of_wine");
-
-    public static Item EMPTY_CUP = register(new EmptyCupItem(), "empty_cup");
-
-    public static Item PAINKILLERS = register(new Painkillers(), "painkillers");
-
-    public static Item SLEEPING_PILLS = register(new SleepingPills(), "sleeping_pills");
-
-    public static Item THERMOMETER = register(new Thermometer(), "thermometer");
-
-    public static Item WOOL_HELMET = register(
-            new ArmorItem(
-                    woolArmorMaterial,
-                    ArmorItem.Type.HELMET,
-                    new Item.Properties()
-            ),
-            "wool_helmet"
-    );
-
-    public static Item WOOL_CHESTPLATE = register(
-            new ArmorItem(
-                    woolArmorMaterial,
-                    ArmorItem.Type.CHESTPLATE,
-                    new Item.Properties()
-            ),
-            "wool_chestplate"
-    );
-
-    public static Item WOOL_LEGGINGS = register(
-            new ArmorItem(
-                    woolArmorMaterial,
-                    ArmorItem.Type.LEGGINGS,
-                    new Item.Properties()
-            ),
-            "wool_leggings"
-    );
-
-    public static Item WOOL_BOOTS = register(
-            new ArmorItem(
-                    woolArmorMaterial,
-                    ArmorItem.Type.BOOTS,
-                    new Item.Properties()
-            ),
-            "wool_boots"
-    );
-
-    public static Item register(Item item, String id) {
+    public static Item register(String id, Item item) {
         ResourceLocation itemID = ZomboidHealthSystem.getResourceLocation(id);
         return Registry.register(BuiltInRegistries.ITEM, itemID, item);
     }
