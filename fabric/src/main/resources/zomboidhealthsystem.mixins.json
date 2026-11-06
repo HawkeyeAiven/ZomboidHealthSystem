@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "aiven.zomboidhealthsystem.mixin.fabric.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "minVersion": "0.8",
+  "client": [
+    "client.GuiMixin"
+  ],
+  "mixins": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
