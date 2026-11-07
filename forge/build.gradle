@@ -40,9 +40,9 @@ dependencies {
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
 
-    forgeRuntimeLibrary("local:json5-1.0.0")
-    implementation("local:json5-1.0.0")
-    include("local:json5-1.0.0")
+    forgeRuntimeLibrary("local:json5:1.0.0")
+    implementation("local:json5:1.0.0")
+    include("local:json5:1.0.0")
 }
 
 processResources {

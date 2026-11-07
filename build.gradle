@@ -33,7 +33,9 @@ allprojects {
     group = rootProject.maven_group
 
     repositories {
-
+        flatDir {
+            dirs rootProject.file("libs")
+        }
     }
 
     tasks.withType(JavaCompile) {

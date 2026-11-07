@@ -2,12 +2,6 @@ plugins {
     id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
-repositories {
-    flatDir {
-        dirs '../libs'
-    }
-}
-
 def localLibs = fileTree(dir: "../libs", includes: ['*.jar'])
 
 architectury {
