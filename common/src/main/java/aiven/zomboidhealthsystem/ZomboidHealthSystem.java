@@ -35,6 +35,7 @@ public final class ZomboidHealthSystem {
 
         //TODO
         // - поддерживать моды, где ночь пролетает не сразу, а как в зомбоиде
+        // - Иконку в forge билде
     }
 
     public static ResourceLocation getResourceLocation(String path) {
