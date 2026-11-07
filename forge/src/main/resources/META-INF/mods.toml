@@ -1,6 +1,6 @@
 modLoader = "javafml"
 loaderVersion = "[47,)"
-#issueTrackerURL = ""
+issueTrackerURL = "https://github.com/HawkeyeAiven/ZomboidHealthSystem/issues"
 license = "MIT"
 
 [[mods]]
@@ -9,9 +9,9 @@ version = "${version}"
 displayName = "Zomboid Health System"
 authors = "Hawkeye_Aiven"
 description = '''
-Hardcore bro
+The new health system consist of 8 body parts, each part can be injured by different ways like scratches or deep fractures.
 '''
-#logoFile = ""
+logoFile = "icon.png"
 
 [[dependencies.zomboidhealthsystem]]
 modId = "forge"

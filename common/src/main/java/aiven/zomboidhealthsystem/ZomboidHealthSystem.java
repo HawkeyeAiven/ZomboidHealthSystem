@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 public final class ZomboidHealthSystem {
     public static final String ID = "zomboidhealthsystem";
     public static final String NAME = "Zomboid Health System";
-    public static final String VERSION = "2.0.3";
+    public static final String VERSION = "2.0.4";
     public static final String ID_VER = ID + "-" + VERSION;
 
     public static final Logger log = LogUtils.getLogger();
@@ -35,7 +35,6 @@ public final class ZomboidHealthSystem {
 
         //TODO
         // - поддерживать моды, где ночь пролетает не сразу, а как в зомбоиде
-        // - Иконку в forge билде
     }
 
     public static ResourceLocation getResourceLocation(String path) {
