@@ -38,7 +38,12 @@ public final class Wind extends SimpleMoodle {
     }
 
     @Override
-    public void sleep(int sumTicks) {
+    public void sleep(int ticks) {
+
+    }
+
+    @Override
+    public void onSleep(int sumTicks) {
 
     }
 

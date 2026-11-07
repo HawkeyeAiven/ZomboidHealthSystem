@@ -8,11 +8,11 @@ import aiven.zomboidhealthsystem.gui.widget.ModMenuWidget;
 
 import net.minecraft.network.chat.Component;
 
-public class ModScreen extends AbstractModScreen {
+public class ModMenuScreen extends AbstractModScreen {
 
     private static ModMenuWidget modMenuWidget;
 
-    public ModScreen() {
+    public ModMenuScreen() {
         super(Component.literal(ZomboidHealthSystem.NAME));
 
         if(modMenuWidget == null) {
@@ -42,5 +42,9 @@ public class ModScreen extends AbstractModScreen {
         config.moodles_hud_ypos = hud.getMoodlesWidget().getY();
 
         super.onClose();
+    }
+
+    public ModMenuWidget getModMenuWidget() {
+        return modMenuWidget;
     }
 }

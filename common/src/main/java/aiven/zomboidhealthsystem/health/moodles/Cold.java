@@ -56,7 +56,12 @@ public final class Cold extends ImportantMoodle {
     }
 
     @Override
-    public void sleep(int sumTicks) {
+    public void sleep(int ticks) {
+
+    }
+
+    @Override
+    public void onSleep(int sumTicks) {
         if(sumTicks >= 8000) {
             float amplifier = (Temperature.AVERAGE_TEMPERATURE_BODY - getHealth().getTemperature().getValue()) / 1.5F;
             if (amplifier < 1) {

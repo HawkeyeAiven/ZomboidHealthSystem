@@ -55,6 +55,7 @@ Most mechanics are based on **Project Zomboid**, but I've made some adjustments.
 - You will die if your body temperature drops below 31°C or rises above 43°C.
 - You can warm yourself up near a campfire, lava, or a furnace, or by wearing leather armor.
 - Wetness and wind lower the perceived temperature.
+- Depends on the time of day.
 - You start sweating when your body temperature reaches 38°C.
 - Your body temperature rises slightly when running.
 - Hypothermia and hyperthermia make you weaker.
@@ -92,6 +93,8 @@ Most mechanics are based on **Project Zomboid**, but I've made some adjustments.
 ### World
 - Each biome has its own temperature.
 - Without warm clothing, you will freeze in cold biomes and overheat in hot ones.
+- The temperature changes throughout the day.
+- The temperature drops when it rains.
 
 ### Keybinds
 - H - Open the interface.
@@ -151,6 +154,7 @@ Most mechanics are based on **Project Zomboid**, but I've made some adjustments.
 - Вы умрете, если ваша температура ниже 31°C, или выше 43°C.
 - Вы можете согреться у костра, лавы, печи или надев кожаную броню.
 - Влажность и ветер снижают ощущаемую температуру.
+- Зависит от времени дня.
 - Начиная с температуры тела 38°C вы начинаете потеть.
 - Немного приподнимается при беге.
 - При гипотермии или гипертермии вы ослабеваете.
@@ -186,7 +190,10 @@ Most mechanics are based on **Project Zomboid**, but I've made some adjustments.
 - Смиритесь со своей смертью.
 
 ### Мир
-- У каждого биома своя температура. В холодным биомах без теплой одежы вы будете замерзать, в жарких сильно перегреваться.
+- У каждого биома своя температура. 
+- В холодным биомах без теплой одежы вы будете замерзать, в жарких сильно перегреваться.
+- Температура меняется в течение дня.
+- Температура снижается во время дождя.
 
 ### Бинды
 - H - интерфейс

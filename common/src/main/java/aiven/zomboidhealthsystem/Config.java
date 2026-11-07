@@ -8,7 +8,8 @@ import com.github.HawkeyeAiven.json5.annotations.Comment;
 
 import de.marhali.json5.Json5;
 
-import net.minecraft.client.Minecraft;
+import dev.architectury.injectables.annotations.ExpectPlatform;
+
 import net.minecraft.world.item.Items;
 
 import org.slf4j.Logger;
@@ -17,14 +18,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.LinkedHashMap;
 
 public final class Config {
-    //TODO Можно получать через API
-    // Forge: FMLPaths.CONFIGDIR.get()
-    // Fabric: FabricLoader.getInstance().getConfigDir()
-    private static final File configDirectory = new File(Minecraft.getInstance().gameDirectory, "config");
-    private static final File file = new File(configDirectory, ZomboidHealthSystem.ID_VER + ".json5");
+    private static final File file = new File(getConfigDirectory().toFile(), ZomboidHealthSystem.ID_VER + ".json5");
 
     private static final Json5 json5 = Json5.builder(builder -> builder
             .writeComments()
@@ -55,6 +53,18 @@ public final class Config {
         heat_values.put(Util.getStringId(Items.LEATHER_BOOTS), 4.5F);
     }
     public Float heat_from_other_armor = 1.0F;
+
+    @Comment("The time at which the temperature begins to rise.")
+    public Integer heating_start_time = 23000;
+    @Comment("The time at which the temperature begins to drop.")
+    public Integer heating_end_time = 6000;
+    @Comment("Maximum temperature fluctuation throughout the day. A value of \"0\" disables the daytime temperature.")
+    public Float max_daytime_temperature_shift = 5.0F;
+
+    @Comment("Maximum temperature shift caused by rain.")
+    public Float max_rain_temperature_shift = 5.0F;
+    @Comment("The rate at which rain reduces temperature.")
+    public Float rain_temperature_speed = 1.0F / 5000.0F;
 
     @Comment("The rate at which drowsiness increases. A value of \"0\" disables it.")
     public Float drowsiness_speed_multiplier = 1.0F;
@@ -124,6 +134,42 @@ public final class Config {
     public Integer time_hud_ypos = 6;
 
     @Comment("""
+              Symbol  Meaning                       Examples
+               G       era                           AD; Anno Domini; A
+               u       year                          2004; 04
+               y       year-of-era                   2004; 04
+               D       day-of-year                   189
+               M/L     month-of-year                 7; 07; Jul; July; J
+               d       day-of-month                  10
+            
+               Q/q     quarter-of-year               3; 03; Q3; 3rd quarter
+               Y       week-based-year               1996; 96
+               w       week-of-week-based-year       27
+               W       week-of-month                 4
+               E       day-of-week                   Tue; Tuesday; T
+               e/c     localized day-of-week         2; 02; Tue; Tuesday; T
+               F       week-of-month                 3
+            
+               a       am-pm-of-day                  PM
+               h       clock-hour-of-am-pm (1-12)    12
+               K       hour-of-am-pm (0-11)          0
+               k       clock-hour-of-am-pm (1-24)    0
+            
+               H       hour-of-day (0-23)            0
+               m       minute-of-hour                30
+               s       second-of-minute              55
+               S       fraction-of-second            978
+               A       milli-of-day                  1234
+               n       nano-of-second                987654321
+               N       nano-of-day                   1234000000
+            
+            Simple examples:
+            - 24-hour format: "H:mm".
+            - 12-hour format: "h:mm a".\
+            """)
+    public String time_format = "H:mm";
+
+    @Comment("""
             "ZOMBOID": Shows damage, bleeding and a bandage
             "SIMPLE": Shows the level of damage and the presence of a bandage\
             """)
@@ -170,5 +216,10 @@ public final class Config {
 
     public static Config getInstance() {
         return config;
+    }
+
+    @ExpectPlatform
+    public static Path getConfigDirectory() {
+        throw new AssertionError();
     }
 }

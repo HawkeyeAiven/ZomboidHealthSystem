@@ -21,6 +21,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Random;
 import java.util.function.Predicate;
 
@@ -28,6 +30,18 @@ public final class Util {
 
     private Util() {
 
+    }
+
+    public static LocalDateTime fromMinecraftDayTime(long dayTime) {
+        dayTime += 8000;
+        LocalDateTime dateTime = LocalDateTime.of(0, 1, 1, 0, 0, 0);
+        long millis = (long) (dayTime * 3.6) * 1000L;
+        return dateTime.plus(millis, ChronoUnit.MILLIS);
+    }
+
+    public static int getDays(long dayTime) {
+        dayTime += 8000;
+        return Math.toIntExact(dayTime / 24000);
     }
 
     public static ResourceLocation getId(Item item) {

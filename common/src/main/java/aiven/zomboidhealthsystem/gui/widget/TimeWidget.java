@@ -1,10 +1,13 @@
 package aiven.zomboidhealthsystem.gui.widget;
 
-import aiven.zomboidhealthsystem.utility.ModTime;
+import aiven.zomboidhealthsystem.Config;
+import aiven.zomboidhealthsystem.utility.Util;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+
+import java.time.format.DateTimeFormatter;
 
 public class TimeWidget extends AbstractMovableWidget {
     private final Minecraft minecraft;
@@ -37,7 +40,7 @@ public class TimeWidget extends AbstractMovableWidget {
 
     public String getStringTime() {
         if(minecraft.level != null) {
-            return new ModTime(minecraft.level.getDayTime()).toString();
+            return Util.fromMinecraftDayTime(Minecraft.getInstance().level.getDayTime()).format(DateTimeFormatter.ofPattern(Config.getInstance().time_format));
         } else {
             return null;
         }

@@ -9,6 +9,8 @@ import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(value = Level.class)
 public abstract class LevelMixin {
+    @Shadow public abstract boolean isRaining();
+
     @Shadow
     public abstract boolean isClientSide();
 

@@ -3,7 +3,6 @@ package aiven.zomboidhealthsystem.gui.widget;
 import aiven.zomboidhealthsystem.ZomboidHealthSystem;
 
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.network.chat.Component;
 
 public class HealthTabButton extends ModMenuWidgetTabButton {
 

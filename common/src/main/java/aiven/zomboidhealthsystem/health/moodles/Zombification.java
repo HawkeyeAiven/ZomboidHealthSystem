@@ -69,7 +69,12 @@ public final class Zombification extends ImportantMoodle {
     }
 
     @Override
-    public void sleep(int sumTicks) {
+    public void sleep(int ticks) {
+
+    }
+
+    @Override
+    public void onSleep(int sumTicks) {
 
     }
 

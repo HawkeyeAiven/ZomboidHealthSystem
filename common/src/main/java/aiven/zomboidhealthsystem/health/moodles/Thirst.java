@@ -72,8 +72,13 @@ public final class Thirst extends ImportantMoodle {
     }
 
     @Override
-    public void sleep(int sumTicks) {
-        this.setValue(this.getValue() + (0.35F / 8000) * sumTicks * Config.getInstance().thirst_speed_multiplier);
+    public void sleep(int ticks) {
+        this.setValue(this.getValue() + (0.35F / 8000) * ticks * Config.getInstance().thirst_speed_multiplier);
+    }
+
+    @Override
+    public void onSleep(int sumTicks) {
+
     }
 
     @Override

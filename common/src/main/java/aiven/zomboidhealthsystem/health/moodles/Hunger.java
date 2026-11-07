@@ -90,8 +90,13 @@ public final class Hunger extends ImportantMoodle {
     }
 
     @Override
-    public void sleep(int sumTicks) {
-        this.addValue(0.5F / 8000 * sumTicks * (getValue() < 0 ? 2.25F : 1.0F) * Config.getInstance().hunger_speed_multiplier);
+    public void sleep(int ticks) {
+        this.addValue(0.5F / 8000 * ticks * (getValue() < 0 ? 2.25F : 1.0F) * Config.getInstance().hunger_speed_multiplier);
+    }
+
+    @Override
+    public void onSleep(int sumTicks) {
+
     }
 
     @Override

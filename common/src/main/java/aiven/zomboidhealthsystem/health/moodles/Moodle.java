@@ -22,7 +22,9 @@ public abstract class Moodle {
 
     public abstract int getAmplifier();
 
-    public abstract void sleep(int sumTicks);
+    public abstract void sleep(int ticks);
+
+    public abstract void onSleep(int sumTicks);
 
     public abstract byte[] getNbt();
 

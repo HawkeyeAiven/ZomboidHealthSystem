@@ -3,7 +3,6 @@ package aiven.zomboidhealthsystem.gui.widget;
 import aiven.zomboidhealthsystem.gui.RenderHelper;
 import aiven.zomboidhealthsystem.health.Health;
 import aiven.zomboidhealthsystem.utility.ClientUtil;
-import aiven.zomboidhealthsystem.utility.Util;
 
 import net.minecraft.client.gui.GuiGraphics;
 
@@ -24,8 +23,8 @@ public class ZomboidBodyWidget extends AbstractBodyWidget {
         bodyParts.add(new BodyPart(13, 65, 8, 8, Health.RIGHT_FOOT_ID));
     }
 
-    public ZomboidBodyWidget(int x, int y) {
-        super(x, y, 28, 73);
+    public ZomboidBodyWidget(int x, int y, Mode mode) {
+        super(x, y, 28, 73, mode);
     }
 
     @Override
@@ -42,9 +41,6 @@ public class ZomboidBodyWidget extends AbstractBodyWidget {
         private final int x, y, width, height;
         private final String id;
 
-        private float d = 0;
-        private boolean bl = true;
-
         public BodyPart(int x, int y, int width, int height, String id) {
             this.x = x;
             this.y = y;
@@ -56,17 +52,14 @@ public class ZomboidBodyWidget extends AbstractBodyWidget {
         public void renderPart(GuiGraphics context, float tickDelta, aiven.zomboidhealthsystem.health.bodyparts.BodyPart bodyPart, int x, int y) {
             int color;
             if (bodyPart.isBleeding() && !bodyPart.isBandaged()) {
-                if (bl) {
-                    d += tickDelta / 20;
-                } else {
-                    d -= tickDelta / 20;
-                }
-                d = Util.clamp(d, 0.0F, 1.0F);
 
-                if (d == 1.0F) {
-                    bl = false;
-                } else if (d == 0.0F) {
-                    bl = true;
+                int g = 1000;
+                long t = System.currentTimeMillis() % g;
+                float d;
+                if(t < g / 2) {
+                    d = (float) t / ((float) g / 2);
+                } else {
+                    d = ((float)(g - t) / ((float) g / 2));
                 }
 
                 color = blendColors(Color.FULL_HP.getValue(), Color.BLEEDING.getValue(), d);

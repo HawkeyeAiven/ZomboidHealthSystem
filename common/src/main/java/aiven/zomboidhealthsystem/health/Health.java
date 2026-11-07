@@ -341,6 +341,12 @@ public final class Health {
         }
     }
 
+    public void onSleep(int sumTicks) {
+        for(Moodle moodle : moodles) {
+            moodle.onSleep(sumTicks);
+        }
+    }
+
     public boolean isHurt() {
         return getHpSum() < getMaxHpSum() || blood.getValue() < blood.maxValue();
     }

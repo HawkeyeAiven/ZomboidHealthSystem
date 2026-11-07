@@ -2,6 +2,7 @@ package aiven.zomboidhealthsystem.utility;
 
 import aiven.zomboidhealthsystem.mixin.access.PlayerAccess;
 import aiven.zomboidhealthsystem.health.Health;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 

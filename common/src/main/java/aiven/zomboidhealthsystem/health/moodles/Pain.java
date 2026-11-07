@@ -60,7 +60,12 @@ public final class Pain extends Moodle {
     }
 
     @Override
-    public void sleep(int sumTicks) {
+    public void sleep(int ticks) {
+
+    }
+
+    @Override
+    public void onSleep(int sumTicks) {
         if(sumTicks >= 3000) {
             painkillerEffect = true;
             painkillerAmount = 0;

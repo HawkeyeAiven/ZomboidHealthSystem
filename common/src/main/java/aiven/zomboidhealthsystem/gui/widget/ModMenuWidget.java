@@ -5,12 +5,14 @@ import aiven.zomboidhealthsystem.ZomboidHealthSystem;
 import aiven.zomboidhealthsystem.gui.BodyWidgetType;
 import aiven.zomboidhealthsystem.health.Health;
 import aiven.zomboidhealthsystem.utility.ClientUtil;
-import aiven.zomboidhealthsystem.utility.ModTime;
 import aiven.zomboidhealthsystem.utility.Util;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class ModMenuWidget extends ModContainer {
     private static final int width = (int)(498 / 2.5F);
@@ -70,19 +72,9 @@ public class ModMenuWidget extends ModContainer {
         addChildren(infoTabButton);
 
         if(BodyWidgetType.ZOMBOID.toString().equals(Config.getInstance().body_widget_type)) {
-            this.healthTabGroup.addChildren(new ZomboidBodyWidget(16, 50) {
-                @Override
-                protected boolean isValidClickButton(int i) {
-                    return false;
-                }
-            });
+            this.healthTabGroup.addChildren(new ZomboidBodyWidget(16, 50, AbstractBodyWidget.Mode.WIDGET));
         } else {
-            this.healthTabGroup.addChildren(new SimpleBodyWidget(14, 50) {
-                @Override
-                protected boolean isValidClickButton(int i) {
-                    return false;
-                }
-            });
+            this.healthTabGroup.addChildren(new SimpleBodyWidget(14, 50, AbstractBodyWidget.Mode.WIDGET));
         }
         {
             int x1 = 75;
@@ -102,7 +94,8 @@ public class ModMenuWidget extends ModContainer {
         if(health == null) {
             return;
         }
-        ModTime modTime = new ModTime(Minecraft.getInstance().level.getDayTime());
+        long dayTime = Minecraft.getInstance().level.getDayTime();
+        LocalDateTime dateTime = Util.fromMinecraftDayTime(dayTime);
         if(healthTabGroup.visible) { // StringWidget криво рисуется idk почему
             context.drawString(
                     Minecraft.getInstance().font,
@@ -127,13 +120,13 @@ public class ModMenuWidget extends ModContainer {
 
             context.drawString(
                     Minecraft.getInstance().font,
-                    Component.literal("Day: " + modTime.getDay()),
+                    Component.literal("Day: " + (Util.getDays(dayTime) + 1)),
                     10, 25, 0xFFffffff, true
             );
 
             context.drawString(
                     Minecraft.getInstance().font,
-                    Component.literal( "Time: " + modTime),
+                    Component.literal( "Time: " + (dateTime.format(DateTimeFormatter.ofPattern(Config.getInstance().time_format)))),
                     10, 35, 0xFFffffff, true
             );
 

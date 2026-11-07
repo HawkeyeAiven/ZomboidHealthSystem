@@ -1,6 +1,6 @@
 package aiven.zomboidhealthsystem;
 
-import aiven.zomboidhealthsystem.gui.screen.ModScreen;
+import aiven.zomboidhealthsystem.gui.screen.ModMenuScreen;
 
 import com.mojang.blaze3d.platform.InputConstants;
 
@@ -22,7 +22,7 @@ public final class ModKeyBindings {
             InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_H,
             "key.kategory." + ZomboidHealthSystem.ID + ".zomboid"
-    ), () -> Minecraft.getInstance().setScreen(new ModScreen()));
+    ), () -> Minecraft.getInstance().setScreen(new ModMenuScreen()));
 
     private ModKeyBindings() {
 

@@ -23,9 +23,9 @@ public class HudWidgetGroup extends ModWidgetGroup {
         this.timeWidget = new TimeWidget(config.time_hud_xpos, config.time_hud_ypos, minecraft);
         this.moodlesWidget = new MoodlesWidget(0, config.moodles_hud_ypos);
         if(BodyWidgetType.ZOMBOID.toString().equals(Config.getInstance().body_widget_type)) {
-            this.bodyWidget = new ZomboidBodyWidget(config.health_hud_xpos, config.health_hud_ypos);
+            this.bodyWidget = new ZomboidBodyWidget(config.health_hud_xpos, config.health_hud_ypos, AbstractBodyWidget.Mode.HUD);
         } else {
-            this.bodyWidget = new SimpleBodyWidget(config.health_hud_xpos, config.health_hud_ypos);
+            this.bodyWidget = new SimpleBodyWidget(config.health_hud_xpos, config.health_hud_ypos, AbstractBodyWidget.Mode.HUD);
         }
 
         if(config.time_hud) {

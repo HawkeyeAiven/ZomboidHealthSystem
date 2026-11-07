@@ -2,6 +2,7 @@ package aiven.zomboidhealthsystem.health.moodles;
 
 import aiven.zomboidhealthsystem.*;
 import aiven.zomboidhealthsystem.health.Health;
+import aiven.zomboidhealthsystem.mixin.access.ServerLevelAccess;
 import aiven.zomboidhealthsystem.utility.Util;
 
 import net.minecraft.core.BlockPos;
@@ -236,16 +237,25 @@ public final class Temperature extends ImportantMoodle {
     }
 
     @Override
-    public void sleep(int sumTicks) {
+    public void sleep(int ticks) {
+
+    }
+
+    @Override
+    public void onSleep(int sumTicks) {
 
     }
 
     public float getPerceivedTemperature() {
-        return getTemperatureAtUserPos() + getHeat() + heatFromBlocks + getHeatFromArmor();
+        return getTemperatureAtUserPos() + getHeat() + heatFromBlocks + getHeatFromArmor() + getDayTimeTemperature() + ((ServerLevelAccess) getLevel()).zomboidhealthsystem$getRainTemperature();
     }
 
     public float getTemperatureAtUserPos() {
        return getTemperatureAtPos(getPlayer().blockPosition());
+    }
+
+    public float getDayTimeTemperature() {
+        return getDayTimeTemperature(getLevel().getDayTime(), Config.getInstance().max_daytime_temperature_shift, Config.getInstance().heating_start_time, Config.getInstance().heating_end_time);
     }
 
     public float getTemperatureAtPos(BlockPos pos) {
@@ -362,6 +372,29 @@ public final class Temperature extends ImportantMoodle {
             return value;
         } else {
             return Config.getInstance().heat_from_other_armor;
+        }
+    }
+
+    public static float getDayTimeTemperature(long dayTime, float maxDelta, int heatingStartTime, int heatingEndtime) {
+        if(maxDelta <= 0) {
+            return 0;
+        }
+
+        int d = 24000 - heatingStartTime;
+        dayTime += d;
+        heatingStartTime = 0;
+        heatingEndtime += d;
+
+        dayTime %= 24000L;
+
+        int dayLength = 24000;
+
+        if(dayTime >= heatingStartTime && dayTime <= heatingEndtime) { // 0 - 7000
+            float p = (float) dayTime / heatingEndtime;
+            return (1 - (p * 2)) * -maxDelta;
+        } else {
+            float p = (float) (dayTime - heatingEndtime) / (dayLength - heatingEndtime);
+            return (1 - (p * 2)) * maxDelta;
         }
     }
 }

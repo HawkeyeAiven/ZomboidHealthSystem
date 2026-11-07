@@ -48,10 +48,10 @@ public abstract class ServerLevelMixin extends LevelMixin implements ServerLevel
     @Final
     private MinecraftServer server;
     @Unique
-    private @Nullable List<ServerPlayer> lastSleepingPlayers = null;
+    private @Nullable List<ServerPlayer> zomboidhealthsystem$lastSleepingPlayers = null;
 
     @Unique
-    private @Nullable Long lastDayTime = null;
+    private @Nullable Long zomboidhealthsystem$lastDayTime = null;
 
     @Override
     public float zomboid_health_system$getWind() {
@@ -62,10 +62,26 @@ public abstract class ServerLevelMixin extends LevelMixin implements ServerLevel
         }
     }
 
-    @Unique
-    private void setWind(float wind) {
+    @Override
+    public float zomboidhealthsystem$getRainTemperature() {
         if(levelData instanceof PrimaryLevelDataAccess access) {
-            access.zomboid_health_system$setWind(wind);
+            return access.zomboidhealthsystem$getRainTemperature();
+        } else {
+            return 0.0F;
+        }
+    }
+
+    @Unique
+    private void zomboidhealthsystem$setWind(float value) {
+        if(levelData instanceof PrimaryLevelDataAccess access) {
+            access.zomboid_health_system$setWind(value);
+        }
+    }
+
+    @Unique
+    private void zomboidhealthsystem$setRainTemperature(float value) {
+        if(levelData instanceof PrimaryLevelDataAccess access) {
+            access.zomboidhealthsystem$setRainTemperature(value);
         }
     }
 
@@ -74,40 +90,56 @@ public abstract class ServerLevelMixin extends LevelMixin implements ServerLevel
         int i = this.getGameRules().getInt(GameRules.RULE_PLAYERS_SLEEPING_PERCENTAGE);
         if (this.sleepStatus.areEnoughSleeping(i) && this.sleepStatus.areEnoughDeepSleeping(i, this.players)) {
             if (this.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT)) {
-                lastSleepingPlayers = getPlayers((LivingEntity::isSleeping));
-                lastDayTime = getDayTime();
+                zomboidhealthsystem$lastSleepingPlayers = getPlayers((LivingEntity::isSleeping));
+                zomboidhealthsystem$lastDayTime = getDayTime();
             }
         }
     }
 
     @Inject(at = @At("RETURN"), method = "tick")
     public void endTick(BooleanSupplier booleanSupplier, CallbackInfo ci) {
-        if(lastSleepingPlayers != null && lastDayTime != null) {
-            long ticks = getDayTime() - lastDayTime;
-            onSleep(lastSleepingPlayers, ticks);
-            lastSleepingPlayers = null;
-            lastDayTime = null;
+        if(zomboidhealthsystem$lastSleepingPlayers != null && zomboidhealthsystem$lastDayTime != null) {
+            long ticks = getDayTime() - zomboidhealthsystem$lastDayTime;
+            zomboidhealthsystem$onSleep(zomboidhealthsystem$lastSleepingPlayers, ticks);
+            zomboidhealthsystem$lastSleepingPlayers = null;
+            zomboidhealthsystem$lastDayTime = null;
         }
-        updateWind(1);
+
+        zomboidhealthsystem$updateWind(1);
+
+        {
+            float m;
+            if(isRaining()) {
+                m = -1;
+            } else {
+                m = 1;
+            }
+
+            float rainTemp = zomboidhealthsystem$getRainTemperature();
+            float d = 1.0F * Config.getInstance().rain_temperature_speed;
+            float min = Config.getInstance().max_rain_temperature_shift * -1;
+            zomboidhealthsystem$setRainTemperature(Util.clamp(rainTemp + (d * m), min, 0));
+        }
     }
 
     @Unique
-    private void updateWind(int tickDelta) {
+    private void zomboidhealthsystem$updateWind(int tickDelta) {
         if (Util.random(Config.getInstance().wind_update_chance * tickDelta)) {
             if (Util.random(Config.getInstance().wind_chance)) {
-                setWind(new Random().nextFloat(Config.getInstance().min_wind, Config.getInstance().max_wind));
+                zomboidhealthsystem$setWind(new Random().nextFloat(Config.getInstance().min_wind, Config.getInstance().max_wind));
             } else {
-                setWind(0.0F);
+                zomboidhealthsystem$setWind(0.0F);
             }
         }
     }
 
     @Unique
-    private void onSleep(List<ServerPlayer> players, long time) {
-        updateWind(Math.toIntExact(time));
+    private void zomboidhealthsystem$onSleep(List<ServerPlayer> players, long time) {
+        zomboidhealthsystem$updateWind(Math.toIntExact(time));
         for(ServerPlayer player : players) {
             Health health = ((PlayerAccess) player).zomboid_health_system$getModHealth();
             health.sleep(Math.toIntExact(time));
+            health.onSleep(Math.toIntExact(time));
         }
     }
 }

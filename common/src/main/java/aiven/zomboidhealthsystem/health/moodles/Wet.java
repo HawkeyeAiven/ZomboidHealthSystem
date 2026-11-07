@@ -55,7 +55,12 @@ public final class Wet extends SimpleMoodle {
     }
 
     @Override
-    public void sleep(int sumTicks) {
-        addValue(-1.0F / 400 * sumTicks);
+    public void sleep(int ticks) {
+        addValue(-1.0F / 400 * ticks);
+    }
+
+    @Override
+    public void onSleep(int sumTicks) {
+
     }
 }

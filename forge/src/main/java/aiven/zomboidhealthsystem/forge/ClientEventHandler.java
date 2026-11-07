@@ -19,7 +19,9 @@ public final class ClientEventHandler {
 
     @SubscribeEvent
     public static void renderGui(RenderGuiEvent event) {
-        ZomboidHealthSystemClient.getHud().render(event.getGuiGraphics(), event.getPartialTick());
+        if(event instanceof RenderGuiEvent.Post) {
+            ZomboidHealthSystemClient.getHud().render(event.getGuiGraphics(), event.getPartialTick());
+        }
     }
 
     @SubscribeEvent

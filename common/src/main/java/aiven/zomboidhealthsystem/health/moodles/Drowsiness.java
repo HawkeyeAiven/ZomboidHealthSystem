@@ -102,7 +102,12 @@ public final class Drowsiness extends ImportantMoodle {
     }
 
     @Override
-    public void sleep(int sumTicks) {
+    public void sleep(int ticks) {
+        setValue(value - (float) ticks / 8000.0F);
+    }
+
+    @Override
+    public void onSleep(int sumTicks) {
         if(sumTicks >= 1000) {
             this.max_caffeine_value = 0;
             this.caffeine_value = 0;
@@ -111,7 +116,6 @@ public final class Drowsiness extends ImportantMoodle {
             this.max_sleeping_pills_value = 0;
             this.sleeping_pills_effect = true;
         }
-        setValue(value - (float) sumTicks / 8000.0F);
     }
 
     @Override

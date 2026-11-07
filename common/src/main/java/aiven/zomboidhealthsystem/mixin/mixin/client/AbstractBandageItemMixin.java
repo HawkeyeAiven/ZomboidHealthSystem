@@ -1,6 +1,6 @@
 package aiven.zomboidhealthsystem.mixin.mixin.client;
 
-import aiven.zomboidhealthsystem.gui.screen.ModScreen;
+import aiven.zomboidhealthsystem.gui.screen.ModMenuScreen;
 import aiven.zomboidhealthsystem.item.AbstractBandageItem;
 
 import net.minecraft.client.Minecraft;
@@ -22,8 +22,10 @@ public class AbstractBandageItemMixin {
     @Inject(at = @At("RETURN"), method = "use")
     public void use(Level level, Player player, InteractionHand interactionHand, CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir) {
         try {
-            if(cir.getReturnValue().getResult().equals(InteractionResult.PASS)) {
-                Minecraft.getInstance().setScreen(new ModScreen());
+            if(level.isClientSide) {
+                if (cir.getReturnValue().getResult().equals(InteractionResult.PASS)) {
+                    Minecraft.getInstance().setScreen(new ModMenuScreen());
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

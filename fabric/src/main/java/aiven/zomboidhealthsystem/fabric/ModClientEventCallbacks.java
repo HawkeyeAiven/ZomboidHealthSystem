@@ -2,7 +2,7 @@ package aiven.zomboidhealthsystem.fabric;
 
 import aiven.zomboidhealthsystem.ModKeyBindings;
 import aiven.zomboidhealthsystem.ZomboidHealthSystemClient;
-import aiven.zomboidhealthsystem.gui.screen.ModScreen;
+import aiven.zomboidhealthsystem.gui.screen.ModMenuScreen;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
@@ -21,7 +21,7 @@ public final class ModClientEventCallbacks {
     public static void initialize() {
         HudRenderCallback.EVENT.register((context, tickDelta) -> {
             Screen screen = Minecraft.getInstance().screen;
-            if(!(screen instanceof ModScreen) && !(screen instanceof InventoryScreen)) {
+            if(!(screen instanceof ModMenuScreen) && !(screen instanceof InventoryScreen)) {
                 ZomboidHealthSystemClient.getHud().render(context, tickDelta);
             }
         });

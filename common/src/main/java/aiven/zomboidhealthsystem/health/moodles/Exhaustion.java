@@ -45,8 +45,13 @@ public final class Exhaustion extends SimpleMoodle {
     }
 
     @Override
-    public void sleep(int sumTicks) {
-        this.addValue(-1.0F / 400 * sumTicks);
+    public void sleep(int ticks) {
+        this.addValue(-1.0F / 400 * ticks);
+    }
+
+    @Override
+    public void onSleep(int sumTicks) {
+
     }
 
     public void onJump() {
